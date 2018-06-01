@@ -1,0 +1,13 @@
+.alx-page {
+    opacity: 0; 
+    height: 0;
+    overflow: hidden;
+    transition: all 1s ease;
+
+    &.alx-page-active {
+        height: auto;
+        position: relative;
+        visibility: visible;
+        opacity: 1;
+    }
+}
