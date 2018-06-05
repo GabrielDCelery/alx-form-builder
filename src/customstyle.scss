@@ -5,7 +5,6 @@ $secondary-color: #10069f;
 $ternary-color: #fa4692;
 $primary-color-darken: #CC9700;
 $primary-color-shadow: #CE3D11;
-
 body {
     margin: 0;
     box-sizing: border-box;
@@ -20,7 +19,6 @@ heading {
     display: block;
     height: $heading-height;
     width: 100%;
-
     &:after {
         content: "";
         display: table;
@@ -35,7 +33,6 @@ heading {
     position: relative;
     text-align: center;
     vertical-align: middle;
-
     img {
         position: absolute;
         height: $logo-height;
@@ -53,7 +50,6 @@ heading {
     vertical-align: middle;
     float: right;
     color: $secondary-color;
-
     h1 {
         position: relative;
         left: -10vw;
@@ -70,26 +66,21 @@ main {
     background-color: $primary-color;
     margin: 0;
     padding: 0;
-    text-align: center;
-    //border-top: 1px solid rgba($secondary-color, 0.4);
+    text-align: center; //border-top: 1px solid rgba($secondary-color, 0.4);
     //border-bottom: 1px solid rgba($secondary-color, 0.4);
     font-size: 16px;
-
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-
     ul {
         margin: 0 auto;
         display: table;
         width: 70%;
         list-style-type: none;
         height: inherit;
-
         li {
             display: table-cell;
             text-align: center;
             height: inherit;
             vertical-align: middle;
-
             a {
                 display: inline-block;
                 color: $secondary-color;
@@ -98,10 +89,8 @@ main {
                 padding: 1vh 2vw;
                 font-weight: bold;
             }
-
             &.page-menu-active {
                 background-color: $secondary-color;
-                
                 a {
                     color: $primary-color;
                 }
@@ -140,9 +129,9 @@ button,
     cursor: pointer;
     -webkit-user-drag: none;
     -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     box-sizing: border-box;
     font-family: inherit;
     font-size: 0.8rem;
@@ -165,11 +154,9 @@ button,
         padding: 0.5em 2em;
         margin-right: 0.5em;
     }
-
     button {
         float: left;
     }
-
     #target_form_logout {
         float: right;
     }
@@ -192,7 +179,6 @@ button,
 
 #alx-save-load-buttons-container {
     padding: 2vh 0;
-
     &:after {
         content: "";
         display: table;
@@ -208,8 +194,7 @@ form {
     padding: 1rem;
     margin-top: 1rem;
     background-color: $primary-color;
-    border-radius: 0.2rem;
-    //border: 1px solid rgba($secondary-color, 0.4);
+    border-radius: 0.2rem; //border: 1px solid rgba($secondary-color, 0.4);
     opacity: 1;
     font-size: 15px;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
@@ -217,7 +202,6 @@ form {
 
 .form-title {
     text-align: center;
-
     h2 {
         margin-top: 0;
         color: $secondary-color;
@@ -227,14 +211,12 @@ form {
 
 .alx-form-input-wrapper {
     position: relative;
-
     input.error,
     select.error,
     textarea.error {
         color: #b94a48 !important;
         border-color: #e9322d !important;
     }
-
     label {
         &.error {
             position: absolute;
@@ -249,7 +231,6 @@ form {
             border-radius: .25em;
             background-color: #d9534f;
             z-index: 2;
-            
             /*
             position: absolute;
             display: block;

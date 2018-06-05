@@ -22,641 +22,629 @@
             "pure-g"
         ]
     },
-    "fields": [
-        {
+    "fields": [{
             "id": "id_field_agreement_type",
             "groups": [
-                "group-request-details"
+                "request-details"
             ],
-            "decoratorClasses": {}
+            "decoratorClasses": {
+                "field": ["something"]
+            }
         },
         {
             "id": "id_field_legal_opinion_required",
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_governing_law",
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_if_other_please_provide_details",
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_reference_number",
+            "bIsLookupField": true,
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_customer_name",
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_lead_party_company_name",
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_counsel_acting_for_lead_party",
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_acting_counsel_e_mail",
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_lead_party_country",
             "groups": [
-                "group-request-details"
+                "request-details"
             ]
         },
         {
             "id": "id_field_aircraft_manufacturer",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_manufacturer_serial_number",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_engine_serial_numbers",
             "placeholder": "e.g. 42405 & 42406",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_aircraft_type",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_aircraft_registration_mark",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_engine_type",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_is_the_aircraft_part_of_a_fleet",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_total_number_of_aircrafts_in_the_fleet",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_number_of_this_aircraft_in_the_fleet",
             "groups": [
-                "group-aircraft-manufacturer"
+                "aircraft-manufacturer"
             ]
         },
         {
             "id": "id_field_purpose_of_ewa",
             "groups": [
-                "group-background",
-                "group-ewa"
+                "background",
+                "ewa"
             ]
         },
         {
             "id": "id_field_financial_structure",
             "groups": [
-                "group-background",
-                "group-ewa"
+                "background",
+                "ewa"
             ]
         },
         {
             "id": "id_field_parties_involved",
             "groups": [
-                "group-background"
+                "background"
             ]
         },
         {
             "id": "id_field_are_there_any_amendments",
             "groups": [
-                "group-background",
-                "group-ewa"
+                "background",
+                "ewa"
             ]
         },
         {
             "id": "id_field_amendments_detail",
-            "replaceConfig": {
-                "type": "textarea",
-                "attributes": {
-                    "rows": 2
-                }
-            },
+            "bIsTextArea": true,
             "groups": [
-                "group-background",
-                "group-ewa"
+                "background",
+                "ewa"
             ]
         },
         {
             "id": "id_field_are_there_any_additional_definitions",
             "groups": [
-                "group-background",
-                "group-ewa"
+                "background",
+                "ewa"
             ]
         },
         {
             "id": "id_field_definitions_detail",
-            "replaceConfig": {
-                "type": "textarea",
-                "attributes": {
-                    "rows": 2
-                }
-            },
+            "bIsTextArea": true,
             "groups": [
-                "group-background",
-                "group-ewa"
+                "background",
+                "ewa"
             ]
         },
         {
             "id": "id_field_if_other_please_specify",
             "groups": [
-                "group-background"
+                "background"
             ]
         },
         {
             "id": "id_field_deg_number_of_ewa_to_be_terminated",
             "groups": [
-                "group-background",
-                "group-tewa"
+                "background",
+                "tewa"
             ]
         },
         {
             "id": "id_field_date_of_original_ewa",
             "groups": [
-                "group-background",
-                "group-tewa"
+                "background",
+                "tewa"
             ]
         },
         {
             "id": "id_field_please_confirm_all_parties_wish_to_terminate_the_agreement",
             "groups": [
-                "group-background",
-                "group-tewa"
+                "background",
+                "tewa"
             ]
         },
         {
             "id": "id_field_original_executed_ewa",
             "groups": [
-                "group-background",
-                "group-tewa"
+                "background",
+                "tewa"
             ]
         },
         {
             "id": "id_field_please_specify_deal_deadline",
             "groups": [
-                "group-background"
+                "background"
             ]
         },
         {
             "id": "id_field_lessee_full_name",
             "groups": [
-                "group-parties",
-                "group-lessee"
+                "parties",
+                "lessee"
             ]
         },
         {
             "id": "id_field_lessee_country_of_incorporation",
             "groups": [
-                "group-parties",
-                "group-lessee"
+                "parties",
+                "lessee"
             ]
         },
         {
             "id": "id_field_lessee_address",
             "groups": [
-                "group-parties",
-                "group-lessee"
+                "parties",
+                "lessee"
             ]
         },
         {
             "id": "id_field_lessee_the_above_is",
             "groups": [
-                "group-parties",
-                "group-lessee"
+                "parties",
+                "lessee"
             ]
         },
         {
             "id": "id_field_lessee_name_of_authorised_signatory",
             "groups": [
-                "group-parties",
-                "group-lessee"
+                "parties",
+                "lessee"
             ]
         },
         {
             "id": "id_field_lessor_full_name",
             "groups": [
-                "group-parties",
-                "group-lessor"
+                "parties",
+                "lessor"
             ]
         },
         {
             "id": "id_field_lessor_country_of_incorporation",
             "groups": [
-                "group-parties",
-                "group-lessor"
+                "parties",
+                "lessor"
             ]
         },
         {
             "id": "id_field_lessor_address",
             "groups": [
-                "group-parties",
-                "group-lessor"
+                "parties",
+                "lessor"
             ]
         },
         {
             "id": "id_field_lessor_the_above_is",
             "groups": [
-                "group-parties",
-                "group-lessor"
+                "parties",
+                "lessor"
             ]
         },
         {
             "id": "id_field_lessor_name_of_authorised_signatory",
             "groups": [
-                "group-parties",
-                "group-lessor"
+                "parties",
+                "lessor"
             ]
         },
         {
             "id": "id_field_head_lessor_full_name",
             "groups": [
-                "group-parties",
-                "group-head-lessor"
+                "parties",
+                "head-lessor"
             ]
         },
         {
             "id": "id_field_head_lessor_country_of_incorporation",
             "groups": [
-                "group-parties",
-                "group-head-lessor"
+                "parties",
+                "head-lessor"
             ]
         },
         {
             "id": "id_field_head_lessor_address",
             "groups": [
-                "group-parties",
-                "group-head-lessor"
+                "parties",
+                "head-lessor"
             ]
         },
         {
             "id": "id_field_head_lessor_the_above_is",
             "groups": [
-                "group-parties",
-                "group-head-lessor"
+                "parties",
+                "head-lessor"
             ]
         },
         {
             "id": "id_field_head_lessor_name_of_authorised_signatory",
             "groups": [
-                "group-parties",
-                "group-head-lessor"
+                "parties",
+                "head-lessor"
             ]
         },
         {
             "id": "id_field_trustee_full_name",
             "groups": [
-                "group-parties",
-                "group-trustee"
+                "parties",
+                "trustee"
             ]
         },
         {
             "id": "id_field_trustee_country_of_incorporation",
             "groups": [
-                "group-parties",
-                "group-trustee"
+                "parties",
+                "trustee"
             ]
         },
         {
             "id": "id_field_trustee_address",
             "groups": [
-                "group-parties",
-                "group-trustee"
+                "parties",
+                "trustee"
             ]
         },
         {
             "id": "id_field_trustee_the_above_is",
             "groups": [
-                "group-parties",
-                "group-trustee"
+                "parties",
+                "trustee"
             ]
         },
         {
             "id": "id_field_trustee_name_of_authorised_signatory",
             "groups": [
-                "group-parties",
-                "group-trustee"
+                "parties",
+                "trustee"
             ]
         },
         {
             "id": "id_field_pdp_full_name",
             "groups": [
-                "group-parties",
-                "group-pdp"
+                "parties",
+                "pdp"
             ]
         },
         {
             "id": "id_field_pdp_country_of_incorporation",
             "groups": [
-                "group-parties",
-                "group-pdp"
+                "parties",
+                "pdp"
             ]
         },
         {
             "id": "id_field_pdp_address",
             "groups": [
-                "group-parties",
-                "group-pdp"
+                "parties",
+                "pdp"
             ]
         },
         {
             "id": "id_field_pdp_the_above_is",
             "groups": [
-                "group-parties",
-                "group-pdp"
+                "parties",
+                "pdp"
             ]
         },
         {
             "id": "id_field_pdp_name_of_authorised_signatory",
             "groups": [
-                "group-parties",
-                "group-pdp"
+                "parties",
+                "pdp"
             ]
         },
         {
             "id": "id_field_is_there_a_direct_warranty",
             "groups": [
-                "group-current-agreements",
-                "group-dw"
+                "current-agreements",
+                "dw"
             ]
         },
         {
             "id": "id_field_dw_between",
             "label": "Between",
             "groups": [
-                "group-current-agreements",
-                "group-dw",
-                "group-dw-details"
+                "current-agreements",
+                "dw",
+                "dw-details"
             ]
         },
         {
             "id": "id_field_dw_between_other",
             "label": "Other",
             "groups": [
-                "group-current-agreements",
-                "group-dw",
-                "group-dw-details"
+                "current-agreements",
+                "dw",
+                "dw-details"
             ]
         },
         {
             "id": "id_field_dw_and",
             "label": "And",
             "groups": [
-                "group-current-agreements",
-                "group-dw",
-                "group-dw-details"
+                "current-agreements",
+                "dw",
+                "dw-details"
             ]
         },
         {
             "id": "id_field_dw_and_other",
             "label": "Other",
             "groups": [
-                "group-current-agreements",
-                "group-dw",
-                "group-dw-details"
+                "current-agreements",
+                "dw",
+                "dw-details"
             ]
         },
         {
             "id": "id_field_dw_dated",
             "label": "Dated",
             "groups": [
-                "group-current-agreements",
-                "group-dw",
-                "group-dw-details"
+                "current-agreements",
+                "dw",
+                "dw-details"
             ]
         },
         {
             "id": "id_field_deg_number",
             "label": "DEG Number",
             "groups": [
-                "group-current-agreements",
-                "group-dw",
-                "group-dw-details"
+                "current-agreements",
+                "dw",
+                "dw-details"
             ]
         },
         {
             "id": "id_field_is_there_a_security_agreement",
             "groups": [
-                "group-current-agreements",
-                "group-sa"
+                "current-agreements",
+                "sa"
             ]
         },
         {
             "id": "id_field_sa_between",
             "label": "Between",
             "groups": [
-                "group-current-agreements",
-                "group-sa",
-                "group-sa-details"
+                "current-agreements",
+                "sa",
+                "sa-details"
             ]
         },
         {
             "id": "id_field_sa_between_other",
             "label": "Other",
             "groups": [
-                "group-current-agreements",
-                "group-sa",
-                "group-sa-details"
+                "current-agreements",
+                "sa",
+                "sa-details"
             ]
         },
         {
             "id": "id_field_sa_and",
             "label": "And",
             "groups": [
-                "group-current-agreements",
-                "group-sa",
-                "group-sa-details"
+                "current-agreements",
+                "sa",
+                "sa-details"
             ]
         },
         {
             "id": "id_field_sa_and_other",
             "label": "Other",
             "groups": [
-                "group-current-agreements",
-                "group-sa",
-                "group-sa-details"
+                "current-agreements",
+                "sa",
+                "sa-details"
             ]
         },
         {
             "id": "id_field_sa_dated",
             "label": "Dated",
             "groups": [
-                "group-current-agreements",
-                "group-sa",
-                "group-sa-details"
+                "current-agreements",
+                "sa",
+                "sa-details"
             ]
         },
         {
             "id": "id_field_is_there_a_lease_agreement",
             "groups": [
-                "group-current-agreements",
-                "group-la"
+                "current-agreements",
+                "la"
             ]
         },
         {
             "id": "id_field_la_between",
             "label": "Between",
             "groups": [
-                "group-current-agreements",
-                "group-la",
-                "group-la-details"
+                "current-agreements",
+                "la",
+                "la-details"
             ]
         },
         {
             "id": "id_field_la_between_other",
             "label": "Other",
             "groups": [
-                "group-current-agreements",
-                "group-la",
-                "group-la-details"
+                "current-agreements",
+                "la",
+                "la-details"
             ]
         },
         {
             "id": "id_field_la_and",
             "label": "And",
             "groups": [
-                "group-current-agreements",
-                "group-la",
-                "group-la-details"
+                "current-agreements",
+                "la",
+                "la-details"
             ]
         },
         {
             "id": "id_field_la_and_other",
             "label": "Other",
             "groups": [
-                "group-current-agreements",
-                "group-la",
-                "group-la-details"
+                "current-agreements",
+                "la",
+                "la-details"
             ]
         },
         {
             "id": "id_field_la_dated",
             "label": "Dated",
             "groups": [
-                "group-current-agreements",
-                "group-la",
-                "group-la-details"
+                "current-agreements",
+                "la",
+                "la-details"
             ]
         },
         {
             "id": "id_field_is_there_a_head_lease",
             "groups": [
-                "group-current-agreements",
-                "group-hl"
+                "current-agreements",
+                "hl"
             ]
         },
         {
             "id": "id_field_hl_between",
             "label": "Between",
             "groups": [
-                "group-current-agreements",
-                "group-hl",
-                "group-hl-details"
+                "current-agreements",
+                "hl",
+                "hl-details"
             ]
         },
         {
             "id": "id_field_hl_between_other",
             "label": "Other",
             "groups": [
-                "group-current-agreements",
-                "group-hl",
-                "group-hl-details"
+                "current-agreements",
+                "hl",
+                "hl-details"
             ]
         },
         {
             "id": "id_field_hl_and",
             "label": "And",
             "groups": [
-                "group-current-agreements",
-                "group-hl",
-                "group-hl-details"
+                "current-agreements",
+                "hl",
+                "hl-details"
             ]
         },
         {
             "id": "id_field_hl_and_other",
             "label": "Other",
             "groups": [
-                "group-current-agreements",
-                "group-hl",
-                "group-hl-details"
+                "current-agreements",
+                "hl",
+                "hl-details"
             ]
         },
         {
             "id": "id_field_hl_dated",
             "label": "Dated",
             "groups": [
-                "group-current-agreements",
-                "group-hl",
-                "group-hl-details"
+                "current-agreements",
+                "hl",
+                "hl-details"
             ]
         }
     ],
-    "pages": [
-        {
+    "pages": [{
             "label": "Request Details",
-            "id": "group-request-details"
+            "id": "request-details"
         },
         {
             "label": "Aircraft Manufacturer",
-            "id": "group-aircraft-manufacturer"
+            "id": "aircraft-manufacturer"
         },
         {
             "label": "Background",
-            "id": "group-background"
+            "id": "background"
         },
         {
             "label": "Parties",
-            "id": "group-parties"
+            "id": "parties"
         },
         {
             "label": "Current Agreements",
-            "id": "group-current-agreements"
+            "id": "current-agreements"
         }
     ],
-    "lookupFields": {
-        "primary": "id_field_reference_number"
-    },
     "dependencies": {
         "id_field_legal_opinion_required": {
             "type": "field",
@@ -664,20 +652,16 @@
                 "value": "",
                 "visible": false
             },
-            "validStates": [
-                {
-                    "value": "",
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_agreement_type",
-                            "values": [
-                                "Engine Warranty Agreement"
-                            ]
-                        }
+            "validStates": [{
+                "value": "",
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_agreement_type",
+                    "values": [
+                        "Engine Warranty Agreement"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_if_other_please_provide_details": {
             "type": "field",
@@ -685,523 +669,415 @@
                 "value": "",
                 "visible": false
             },
-            "validStates": [
-                {
-                    "value": "",
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_governing_law",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "value": "",
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_governing_law",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-ewa": {
+        "ewa": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_agreement_type",
-                            "values": [
-                                "Engine Warranty Agreement"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_agreement_type",
+                    "values": [
+                        "Engine Warranty Agreement"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-tewa": {
+        "tewa": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_agreement_type",
-                            "values": [
-                                "Termination Engine Warranty Agreement"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_agreement_type",
+                    "values": [
+                        "Termination Engine Warranty Agreement"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_amendments_detail": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_are_there_any_amendments",
-                            "values": [
-                                "Yes"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_are_there_any_amendments",
+                    "values": [
+                        "Yes"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_definitions_detail": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_are_there_any_additional_definitions",
-                            "values": [
-                                "Yes"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_are_there_any_additional_definitions",
+                    "values": [
+                        "Yes"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-parties": {
+        "parties": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_parties_involved",
-                            "values": [
-                                "Lessor/Lessee",
-                                "Lessor/Lessee/Security Trustee",
-                                "Lessor/Lessee/Head Lessor/Security Trustee",
-                                "PDP Lender/Lessee"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_parties_involved",
+                    "values": [
+                        "Lessor/Lessee",
+                        "Lessor/Lessee/Security Trustee",
+                        "Lessor/Lessee/Head Lessor/Security Trustee",
+                        "PDP Lender/Lessee"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-current-agreements": {
+        "current-agreements": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_agreement_type",
-                            "values": [
-                                "Engine Warranty Agreement"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_agreement_type",
+                    "values": [
+                        "Engine Warranty Agreement"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_total_number_of_aircrafts_in_the_fleet": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_is_the_aircraft_part_of_a_fleet",
-                            "values": [
-                                "Yes"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_is_the_aircraft_part_of_a_fleet",
+                    "values": [
+                        "Yes"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_number_of_this_aircraft_in_the_fleet": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_is_the_aircraft_part_of_a_fleet",
-                            "values": [
-                                "Yes"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_is_the_aircraft_part_of_a_fleet",
+                    "values": [
+                        "Yes"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_if_other_please_specify": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_parties_involved",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_parties_involved",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-lessee": {
+        "lessee": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_parties_involved",
-                            "values": [
-                                "Lessor/Lessee",
-                                "Lessor/Lessee/Security Trustee",
-                                "Lessor/Lessee/Head Lessor/Security Trustee",
-                                "PDP Lender/Lessee"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_parties_involved",
+                    "values": [
+                        "Lessor/Lessee",
+                        "Lessor/Lessee/Security Trustee",
+                        "Lessor/Lessee/Head Lessor/Security Trustee",
+                        "PDP Lender/Lessee"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-lessor": {
+        "lessor": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_parties_involved",
-                            "values": [
-                                "Lessor/Lessee",
-                                "Lessor/Lessee/Security Trustee",
-                                "Lessor/Lessee/Head Lessor/Security Trustee"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_parties_involved",
+                    "values": [
+                        "Lessor/Lessee",
+                        "Lessor/Lessee/Security Trustee",
+                        "Lessor/Lessee/Head Lessor/Security Trustee"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-head-lessor": {
+        "head-lessor": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_parties_involved",
-                            "values": [
-                                "Lessor/Lessee/Head Lessor/Security Trustee"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_parties_involved",
+                    "values": [
+                        "Lessor/Lessee/Head Lessor/Security Trustee"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-trustee": {
+        "trustee": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_parties_involved",
-                            "values": [
-                                "Lessor/Lessee/Security Trustee",
-                                "Lessor/Lessee/Head Lessor/Security Trustee"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_parties_involved",
+                    "values": [
+                        "Lessor/Lessee/Security Trustee",
+                        "Lessor/Lessee/Head Lessor/Security Trustee"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-pdp": {
+        "pdp": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_parties_involved",
-                            "values": [
-                                "PDP Lender/Lessee"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_parties_involved",
+                    "values": [
+                        "PDP Lender/Lessee"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-dw-details": {
+        "dw-details": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_is_there_a_direct_warranty",
-                            "values": [
-                                "Yes"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_is_there_a_direct_warranty",
+                    "values": [
+                        "Yes"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-sa-details": {
+        "sa-details": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_is_there_a_security_agreement",
-                            "values": [
-                                "Yes"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_is_there_a_security_agreement",
+                    "values": [
+                        "Yes"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-la-details": {
+        "la-details": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_is_there_a_lease_agreement",
-                            "values": [
-                                "Yes"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_is_there_a_lease_agreement",
+                    "values": [
+                        "Yes"
                     ]
-                }
-            ]
+                }]
+            }]
         },
-        "group-hl-details": {
+        "hl-details": {
             "type": "group",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_is_there_a_head_lease",
-                            "values": [
-                                "Yes"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_is_there_a_head_lease",
+                    "values": [
+                        "Yes"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_dw_between_other": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_dw_between",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_dw_between",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_sa_between_other": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_sa_between",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_sa_between",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_la_between_other": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_la_between",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_la_between",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_hl_between_other": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_hl_between",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_hl_between",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_dw_and_other": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_dw_and",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_dw_and",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_sa_and_other": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_sa_and",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_sa_and",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_la_and_other": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_la_and",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_la_and",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         },
         "id_field_hl_and_other": {
             "type": "field",
             "defaultState": {
                 "visible": false
             },
-            "validStates": [
-                {
-                    "visible": true,
-                    "criterias": [
-                        {
-                            "target": "id_field_hl_and",
-                            "values": [
-                                "Other"
-                            ]
-                        }
+            "validStates": [{
+                "visible": true,
+                "criterias": [{
+                    "target": "id_field_hl_and",
+                    "values": [
+                        "Other"
                     ]
-                }
-            ]
+                }]
+            }]
         }
     },
     "validation": {
@@ -1215,10 +1091,10 @@
             "pattern": "^([0-9]{3,10}) & ([0-9]{3,10})$"
         },
         "id_field_legal_opinion_required": {
-        	"required": true
+            "required": true
         },
         "id_field_customer_name": {
-        	"required": true
+            "required": true
         }
     },
     "inputMask": {

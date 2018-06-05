@@ -154,14 +154,12 @@ class Paginator {
     }
 
     _prepareGroupsForPagination(_pages) {
-        _pages.map((_page, _index) => {
-            const _$page = this.QUICK_SELECTOR.getElemById(_page.id);
+        return _pages.map((_page, _index) => {
+            const _$page = this.QUICK_SELECTOR.getElemById(`${this.PREFIX_GROUP}${_page.id}`);
 
             _$page.addClass(LOCAL_DECORATOR_PAGE);
             _$page.data(LOCAL_DATA_PAGE_LABEL, _page.label);
-
-            return `#${_$page.attr('id')}`;
-        }).join(',');
+        });
     }
 
     _setActivePage(_pageId) {
@@ -191,7 +189,7 @@ class Paginator {
         this._initGlobalEventListeners();
         this._prepareGroupsForPagination(_pagesConfig);
         this._generateNavBar();
-        this._moveToPage(_pagesConfig[0].id);
+        this._moveToPage(`${this.PREFIX_GROUP}${_pagesConfig[0].id}`);
         this.animationConfig = {
             duration: 600
         };

@@ -1841,6 +1841,470 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 /* 2 */
 /***/ (function(module, exports) {
 
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+var stylesInDom = {};
+
+var	memoize = function (fn) {
+	var memo;
+
+	return function () {
+		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+		return memo;
+	};
+};
+
+var isOldIE = memoize(function () {
+	// Test for IE <= 9 as proposed by Browserhacks
+	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+	// Tests for existence of standard globals is to allow style-loader
+	// to operate correctly into non-standard environments
+	// @see https://github.com/webpack-contrib/style-loader/issues/177
+	return window && document && document.all && !window.atob;
+});
+
+var getTarget = function (target) {
+  return document.querySelector(target);
+};
+
+var getElement = (function (fn) {
+	var memo = {};
+
+	return function(target) {
+                // If passing function in options, then use it for resolve "head" element.
+                // Useful for Shadow Root style i.e
+                // {
+                //   insertInto: function () { return document.querySelector("#foo").shadowRoot }
+                // }
+                if (typeof target === 'function') {
+                        return target();
+                }
+                if (typeof memo[target] === "undefined") {
+			var styleTarget = getTarget.call(this, target);
+			// Special case to return head of iframe instead of iframe itself
+			if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+				try {
+					// This will throw an exception if access to iframe is blocked
+					// due to cross-origin restrictions
+					styleTarget = styleTarget.contentDocument.head;
+				} catch(e) {
+					styleTarget = null;
+				}
+			}
+			memo[target] = styleTarget;
+		}
+		return memo[target]
+	};
+})();
+
+var singleton = null;
+var	singletonCounter = 0;
+var	stylesInsertedAtTop = [];
+
+var	fixUrls = __webpack_require__(12);
+
+module.exports = function(list, options) {
+	if (typeof DEBUG !== "undefined" && DEBUG) {
+		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+	}
+
+	options = options || {};
+
+	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
+
+	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+	// tags it will allow on a page
+	if (!options.singleton && typeof options.singleton !== "boolean") options.singleton = isOldIE();
+
+	// By default, add <style> tags to the <head> element
+        if (!options.insertInto) options.insertInto = "head";
+
+	// By default, add <style> tags to the bottom of the target
+	if (!options.insertAt) options.insertAt = "bottom";
+
+	var styles = listToStyles(list, options);
+
+	addStylesToDom(styles, options);
+
+	return function update (newList) {
+		var mayRemove = [];
+
+		for (var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+
+			domStyle.refs--;
+			mayRemove.push(domStyle);
+		}
+
+		if(newList) {
+			var newStyles = listToStyles(newList, options);
+			addStylesToDom(newStyles, options);
+		}
+
+		for (var i = 0; i < mayRemove.length; i++) {
+			var domStyle = mayRemove[i];
+
+			if(domStyle.refs === 0) {
+				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
+
+				delete stylesInDom[domStyle.id];
+			}
+		}
+	};
+};
+
+function addStylesToDom (styles, options) {
+	for (var i = 0; i < styles.length; i++) {
+		var item = styles[i];
+		var domStyle = stylesInDom[item.id];
+
+		if(domStyle) {
+			domStyle.refs++;
+
+			for(var j = 0; j < domStyle.parts.length; j++) {
+				domStyle.parts[j](item.parts[j]);
+			}
+
+			for(; j < item.parts.length; j++) {
+				domStyle.parts.push(addStyle(item.parts[j], options));
+			}
+		} else {
+			var parts = [];
+
+			for(var j = 0; j < item.parts.length; j++) {
+				parts.push(addStyle(item.parts[j], options));
+			}
+
+			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+		}
+	}
+}
+
+function listToStyles (list, options) {
+	var styles = [];
+	var newStyles = {};
+
+	for (var i = 0; i < list.length; i++) {
+		var item = list[i];
+		var id = options.base ? item[0] + options.base : item[0];
+		var css = item[1];
+		var media = item[2];
+		var sourceMap = item[3];
+		var part = {css: css, media: media, sourceMap: sourceMap};
+
+		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
+		else newStyles[id].parts.push(part);
+	}
+
+	return styles;
+}
+
+function insertStyleElement (options, style) {
+	var target = getElement(options.insertInto)
+
+	if (!target) {
+		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
+	}
+
+	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
+
+	if (options.insertAt === "top") {
+		if (!lastStyleElementInsertedAtTop) {
+			target.insertBefore(style, target.firstChild);
+		} else if (lastStyleElementInsertedAtTop.nextSibling) {
+			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
+		} else {
+			target.appendChild(style);
+		}
+		stylesInsertedAtTop.push(style);
+	} else if (options.insertAt === "bottom") {
+		target.appendChild(style);
+	} else if (typeof options.insertAt === "object" && options.insertAt.before) {
+		var nextSibling = getElement(options.insertInto + " " + options.insertAt.before);
+		target.insertBefore(style, nextSibling);
+	} else {
+		throw new Error("[Style Loader]\n\n Invalid value for parameter 'insertAt' ('options.insertAt') found.\n Must be 'top', 'bottom', or Object.\n (https://github.com/webpack-contrib/style-loader#insertat)\n");
+	}
+}
+
+function removeStyleElement (style) {
+	if (style.parentNode === null) return false;
+	style.parentNode.removeChild(style);
+
+	var idx = stylesInsertedAtTop.indexOf(style);
+	if(idx >= 0) {
+		stylesInsertedAtTop.splice(idx, 1);
+	}
+}
+
+function createStyleElement (options) {
+	var style = document.createElement("style");
+
+	options.attrs.type = "text/css";
+
+	addAttrs(style, options.attrs);
+	insertStyleElement(options, style);
+
+	return style;
+}
+
+function createLinkElement (options) {
+	var link = document.createElement("link");
+
+	options.attrs.type = "text/css";
+	options.attrs.rel = "stylesheet";
+
+	addAttrs(link, options.attrs);
+	insertStyleElement(options, link);
+
+	return link;
+}
+
+function addAttrs (el, attrs) {
+	Object.keys(attrs).forEach(function (key) {
+		el.setAttribute(key, attrs[key]);
+	});
+}
+
+function addStyle (obj, options) {
+	var style, update, remove, result;
+
+	// If a transform function was defined, run it on the css
+	if (options.transform && obj.css) {
+	    result = options.transform(obj.css);
+
+	    if (result) {
+	    	// If transform returns a value, use that instead of the original css.
+	    	// This allows running runtime transformations on the css.
+	    	obj.css = result;
+	    } else {
+	    	// If the transform function returns a falsy value, don't add this css.
+	    	// This allows conditional loading of css
+	    	return function() {
+	    		// noop
+	    	};
+	    }
+	}
+
+	if (options.singleton) {
+		var styleIndex = singletonCounter++;
+
+		style = singleton || (singleton = createStyleElement(options));
+
+		update = applyToSingletonTag.bind(null, style, styleIndex, false);
+		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+
+	} else if (
+		obj.sourceMap &&
+		typeof URL === "function" &&
+		typeof URL.createObjectURL === "function" &&
+		typeof URL.revokeObjectURL === "function" &&
+		typeof Blob === "function" &&
+		typeof btoa === "function"
+	) {
+		style = createLinkElement(options);
+		update = updateLink.bind(null, style, options);
+		remove = function () {
+			removeStyleElement(style);
+
+			if(style.href) URL.revokeObjectURL(style.href);
+		};
+	} else {
+		style = createStyleElement(options);
+		update = applyToTag.bind(null, style);
+		remove = function () {
+			removeStyleElement(style);
+		};
+	}
+
+	update(obj);
+
+	return function updateStyle (newObj) {
+		if (newObj) {
+			if (
+				newObj.css === obj.css &&
+				newObj.media === obj.media &&
+				newObj.sourceMap === obj.sourceMap
+			) {
+				return;
+			}
+
+			update(obj = newObj);
+		} else {
+			remove();
+		}
+	};
+}
+
+var replaceText = (function () {
+	var textStore = [];
+
+	return function (index, replacement) {
+		textStore[index] = replacement;
+
+		return textStore.filter(Boolean).join('\n');
+	};
+})();
+
+function applyToSingletonTag (style, index, remove, obj) {
+	var css = remove ? "" : obj.css;
+
+	if (style.styleSheet) {
+		style.styleSheet.cssText = replaceText(index, css);
+	} else {
+		var cssNode = document.createTextNode(css);
+		var childNodes = style.childNodes;
+
+		if (childNodes[index]) style.removeChild(childNodes[index]);
+
+		if (childNodes.length) {
+			style.insertBefore(cssNode, childNodes[index]);
+		} else {
+			style.appendChild(cssNode);
+		}
+	}
+}
+
+function applyToTag (style, obj) {
+	var css = obj.css;
+	var media = obj.media;
+
+	if(media) {
+		style.setAttribute("media", media)
+	}
+
+	if(style.styleSheet) {
+		style.styleSheet.cssText = css;
+	} else {
+		while(style.firstChild) {
+			style.removeChild(style.firstChild);
+		}
+
+		style.appendChild(document.createTextNode(css));
+	}
+}
+
+function updateLink (link, options, obj) {
+	var css = obj.css;
+	var sourceMap = obj.sourceMap;
+
+	/*
+		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
+		and there is no publicPath defined then lets turn convertToAbsoluteUrls
+		on by default.  Otherwise default to the convertToAbsoluteUrls option
+		directly
+	*/
+	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
+
+	if (options.convertToAbsoluteUrls || autoFixUrls) {
+		css = fixUrls(css);
+	}
+
+	if (sourceMap) {
+		// http://stackoverflow.com/a/26603875
+		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+	}
+
+	var blob = new Blob([css], { type: "text/css" });
+
+	var oldSrc = link.href;
+
+	link.href = URL.createObjectURL(blob);
+
+	if(oldSrc) URL.revokeObjectURL(oldSrc);
+}
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
 /**
  * lodash (Custom Build) <https://lodash.com/>
  * Build: `lodash modularize exports="npm" -o ./`
@@ -2406,470 +2870,6 @@ function identity(value) {
 }
 
 module.exports = forEach;
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function(useSourceMap) {
-	var list = [];
-
-	// return the list of modules as css string
-	list.toString = function toString() {
-		return this.map(function (item) {
-			var content = cssWithMappingToString(item, useSourceMap);
-			if(item[2]) {
-				return "@media " + item[2] + "{" + content + "}";
-			} else {
-				return content;
-			}
-		}).join("");
-	};
-
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
-};
-
-function cssWithMappingToString(item, useSourceMap) {
-	var content = item[1] || '';
-	var cssMapping = item[3];
-	if (!cssMapping) {
-		return content;
-	}
-
-	if (useSourceMap && typeof btoa === 'function') {
-		var sourceMapping = toComment(cssMapping);
-		var sourceURLs = cssMapping.sources.map(function (source) {
-			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
-		});
-
-		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-	}
-
-	return [content].join('\n');
-}
-
-// Adapted from convert-source-map (MIT)
-function toComment(sourceMap) {
-	// eslint-disable-next-line no-undef
-	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-
-	return '/*# ' + data + ' */';
-}
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-
-var stylesInDom = {};
-
-var	memoize = function (fn) {
-	var memo;
-
-	return function () {
-		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-		return memo;
-	};
-};
-
-var isOldIE = memoize(function () {
-	// Test for IE <= 9 as proposed by Browserhacks
-	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
-	// Tests for existence of standard globals is to allow style-loader
-	// to operate correctly into non-standard environments
-	// @see https://github.com/webpack-contrib/style-loader/issues/177
-	return window && document && document.all && !window.atob;
-});
-
-var getTarget = function (target) {
-  return document.querySelector(target);
-};
-
-var getElement = (function (fn) {
-	var memo = {};
-
-	return function(target) {
-                // If passing function in options, then use it for resolve "head" element.
-                // Useful for Shadow Root style i.e
-                // {
-                //   insertInto: function () { return document.querySelector("#foo").shadowRoot }
-                // }
-                if (typeof target === 'function') {
-                        return target();
-                }
-                if (typeof memo[target] === "undefined") {
-			var styleTarget = getTarget.call(this, target);
-			// Special case to return head of iframe instead of iframe itself
-			if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
-				try {
-					// This will throw an exception if access to iframe is blocked
-					// due to cross-origin restrictions
-					styleTarget = styleTarget.contentDocument.head;
-				} catch(e) {
-					styleTarget = null;
-				}
-			}
-			memo[target] = styleTarget;
-		}
-		return memo[target]
-	};
-})();
-
-var singleton = null;
-var	singletonCounter = 0;
-var	stylesInsertedAtTop = [];
-
-var	fixUrls = __webpack_require__(12);
-
-module.exports = function(list, options) {
-	if (typeof DEBUG !== "undefined" && DEBUG) {
-		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-	}
-
-	options = options || {};
-
-	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
-
-	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-	// tags it will allow on a page
-	if (!options.singleton && typeof options.singleton !== "boolean") options.singleton = isOldIE();
-
-	// By default, add <style> tags to the <head> element
-        if (!options.insertInto) options.insertInto = "head";
-
-	// By default, add <style> tags to the bottom of the target
-	if (!options.insertAt) options.insertAt = "bottom";
-
-	var styles = listToStyles(list, options);
-
-	addStylesToDom(styles, options);
-
-	return function update (newList) {
-		var mayRemove = [];
-
-		for (var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-
-			domStyle.refs--;
-			mayRemove.push(domStyle);
-		}
-
-		if(newList) {
-			var newStyles = listToStyles(newList, options);
-			addStylesToDom(newStyles, options);
-		}
-
-		for (var i = 0; i < mayRemove.length; i++) {
-			var domStyle = mayRemove[i];
-
-			if(domStyle.refs === 0) {
-				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
-
-				delete stylesInDom[domStyle.id];
-			}
-		}
-	};
-};
-
-function addStylesToDom (styles, options) {
-	for (var i = 0; i < styles.length; i++) {
-		var item = styles[i];
-		var domStyle = stylesInDom[item.id];
-
-		if(domStyle) {
-			domStyle.refs++;
-
-			for(var j = 0; j < domStyle.parts.length; j++) {
-				domStyle.parts[j](item.parts[j]);
-			}
-
-			for(; j < item.parts.length; j++) {
-				domStyle.parts.push(addStyle(item.parts[j], options));
-			}
-		} else {
-			var parts = [];
-
-			for(var j = 0; j < item.parts.length; j++) {
-				parts.push(addStyle(item.parts[j], options));
-			}
-
-			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-		}
-	}
-}
-
-function listToStyles (list, options) {
-	var styles = [];
-	var newStyles = {};
-
-	for (var i = 0; i < list.length; i++) {
-		var item = list[i];
-		var id = options.base ? item[0] + options.base : item[0];
-		var css = item[1];
-		var media = item[2];
-		var sourceMap = item[3];
-		var part = {css: css, media: media, sourceMap: sourceMap};
-
-		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
-		else newStyles[id].parts.push(part);
-	}
-
-	return styles;
-}
-
-function insertStyleElement (options, style) {
-	var target = getElement(options.insertInto)
-
-	if (!target) {
-		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
-	}
-
-	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
-
-	if (options.insertAt === "top") {
-		if (!lastStyleElementInsertedAtTop) {
-			target.insertBefore(style, target.firstChild);
-		} else if (lastStyleElementInsertedAtTop.nextSibling) {
-			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
-		} else {
-			target.appendChild(style);
-		}
-		stylesInsertedAtTop.push(style);
-	} else if (options.insertAt === "bottom") {
-		target.appendChild(style);
-	} else if (typeof options.insertAt === "object" && options.insertAt.before) {
-		var nextSibling = getElement(options.insertInto + " " + options.insertAt.before);
-		target.insertBefore(style, nextSibling);
-	} else {
-		throw new Error("[Style Loader]\n\n Invalid value for parameter 'insertAt' ('options.insertAt') found.\n Must be 'top', 'bottom', or Object.\n (https://github.com/webpack-contrib/style-loader#insertat)\n");
-	}
-}
-
-function removeStyleElement (style) {
-	if (style.parentNode === null) return false;
-	style.parentNode.removeChild(style);
-
-	var idx = stylesInsertedAtTop.indexOf(style);
-	if(idx >= 0) {
-		stylesInsertedAtTop.splice(idx, 1);
-	}
-}
-
-function createStyleElement (options) {
-	var style = document.createElement("style");
-
-	options.attrs.type = "text/css";
-
-	addAttrs(style, options.attrs);
-	insertStyleElement(options, style);
-
-	return style;
-}
-
-function createLinkElement (options) {
-	var link = document.createElement("link");
-
-	options.attrs.type = "text/css";
-	options.attrs.rel = "stylesheet";
-
-	addAttrs(link, options.attrs);
-	insertStyleElement(options, link);
-
-	return link;
-}
-
-function addAttrs (el, attrs) {
-	Object.keys(attrs).forEach(function (key) {
-		el.setAttribute(key, attrs[key]);
-	});
-}
-
-function addStyle (obj, options) {
-	var style, update, remove, result;
-
-	// If a transform function was defined, run it on the css
-	if (options.transform && obj.css) {
-	    result = options.transform(obj.css);
-
-	    if (result) {
-	    	// If transform returns a value, use that instead of the original css.
-	    	// This allows running runtime transformations on the css.
-	    	obj.css = result;
-	    } else {
-	    	// If the transform function returns a falsy value, don't add this css.
-	    	// This allows conditional loading of css
-	    	return function() {
-	    		// noop
-	    	};
-	    }
-	}
-
-	if (options.singleton) {
-		var styleIndex = singletonCounter++;
-
-		style = singleton || (singleton = createStyleElement(options));
-
-		update = applyToSingletonTag.bind(null, style, styleIndex, false);
-		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
-
-	} else if (
-		obj.sourceMap &&
-		typeof URL === "function" &&
-		typeof URL.createObjectURL === "function" &&
-		typeof URL.revokeObjectURL === "function" &&
-		typeof Blob === "function" &&
-		typeof btoa === "function"
-	) {
-		style = createLinkElement(options);
-		update = updateLink.bind(null, style, options);
-		remove = function () {
-			removeStyleElement(style);
-
-			if(style.href) URL.revokeObjectURL(style.href);
-		};
-	} else {
-		style = createStyleElement(options);
-		update = applyToTag.bind(null, style);
-		remove = function () {
-			removeStyleElement(style);
-		};
-	}
-
-	update(obj);
-
-	return function updateStyle (newObj) {
-		if (newObj) {
-			if (
-				newObj.css === obj.css &&
-				newObj.media === obj.media &&
-				newObj.sourceMap === obj.sourceMap
-			) {
-				return;
-			}
-
-			update(obj = newObj);
-		} else {
-			remove();
-		}
-	};
-}
-
-var replaceText = (function () {
-	var textStore = [];
-
-	return function (index, replacement) {
-		textStore[index] = replacement;
-
-		return textStore.filter(Boolean).join('\n');
-	};
-})();
-
-function applyToSingletonTag (style, index, remove, obj) {
-	var css = remove ? "" : obj.css;
-
-	if (style.styleSheet) {
-		style.styleSheet.cssText = replaceText(index, css);
-	} else {
-		var cssNode = document.createTextNode(css);
-		var childNodes = style.childNodes;
-
-		if (childNodes[index]) style.removeChild(childNodes[index]);
-
-		if (childNodes.length) {
-			style.insertBefore(cssNode, childNodes[index]);
-		} else {
-			style.appendChild(cssNode);
-		}
-	}
-}
-
-function applyToTag (style, obj) {
-	var css = obj.css;
-	var media = obj.media;
-
-	if(media) {
-		style.setAttribute("media", media)
-	}
-
-	if(style.styleSheet) {
-		style.styleSheet.cssText = css;
-	} else {
-		while(style.firstChild) {
-			style.removeChild(style.firstChild);
-		}
-
-		style.appendChild(document.createTextNode(css));
-	}
-}
-
-function updateLink (link, options, obj) {
-	var css = obj.css;
-	var sourceMap = obj.sourceMap;
-
-	/*
-		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
-		and there is no publicPath defined then lets turn convertToAbsoluteUrls
-		on by default.  Otherwise default to the convertToAbsoluteUrls option
-		directly
-	*/
-	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
-
-	if (options.convertToAbsoluteUrls || autoFixUrls) {
-		css = fixUrls(css);
-	}
-
-	if (sourceMap) {
-		// http://stackoverflow.com/a/26603875
-		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-	}
-
-	var blob = new Blob([css], { type: "text/css" });
-
-	var oldSrc = link.href;
-
-	link.href = URL.createObjectURL(blob);
-
-	if(oldSrc) URL.revokeObjectURL(oldSrc);
-}
 
 
 /***/ }),
@@ -3949,33 +3949,40 @@ var QuickSelector = __webpack_require__(17);
 
 var FormPreparator = __webpack_require__(19);
 
-var FormDecorator = __webpack_require__(20);
+var FormDecorator = __webpack_require__(22);
 
-var LookupFieldSynchronizer = __webpack_require__(21);
+var FieldSynchronizer = __webpack_require__(23);
 
-var Conditionals = __webpack_require__(22);
+var Conditionals = __webpack_require__(24);
 
-var Paginator = __webpack_require__(23);
+var Paginator = __webpack_require__(25);
 
-var Validator = __webpack_require__(26);
+var Validator = __webpack_require__(28);
 
-var FormEvents = __webpack_require__(29);
+var FormEvents = __webpack_require__(31);
 
-var InputMask = __webpack_require__(30);
+var InputMask = __webpack_require__(32);
 
-var Bugfix = __webpack_require__(36);
+var Bugfix = __webpack_require__(38);
 
-var NativeMethodOverrides = __webpack_require__(37);
+var NativeMethodOverrides = __webpack_require__(39);
 
 var ID_FORM = 'target_form';
 var PREFIX_LOOKUP_ID = '_acl_';
+var PREFIX_GROUP = 'alx-group-';
 var DECORATOR_STATE_HIDDEN = 'alx-hidden';
 var DECORATOR_STATE_IGNORE = 'alx-ignore';
 var DECORATOR_STATE_REQUIRED = 'alx-required';
-var DECORATOR_FORM_FIELD_WRAPPER = 'form-input-wrapper';
-var DECORATOR_FORM_LABEL_WRAPPER = 'form-label-wrapper';
-var DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER = 'form-element';
-var DECORATOR_FORM_GROUP = 'form-element-group';
+var DECORATOR_FORM_FIELD_WRAPPER = 'alx-form-input-wrapper';
+var DECORATOR_FORM_LABEL_WRAPPER = 'alx-form-label-wrapper';
+var DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER = 'alx-form-element';
+var DECORATOR_FORM_GROUP = 'alx-form-group';
+var IDENTIFIER_FORM_TITLE_CONTAINER = 'alx-form-title-container';
+var IDENTIFIER_LOGO_CONTAINER = 'alx-logo-container';
+var IDENTIFIER_HEADING_CONTAINER = 'alx-heading-container';
+var IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER = 'alx-page-navigation-top-container';
+var IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER = 'alx-page-navigation-bottom-container';
+var IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER = 'alx-save-load-buttons-container';
 $(document).ready(function () {
   var dependencyInjector = new DependencyInjector();
   var quickSelector = new QuickSelector();
@@ -4005,6 +4012,9 @@ $(document).ready(function () {
   }, {
     key: 'DECORATOR_FORM_GROUP',
     value: DECORATOR_FORM_GROUP
+  }, {
+    key: 'PREFIX_GROUP',
+    value: PREFIX_GROUP
   }]);
   formPreparator.init(config);
   var formDecorator = new FormDecorator();
@@ -4017,6 +4027,18 @@ $(document).ready(function () {
   }, {
     key: 'QUICK_SELECTOR',
     value: quickSelector
+  }, {
+    key: 'IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER',
+    value: IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER
+  }, {
+    key: 'IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER',
+    value: IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER
+  }, {
+    key: 'IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER',
+    value: IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER
+  }, {
+    key: 'IDENTIFIER_FORM_TITLE_CONTAINER',
+    value: IDENTIFIER_FORM_TITLE_CONTAINER
   }]);
   formDecorator.init(config);
   var formEvents = new FormEvents();
@@ -4031,8 +4053,8 @@ $(document).ready(function () {
     value: quickSelector
   }]);
   formEvents.init();
-  var lookupFieldSynchronizer = new LookupFieldSynchronizer();
-  dependencyInjector.setTargetInstance(lookupFieldSynchronizer).inject([{
+  var fieldSynchronizer = new FieldSynchronizer();
+  dependencyInjector.setTargetInstance(fieldSynchronizer).inject([{
     key: '$',
     value: $
   }, {
@@ -4048,11 +4070,14 @@ $(document).ready(function () {
     key: 'QUICK_SELECTOR',
     value: quickSelector
   }]);
-  lookupFieldSynchronizer.init(config.lookupFields);
+  fieldSynchronizer.init(config.lookupFields);
   var conditionals = new Conditionals();
   dependencyInjector.setTargetInstance(conditionals).inject([{
     key: '$',
     value: $
+  }, {
+    key: 'QUICK_SELECTOR',
+    value: quickSelector
   }, {
     key: 'FORM_EVENTS',
     value: formEvents
@@ -4062,6 +4087,12 @@ $(document).ready(function () {
   }, {
     key: 'DECORATOR_STATE_IGNORE',
     value: DECORATOR_STATE_IGNORE
+  }, {
+    key: 'DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER',
+    value: DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER
+  }, {
+    key: 'PREFIX_GROUP',
+    value: PREFIX_GROUP
   }]);
   conditionals.init(config.dependencies);
   var paginator = new Paginator();
@@ -4080,8 +4111,17 @@ $(document).ready(function () {
   }, {
     key: 'DECORATOR_STATE_HIDDEN',
     value: DECORATOR_STATE_HIDDEN
+  }, {
+    key: 'IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER',
+    value: IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER
+  }, {
+    key: 'IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER',
+    value: IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER
+  }, {
+    key: 'PREFIX_GROUP',
+    value: PREFIX_GROUP
   }]);
-  paginator.setTopNavBarContainer(formDecorator.getPaginationTopNavBarContainer()).setBottomNavBarContainer(formDecorator.getPaginationBottomNavBarContainer()).init(config.pages);
+  paginator.init(config.pages);
   var validator = new Validator();
   dependencyInjector.setTargetInstance(validator).inject([{
     key: '$',
@@ -4164,7 +4204,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(4)(content, options);
+var update = __webpack_require__(3)(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -4199,12 +4239,12 @@ if(false) {
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(false);
+exports = module.exports = __webpack_require__(2)(false);
 // imports
 
 
 // module
-exports.push([module.i, "body {\n  margin: 0;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box; }\n\n::-webkit-scrollbar {\n  width: 0px;\n  background: transparent; }\n\nheading {\n  display: block;\n  height: 10vh;\n  width: 100%; }\n  heading:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n#logo {\n  width: 20vw;\n  float: left;\n  height: 10vh;\n  position: relative;\n  text-align: center;\n  vertical-align: middle; }\n  #logo img {\n    position: absolute;\n    height: 8vh;\n    position: absolute;\n    top: 50%;\n    -webkit-transform: translateY(-50%);\n            transform: translateY(-50%); }\n\n#heading {\n  position: relative;\n  width: 80vw;\n  height: 10vh;\n  text-align: center;\n  vertical-align: middle;\n  float: right;\n  color: #10069f; }\n  #heading h1 {\n    position: relative;\n    left: -10vw;\n    font-weight: lighter; }\n\nmain {\n  position: relative; }\n\n#page-navigation-top {\n  width: 100%;\n  background-color: #fff8ff;\n  margin: 0;\n  padding: 0;\n  text-align: center;\n  font-size: 16px;\n  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);\n          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2); }\n  #page-navigation-top ul {\n    margin: 0 auto;\n    display: table;\n    width: 70%;\n    list-style-type: none;\n    height: inherit; }\n    #page-navigation-top ul li {\n      display: table-cell;\n      text-align: center;\n      height: inherit;\n      vertical-align: middle;\n      /*\n            &:hover,\n            &:active,\n            &:visited {\n                background-color: $ternary-color;\n                \n                a {\n                    color: $primary-color;\n                }    \n            }*/ }\n      #page-navigation-top ul li a {\n        display: inline-block;\n        color: #10069f;\n        text-align: center;\n        text-decoration: none;\n        padding: 1vh 2vw;\n        font-weight: bold; }\n      #page-navigation-top ul li.page-menu-active {\n        background-color: #10069f; }\n        #page-navigation-top ul li.page-menu-active a {\n          color: #fff8ff; }\n\n#page-navigation-bottom:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\nbutton,\n.page-navigation-button {\n  /* Structure */\n  display: inline-block;\n  zoom: 1;\n  line-height: normal;\n  white-space: nowrap;\n  vertical-align: middle;\n  text-align: center;\n  cursor: pointer;\n  -webkit-user-drag: none;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  font-family: inherit;\n  font-size: 0.8rem;\n  padding: 0.5em 2em;\n  color: #fff8ff;\n  border: 1px solid #fff8ff;\n  background-color: #10069f;\n  text-decoration: none;\n  border-radius: 0.2rem; }\n\n#save-load-buttons #target_form_logout,\n#save-load-buttons button {\n  font-size: 0.6rem;\n  color: #10069f;\n  background-color: #fff;\n  border: 1px solid #aea8fc;\n  border-radius: 0.2rem;\n  padding: 0.5em 2em;\n  margin-right: 0.5em; }\n\n#save-load-buttons button {\n  float: left; }\n\n#save-load-buttons #target_form_logout {\n  float: right; }\n\n.page-navigation-previous-button {\n  float: left; }\n\n.page-navigation-next-button {\n  float: right; }\n\n.form-wrapper,\n#save-load-buttons {\n  width: 50%;\n  margin: 0 auto;\n  margin-top: 2vh; }\n\n#save-load-buttons {\n  padding: 2vh 0; }\n  #save-load-buttons:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n.form-element {\n  height: 3rem; }\n\nform {\n  padding: 1rem;\n  margin-top: 1rem;\n  background-color: #fff8ff;\n  border-radius: 0.2rem;\n  opacity: 1;\n  font-size: 15px;\n  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);\n          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2); }\n\n.form-title {\n  text-align: center; }\n  .form-title h2 {\n    margin-top: 0;\n    color: #10069f;\n    font-weight: lighter; }\n\n.form-input-wrapper {\n  position: relative; }\n  .form-input-wrapper input.error,\n  .form-input-wrapper select.error,\n  .form-input-wrapper textarea.error {\n    color: #b94a48 !important;\n    border-color: #e9322d !important; }\n  .form-input-wrapper label.error {\n    position: absolute;\n    display: block;\n    padding: .5em .6em .5em;\n    font-size: 75%;\n    font-weight: 700;\n    line-height: 2;\n    color: #fff;\n    text-align: center;\n    white-space: nowrap;\n    border-radius: .25em;\n    background-color: #d9534f;\n    z-index: 2;\n    /*\n            position: absolute;\n            display: block;\n            height: 1rem;\n            padding: .5em .6em .5em;\n            font-size: 75%;\n            font-weight: 700;\n            line-height: 2;\n            color: #fff;\n            text-align: center;\n            white-space: nowrap;\n            border-radius: .25em;\n            background-color: #d9534f;\n            z-index: 2;\n            top: -0.5em;\n            right: 0;\n            */ }\n\n.alx-required {\n  background-color: #FFFBCF !important; }\n\n#group-ewa,\n#group-tewa,\n#group-lessee,\n#group-lessor,\n#group-head-lessor,\n#group-trustee,\n#group-pdp,\n#group-dw,\n#group-sa,\n#group-la,\n#group-hl {\n  margin-bottom: 1em;\n  border-bottom: 1px solid rgba(16, 6, 159, 0.4); }\n", ""]);
+exports.push([module.i, "body {\n  margin: 0;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box; }\n\n::-webkit-scrollbar {\n  width: 0px;\n  background: transparent; }\n\nheading {\n  display: block;\n  height: 10vh;\n  width: 100%; }\n  heading:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n#alx-logo {\n  width: 20vw;\n  float: left;\n  height: 10vh;\n  position: relative;\n  text-align: center;\n  vertical-align: middle; }\n  #alx-logo img {\n    position: absolute;\n    height: 8vh;\n    position: absolute;\n    top: 50%;\n    -webkit-transform: translateY(-50%);\n            transform: translateY(-50%); }\n\n#alx-page-title {\n  position: relative;\n  width: 80vw;\n  height: 10vh;\n  text-align: center;\n  vertical-align: middle;\n  float: right;\n  color: #10069f; }\n  #alx-page-title h1 {\n    position: relative;\n    left: -10vw;\n    font-weight: lighter; }\n\nmain {\n  position: relative; }\n\n#alx-page-navigation-top-container {\n  width: 100%;\n  background-color: #fff8ff;\n  margin: 0;\n  padding: 0;\n  text-align: center;\n  font-size: 16px;\n  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);\n          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2); }\n  #alx-page-navigation-top-container ul {\n    margin: 0 auto;\n    display: table;\n    width: 70%;\n    list-style-type: none;\n    height: inherit; }\n    #alx-page-navigation-top-container ul li {\n      display: table-cell;\n      text-align: center;\n      height: inherit;\n      vertical-align: middle;\n      /*\n            &:hover,\n            &:active,\n            &:visited {\n                background-color: $ternary-color;\n                \n                a {\n                    color: $primary-color;\n                }    \n            }*/ }\n      #alx-page-navigation-top-container ul li a {\n        display: inline-block;\n        color: #10069f;\n        text-align: center;\n        text-decoration: none;\n        padding: 1vh 2vw;\n        font-weight: bold; }\n      #alx-page-navigation-top-container ul li.page-menu-active {\n        background-color: #10069f; }\n        #alx-page-navigation-top-container ul li.page-menu-active a {\n          color: #fff8ff; }\n\n#alx-page-navigation-bottom-container:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\nbutton,\n.alx-page-navigation-button {\n  /* Structure */\n  display: inline-block;\n  zoom: 1;\n  line-height: normal;\n  white-space: nowrap;\n  vertical-align: middle;\n  text-align: center;\n  cursor: pointer;\n  -webkit-user-drag: none;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  font-family: inherit;\n  font-size: 0.8rem;\n  padding: 0.5em 2em;\n  color: #fff8ff;\n  border: 1px solid #fff8ff;\n  background-color: #10069f;\n  text-decoration: none;\n  border-radius: 0.2rem; }\n\n#alx-save-load-buttons-container #target_form_logout,\n#alx-save-load-buttons-container button {\n  font-size: 0.6rem;\n  color: #10069f;\n  background-color: #fff;\n  border: 1px solid #aea8fc;\n  border-radius: 0.2rem;\n  padding: 0.5em 2em;\n  margin-right: 0.5em; }\n\n#alx-save-load-buttons-container button {\n  float: left; }\n\n#alx-save-load-buttons-container #target_form_logout {\n  float: right; }\n\n.alx-page-navigation-previous-button {\n  float: left; }\n\n.alx-page-navigation-next-button {\n  float: right; }\n\n.form-wrapper,\n#alx-save-load-buttons-container {\n  width: 50%;\n  margin: 0 auto;\n  margin-top: 2vh; }\n\n#alx-save-load-buttons-container {\n  padding: 2vh 0; }\n  #alx-save-load-buttons-container:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n.alx-form-element {\n  height: 3rem; }\n\nform {\n  padding: 1rem;\n  margin-top: 1rem;\n  background-color: #fff8ff;\n  border-radius: 0.2rem;\n  opacity: 1;\n  font-size: 15px;\n  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);\n          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2); }\n\n.form-title {\n  text-align: center; }\n  .form-title h2 {\n    margin-top: 0;\n    color: #10069f;\n    font-weight: lighter; }\n\n.alx-form-input-wrapper {\n  position: relative; }\n  .alx-form-input-wrapper input.error,\n  .alx-form-input-wrapper select.error,\n  .alx-form-input-wrapper textarea.error {\n    color: #b94a48 !important;\n    border-color: #e9322d !important; }\n  .alx-form-input-wrapper label.error {\n    position: absolute;\n    display: block;\n    padding: .5em .6em .5em;\n    font-size: 75%;\n    font-weight: 700;\n    line-height: 2;\n    color: #fff;\n    text-align: center;\n    white-space: nowrap;\n    border-radius: .25em;\n    background-color: #d9534f;\n    z-index: 2;\n    /*\n            position: absolute;\n            display: block;\n            height: 1rem;\n            padding: .5em .6em .5em;\n            font-size: 75%;\n            font-weight: 700;\n            line-height: 2;\n            color: #fff;\n            text-align: center;\n            white-space: nowrap;\n            border-radius: .25em;\n            background-color: #d9534f;\n            z-index: 2;\n            top: -0.5em;\n            right: 0;\n            */ }\n\n.alx-required {\n  background-color: #FFFBCF !important; }\n\n#group-ewa,\n#group-tewa,\n#group-lessee,\n#group-lessor,\n#group-head-lessor,\n#group-trustee,\n#group-pdp,\n#group-dw,\n#group-sa,\n#group-la,\n#group-hl {\n  margin-bottom: 1em;\n  border-bottom: 1px solid rgba(16, 6, 159, 0.4); }\n", ""]);
 
 // exports
 
@@ -4323,7 +4363,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(4)(content, options);
+var update = __webpack_require__(3)(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -4358,7 +4398,7 @@ if(false) {
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(false);
+exports = module.exports = __webpack_require__(2)(false);
 // imports
 
 
@@ -4372,7 +4412,7 @@ exports.push([module.i, "/*!\nPure v1.0.0\nCopyright 2013 Yahoo!\nLicensed under
 /* 15 */
 /***/ (function(module, exports) {
 
-module.exports = {"formSelector":"#target_form","title":"","logo":"https://www.rolls-royce.com/~/media/Images/R/Rolls-Royce/logo/rebrand-svg-logo.svg?h=96&la=en&w=59","heading":"Engine Warranty Intake Form","subTitle":"Engine Warranty Intake Form","decoratorClasses":{"form":["pure-form"],"title":["form-title"],"field":["pure-input-1"],"fieldWrapperDiv":["form-input-wrapper","pure-u-2-3"],"label":[],"labelWrapperDiv":["form-label-wrapper","pure-u-1-3"],"labelAndFieldWrapperDiv":["form-element","pure-g"]},"fields":[{"id":"id_field_agreement_type","groups":["group-request-details"],"decoratorClasses":{}},{"id":"id_field_legal_opinion_required","groups":["group-request-details"]},{"id":"id_field_governing_law","groups":["group-request-details"]},{"id":"id_field_if_other_please_provide_details","groups":["group-request-details"]},{"id":"id_field_reference_number","groups":["group-request-details"]},{"id":"id_field_customer_name","groups":["group-request-details"]},{"id":"id_field_lead_party_company_name","groups":["group-request-details"]},{"id":"id_field_counsel_acting_for_lead_party","groups":["group-request-details"]},{"id":"id_field_acting_counsel_e_mail","groups":["group-request-details"]},{"id":"id_field_lead_party_country","groups":["group-request-details"]},{"id":"id_field_aircraft_manufacturer","groups":["group-aircraft-manufacturer"]},{"id":"id_field_manufacturer_serial_number","groups":["group-aircraft-manufacturer"]},{"id":"id_field_engine_serial_numbers","placeholder":"e.g. 42405 & 42406","groups":["group-aircraft-manufacturer"]},{"id":"id_field_aircraft_type","groups":["group-aircraft-manufacturer"]},{"id":"id_field_aircraft_registration_mark","groups":["group-aircraft-manufacturer"]},{"id":"id_field_engine_type","groups":["group-aircraft-manufacturer"]},{"id":"id_field_is_the_aircraft_part_of_a_fleet","groups":["group-aircraft-manufacturer"]},{"id":"id_field_total_number_of_aircrafts_in_the_fleet","groups":["group-aircraft-manufacturer"]},{"id":"id_field_number_of_this_aircraft_in_the_fleet","groups":["group-aircraft-manufacturer"]},{"id":"id_field_purpose_of_ewa","groups":["group-background","group-ewa"]},{"id":"id_field_financial_structure","groups":["group-background","group-ewa"]},{"id":"id_field_parties_involved","groups":["group-background"]},{"id":"id_field_are_there_any_amendments","groups":["group-background","group-ewa"]},{"id":"id_field_amendments_detail","replaceConfig":{"type":"textarea","attributes":{"rows":2}},"groups":["group-background","group-ewa"]},{"id":"id_field_are_there_any_additional_definitions","groups":["group-background","group-ewa"]},{"id":"id_field_definitions_detail","replaceConfig":{"type":"textarea","attributes":{"rows":2}},"groups":["group-background","group-ewa"]},{"id":"id_field_if_other_please_specify","groups":["group-background"]},{"id":"id_field_deg_number_of_ewa_to_be_terminated","groups":["group-background","group-tewa"]},{"id":"id_field_date_of_original_ewa","groups":["group-background","group-tewa"]},{"id":"id_field_please_confirm_all_parties_wish_to_terminate_the_agreement","groups":["group-background","group-tewa"]},{"id":"id_field_original_executed_ewa","groups":["group-background","group-tewa"]},{"id":"id_field_please_specify_deal_deadline","groups":["group-background"]},{"id":"id_field_lessee_full_name","groups":["group-parties","group-lessee"]},{"id":"id_field_lessee_country_of_incorporation","groups":["group-parties","group-lessee"]},{"id":"id_field_lessee_address","groups":["group-parties","group-lessee"]},{"id":"id_field_lessee_the_above_is","groups":["group-parties","group-lessee"]},{"id":"id_field_lessee_name_of_authorised_signatory","groups":["group-parties","group-lessee"]},{"id":"id_field_lessor_full_name","groups":["group-parties","group-lessor"]},{"id":"id_field_lessor_country_of_incorporation","groups":["group-parties","group-lessor"]},{"id":"id_field_lessor_address","groups":["group-parties","group-lessor"]},{"id":"id_field_lessor_the_above_is","groups":["group-parties","group-lessor"]},{"id":"id_field_lessor_name_of_authorised_signatory","groups":["group-parties","group-lessor"]},{"id":"id_field_head_lessor_full_name","groups":["group-parties","group-head-lessor"]},{"id":"id_field_head_lessor_country_of_incorporation","groups":["group-parties","group-head-lessor"]},{"id":"id_field_head_lessor_address","groups":["group-parties","group-head-lessor"]},{"id":"id_field_head_lessor_the_above_is","groups":["group-parties","group-head-lessor"]},{"id":"id_field_head_lessor_name_of_authorised_signatory","groups":["group-parties","group-head-lessor"]},{"id":"id_field_trustee_full_name","groups":["group-parties","group-trustee"]},{"id":"id_field_trustee_country_of_incorporation","groups":["group-parties","group-trustee"]},{"id":"id_field_trustee_address","groups":["group-parties","group-trustee"]},{"id":"id_field_trustee_the_above_is","groups":["group-parties","group-trustee"]},{"id":"id_field_trustee_name_of_authorised_signatory","groups":["group-parties","group-trustee"]},{"id":"id_field_pdp_full_name","groups":["group-parties","group-pdp"]},{"id":"id_field_pdp_country_of_incorporation","groups":["group-parties","group-pdp"]},{"id":"id_field_pdp_address","groups":["group-parties","group-pdp"]},{"id":"id_field_pdp_the_above_is","groups":["group-parties","group-pdp"]},{"id":"id_field_pdp_name_of_authorised_signatory","groups":["group-parties","group-pdp"]},{"id":"id_field_is_there_a_direct_warranty","groups":["group-current-agreements","group-dw"]},{"id":"id_field_dw_between","label":"Between","groups":["group-current-agreements","group-dw","group-dw-details"]},{"id":"id_field_dw_between_other","label":"Other","groups":["group-current-agreements","group-dw","group-dw-details"]},{"id":"id_field_dw_and","label":"And","groups":["group-current-agreements","group-dw","group-dw-details"]},{"id":"id_field_dw_and_other","label":"Other","groups":["group-current-agreements","group-dw","group-dw-details"]},{"id":"id_field_dw_dated","label":"Dated","groups":["group-current-agreements","group-dw","group-dw-details"]},{"id":"id_field_deg_number","label":"DEG Number","groups":["group-current-agreements","group-dw","group-dw-details"]},{"id":"id_field_is_there_a_security_agreement","groups":["group-current-agreements","group-sa"]},{"id":"id_field_sa_between","label":"Between","groups":["group-current-agreements","group-sa","group-sa-details"]},{"id":"id_field_sa_between_other","label":"Other","groups":["group-current-agreements","group-sa","group-sa-details"]},{"id":"id_field_sa_and","label":"And","groups":["group-current-agreements","group-sa","group-sa-details"]},{"id":"id_field_sa_and_other","label":"Other","groups":["group-current-agreements","group-sa","group-sa-details"]},{"id":"id_field_sa_dated","label":"Dated","groups":["group-current-agreements","group-sa","group-sa-details"]},{"id":"id_field_is_there_a_lease_agreement","groups":["group-current-agreements","group-la"]},{"id":"id_field_la_between","label":"Between","groups":["group-current-agreements","group-la","group-la-details"]},{"id":"id_field_la_between_other","label":"Other","groups":["group-current-agreements","group-la","group-la-details"]},{"id":"id_field_la_and","label":"And","groups":["group-current-agreements","group-la","group-la-details"]},{"id":"id_field_la_and_other","label":"Other","groups":["group-current-agreements","group-la","group-la-details"]},{"id":"id_field_la_dated","label":"Dated","groups":["group-current-agreements","group-la","group-la-details"]},{"id":"id_field_is_there_a_head_lease","groups":["group-current-agreements","group-hl"]},{"id":"id_field_hl_between","label":"Between","groups":["group-current-agreements","group-hl","group-hl-details"]},{"id":"id_field_hl_between_other","label":"Other","groups":["group-current-agreements","group-hl","group-hl-details"]},{"id":"id_field_hl_and","label":"And","groups":["group-current-agreements","group-hl","group-hl-details"]},{"id":"id_field_hl_and_other","label":"Other","groups":["group-current-agreements","group-hl","group-hl-details"]},{"id":"id_field_hl_dated","label":"Dated","groups":["group-current-agreements","group-hl","group-hl-details"]}],"pages":[{"label":"Request Details","id":"group-request-details"},{"label":"Aircraft Manufacturer","id":"group-aircraft-manufacturer"},{"label":"Background","id":"group-background"},{"label":"Parties","id":"group-parties"},{"label":"Current Agreements","id":"group-current-agreements"}],"lookupFields":{"primary":"id_field_reference_number"},"dependencies":{"id_field_legal_opinion_required":{"type":"field","defaultState":{"value":"","visible":false},"validStates":[{"value":"","visible":true,"criterias":[{"target":"id_field_agreement_type","values":["Engine Warranty Agreement"]}]}]},"id_field_if_other_please_provide_details":{"type":"field","defaultState":{"value":"","visible":false},"validStates":[{"value":"","visible":true,"criterias":[{"target":"id_field_governing_law","values":["Other"]}]}]},"group-ewa":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_agreement_type","values":["Engine Warranty Agreement"]}]}]},"group-tewa":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_agreement_type","values":["Termination Engine Warranty Agreement"]}]}]},"id_field_amendments_detail":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_are_there_any_amendments","values":["Yes"]}]}]},"id_field_definitions_detail":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_are_there_any_additional_definitions","values":["Yes"]}]}]},"group-parties":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee","Lessor/Lessee/Security Trustee","Lessor/Lessee/Head Lessor/Security Trustee","PDP Lender/Lessee"]}]}]},"group-current-agreements":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_agreement_type","values":["Engine Warranty Agreement"]}]}]},"id_field_total_number_of_aircrafts_in_the_fleet":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_the_aircraft_part_of_a_fleet","values":["Yes"]}]}]},"id_field_number_of_this_aircraft_in_the_fleet":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_the_aircraft_part_of_a_fleet","values":["Yes"]}]}]},"id_field_if_other_please_specify":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Other"]}]}]},"group-lessee":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee","Lessor/Lessee/Security Trustee","Lessor/Lessee/Head Lessor/Security Trustee","PDP Lender/Lessee"]}]}]},"group-lessor":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee","Lessor/Lessee/Security Trustee","Lessor/Lessee/Head Lessor/Security Trustee"]}]}]},"group-head-lessor":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee/Head Lessor/Security Trustee"]}]}]},"group-trustee":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee/Security Trustee","Lessor/Lessee/Head Lessor/Security Trustee"]}]}]},"group-pdp":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["PDP Lender/Lessee"]}]}]},"group-dw-details":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_there_a_direct_warranty","values":["Yes"]}]}]},"group-sa-details":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_there_a_security_agreement","values":["Yes"]}]}]},"group-la-details":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_there_a_lease_agreement","values":["Yes"]}]}]},"group-hl-details":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_there_a_head_lease","values":["Yes"]}]}]},"id_field_dw_between_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_dw_between","values":["Other"]}]}]},"id_field_sa_between_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_sa_between","values":["Other"]}]}]},"id_field_la_between_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_la_between","values":["Other"]}]}]},"id_field_hl_between_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_hl_between","values":["Other"]}]}]},"id_field_dw_and_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_dw_and","values":["Other"]}]}]},"id_field_sa_and_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_sa_and","values":["Other"]}]}]},"id_field_la_and_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_la_and","values":["Other"]}]}]},"id_field_hl_and_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_hl_and","values":["Other"]}]}]}},"validation":{"id_field_agreement_type":{"required":true},"id_field_reference_number":{"required":true},"id_field_engine_serial_numbers":{"pattern":"^([0-9]{3,10}) & ([0-9]{3,10})$"},"id_field_legal_opinion_required":{"required":true},"id_field_customer_name":{"required":true}},"inputMask":{"id_field_please_specify_deal_deadline":{"mask":"99/99/9999"},"id_field_date_of_original_ewa":{"mask":"99/99/9999"},"id_field_dw_dated":{"mask":"99/99/9999"},"id_field_sa_dated":{"mask":"99/99/9999"},"id_field_la_dated":{"mask":"99/99/9999"},"id_field_hl_dated":{"mask":"99/99/9999"}}}
+module.exports = {"formSelector":"#target_form","pageTitle":"Engine Warranty Intake Form","formTitle":"","logo":"https://www.rolls-royce.com/~/media/Images/R/Rolls-Royce/logo/rebrand-svg-logo.svg?h=96&la=en&w=59","decoratorClasses":{"form":["pure-form"],"title":[],"field":["pure-input-1"],"fieldWrapperDiv":["pure-u-2-3"],"label":[],"labelWrapperDiv":["pure-u-1-3"],"labelAndFieldWrapperDiv":["pure-g"]},"fields":[{"id":"id_field_agreement_type","groups":["request-details"],"decoratorClasses":{}},{"id":"id_field_legal_opinion_required","groups":["request-details"]},{"id":"id_field_governing_law","groups":["request-details"]},{"id":"id_field_if_other_please_provide_details","groups":["request-details"]},{"id":"id_field_reference_number","groups":["request-details"]},{"id":"id_field_customer_name","groups":["request-details"]},{"id":"id_field_lead_party_company_name","groups":["request-details"]},{"id":"id_field_counsel_acting_for_lead_party","groups":["request-details"]},{"id":"id_field_acting_counsel_e_mail","groups":["request-details"]},{"id":"id_field_lead_party_country","groups":["request-details"]},{"id":"id_field_aircraft_manufacturer","groups":["aircraft-manufacturer"]},{"id":"id_field_manufacturer_serial_number","groups":["aircraft-manufacturer"]},{"id":"id_field_engine_serial_numbers","placeholder":"e.g. 42405 & 42406","groups":["aircraft-manufacturer"]},{"id":"id_field_aircraft_type","groups":["aircraft-manufacturer"]},{"id":"id_field_aircraft_registration_mark","groups":["aircraft-manufacturer"]},{"id":"id_field_engine_type","groups":["aircraft-manufacturer"]},{"id":"id_field_is_the_aircraft_part_of_a_fleet","groups":["aircraft-manufacturer"]},{"id":"id_field_total_number_of_aircrafts_in_the_fleet","groups":["aircraft-manufacturer"]},{"id":"id_field_number_of_this_aircraft_in_the_fleet","groups":["aircraft-manufacturer"]},{"id":"id_field_purpose_of_ewa","groups":["background","ewa"]},{"id":"id_field_financial_structure","groups":["background","ewa"]},{"id":"id_field_parties_involved","groups":["background"]},{"id":"id_field_are_there_any_amendments","groups":["background","ewa"]},{"id":"id_field_amendments_detail","bIsTextArea":true,"groups":["background","ewa"]},{"id":"id_field_are_there_any_additional_definitions","groups":["background","ewa"]},{"id":"id_field_definitions_detail","bIsTextArea":true,"groups":["background","ewa"]},{"id":"id_field_if_other_please_specify","groups":["background"]},{"id":"id_field_deg_number_of_ewa_to_be_terminated","groups":["background","tewa"]},{"id":"id_field_date_of_original_ewa","groups":["background","tewa"]},{"id":"id_field_please_confirm_all_parties_wish_to_terminate_the_agreement","groups":["background","tewa"]},{"id":"id_field_original_executed_ewa","groups":["background","tewa"]},{"id":"id_field_please_specify_deal_deadline","groups":["background"]},{"id":"id_field_lessee_full_name","groups":["parties","lessee"]},{"id":"id_field_lessee_country_of_incorporation","groups":["parties","lessee"]},{"id":"id_field_lessee_address","groups":["parties","lessee"]},{"id":"id_field_lessee_the_above_is","groups":["parties","lessee"]},{"id":"id_field_lessee_name_of_authorised_signatory","groups":["parties","lessee"]},{"id":"id_field_lessor_full_name","groups":["parties","lessor"]},{"id":"id_field_lessor_country_of_incorporation","groups":["parties","lessor"]},{"id":"id_field_lessor_address","groups":["parties","lessor"]},{"id":"id_field_lessor_the_above_is","groups":["parties","lessor"]},{"id":"id_field_lessor_name_of_authorised_signatory","groups":["parties","lessor"]},{"id":"id_field_head_lessor_full_name","groups":["parties","head-lessor"]},{"id":"id_field_head_lessor_country_of_incorporation","groups":["parties","head-lessor"]},{"id":"id_field_head_lessor_address","groups":["parties","head-lessor"]},{"id":"id_field_head_lessor_the_above_is","groups":["parties","head-lessor"]},{"id":"id_field_head_lessor_name_of_authorised_signatory","groups":["parties","head-lessor"]},{"id":"id_field_trustee_full_name","groups":["parties","trustee"]},{"id":"id_field_trustee_country_of_incorporation","groups":["parties","trustee"]},{"id":"id_field_trustee_address","groups":["parties","trustee"]},{"id":"id_field_trustee_the_above_is","groups":["parties","trustee"]},{"id":"id_field_trustee_name_of_authorised_signatory","groups":["parties","trustee"]},{"id":"id_field_pdp_full_name","groups":["parties","pdp"]},{"id":"id_field_pdp_country_of_incorporation","groups":["parties","pdp"]},{"id":"id_field_pdp_address","groups":["parties","pdp"]},{"id":"id_field_pdp_the_above_is","groups":["parties","pdp"]},{"id":"id_field_pdp_name_of_authorised_signatory","groups":["parties","pdp"]},{"id":"id_field_is_there_a_direct_warranty","groups":["current-agreements","dw"]},{"id":"id_field_dw_between","label":"Between","groups":["current-agreements","dw","dw-details"]},{"id":"id_field_dw_between_other","label":"Other","groups":["current-agreements","dw","dw-details"]},{"id":"id_field_dw_and","label":"And","groups":["current-agreements","dw","dw-details"]},{"id":"id_field_dw_and_other","label":"Other","groups":["current-agreements","dw","dw-details"]},{"id":"id_field_dw_dated","label":"Dated","groups":["current-agreements","dw","dw-details"]},{"id":"id_field_deg_number","label":"DEG Number","groups":["current-agreements","dw","dw-details"]},{"id":"id_field_is_there_a_security_agreement","groups":["current-agreements","sa"]},{"id":"id_field_sa_between","label":"Between","groups":["current-agreements","sa","sa-details"]},{"id":"id_field_sa_between_other","label":"Other","groups":["current-agreements","sa","sa-details"]},{"id":"id_field_sa_and","label":"And","groups":["current-agreements","sa","sa-details"]},{"id":"id_field_sa_and_other","label":"Other","groups":["current-agreements","sa","sa-details"]},{"id":"id_field_sa_dated","label":"Dated","groups":["current-agreements","sa","sa-details"]},{"id":"id_field_is_there_a_lease_agreement","groups":["current-agreements","la"]},{"id":"id_field_la_between","label":"Between","groups":["current-agreements","la","la-details"]},{"id":"id_field_la_between_other","label":"Other","groups":["current-agreements","la","la-details"]},{"id":"id_field_la_and","label":"And","groups":["current-agreements","la","la-details"]},{"id":"id_field_la_and_other","label":"Other","groups":["current-agreements","la","la-details"]},{"id":"id_field_la_dated","label":"Dated","groups":["current-agreements","la","la-details"]},{"id":"id_field_is_there_a_head_lease","groups":["current-agreements","hl"]},{"id":"id_field_hl_between","label":"Between","groups":["current-agreements","hl","hl-details"]},{"id":"id_field_hl_between_other","label":"Other","groups":["current-agreements","hl","hl-details"]},{"id":"id_field_hl_and","label":"And","groups":["current-agreements","hl","hl-details"]},{"id":"id_field_hl_and_other","label":"Other","groups":["current-agreements","hl","hl-details"]},{"id":"id_field_hl_dated","label":"Dated","groups":["current-agreements","hl","hl-details"]}],"pages":[{"label":"Request Details","id":"request-details"},{"label":"Aircraft Manufacturer","id":"aircraft-manufacturer"},{"label":"Background","id":"background"},{"label":"Parties","id":"parties"},{"label":"Current Agreements","id":"current-agreements"}],"lookupFields":{"primary":"id_field_reference_number"},"dependencies":{"id_field_legal_opinion_required":{"type":"field","defaultState":{"value":"","visible":false},"validStates":[{"value":"","visible":true,"criterias":[{"target":"id_field_agreement_type","values":["Engine Warranty Agreement"]}]}]},"id_field_if_other_please_provide_details":{"type":"field","defaultState":{"value":"","visible":false},"validStates":[{"value":"","visible":true,"criterias":[{"target":"id_field_governing_law","values":["Other"]}]}]},"ewa":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_agreement_type","values":["Engine Warranty Agreement"]}]}]},"tewa":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_agreement_type","values":["Termination Engine Warranty Agreement"]}]}]},"id_field_amendments_detail":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_are_there_any_amendments","values":["Yes"]}]}]},"id_field_definitions_detail":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_are_there_any_additional_definitions","values":["Yes"]}]}]},"parties":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee","Lessor/Lessee/Security Trustee","Lessor/Lessee/Head Lessor/Security Trustee","PDP Lender/Lessee"]}]}]},"current-agreements":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_agreement_type","values":["Engine Warranty Agreement"]}]}]},"id_field_total_number_of_aircrafts_in_the_fleet":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_the_aircraft_part_of_a_fleet","values":["Yes"]}]}]},"id_field_number_of_this_aircraft_in_the_fleet":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_the_aircraft_part_of_a_fleet","values":["Yes"]}]}]},"id_field_if_other_please_specify":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Other"]}]}]},"lessee":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee","Lessor/Lessee/Security Trustee","Lessor/Lessee/Head Lessor/Security Trustee","PDP Lender/Lessee"]}]}]},"lessor":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee","Lessor/Lessee/Security Trustee","Lessor/Lessee/Head Lessor/Security Trustee"]}]}]},"head-lessor":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee/Head Lessor/Security Trustee"]}]}]},"trustee":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["Lessor/Lessee/Security Trustee","Lessor/Lessee/Head Lessor/Security Trustee"]}]}]},"pdp":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_parties_involved","values":["PDP Lender/Lessee"]}]}]},"dw-details":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_there_a_direct_warranty","values":["Yes"]}]}]},"sa-details":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_there_a_security_agreement","values":["Yes"]}]}]},"la-details":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_there_a_lease_agreement","values":["Yes"]}]}]},"hl-details":{"type":"group","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_is_there_a_head_lease","values":["Yes"]}]}]},"id_field_dw_between_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_dw_between","values":["Other"]}]}]},"id_field_sa_between_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_sa_between","values":["Other"]}]}]},"id_field_la_between_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_la_between","values":["Other"]}]}]},"id_field_hl_between_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_hl_between","values":["Other"]}]}]},"id_field_dw_and_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_dw_and","values":["Other"]}]}]},"id_field_sa_and_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_sa_and","values":["Other"]}]}]},"id_field_la_and_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_la_and","values":["Other"]}]}]},"id_field_hl_and_other":{"type":"field","defaultState":{"visible":false},"validStates":[{"visible":true,"criterias":[{"target":"id_field_hl_and","values":["Other"]}]}]}},"validation":{"id_field_agreement_type":{"required":true},"id_field_reference_number":{"required":true},"id_field_engine_serial_numbers":{"pattern":"^([0-9]{3,10}) & ([0-9]{3,10})$"},"id_field_legal_opinion_required":{"required":true},"id_field_customer_name":{"required":true}},"inputMask":{"id_field_please_specify_deal_deadline":{"mask":"99/99/9999"},"id_field_date_of_original_ewa":{"mask":"99/99/9999"},"id_field_dw_dated":{"mask":"99/99/9999"},"id_field_sa_dated":{"mask":"99/99/9999"},"id_field_la_dated":{"mask":"99/99/9999"},"id_field_hl_dated":{"mask":"99/99/9999"}}}
 
 /***/ }),
 /* 16 */
@@ -5508,9 +5548,12 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+__webpack_require__(20);
+
 var _ = {
-  forEach: __webpack_require__(2)
+  forEach: __webpack_require__(4)
 };
+var LOCAL_DECORATOR_NON_RESIZABLE_TEXTAREA = 'alx-non-resizable-textarea';
 
 var FormPreparator =
 /*#__PURE__*/
@@ -5522,27 +5565,13 @@ function () {
   }
 
   _createClass(FormPreparator, [{
-    key: "_replaceField",
-    value: function _replaceField(_fieldId, _replaceConfig) {
-      if (!_replaceConfig) {
+    key: "_treatFreeformAsNormalInput",
+    value: function _treatFreeformAsNormalInput(_fieldId, _bIsTextArea) {
+      if (_bIsTextArea) {
         return;
       }
 
-      if (_replaceConfig.type === 'textarea') {
-        var _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
-
-        var _$textArea = this.$('<textarea></textarea>');
-
-        _$textArea.attr('id', _fieldId);
-
-        _$textArea.attr('name', _$field.attr('name'));
-
-        _.forEach(_replaceConfig.attributes, function (_value, _attribute) {
-          _$textArea.attr(_attribute, _value);
-        });
-
-        _$field.replaceWith(_$textArea);
-      }
+      this.QUICK_SELECTOR.getElemById(_fieldId).addClass(LOCAL_DECORATOR_NON_RESIZABLE_TEXTAREA);
     }
   }, {
     key: "_decorateFieldWithHelperClasses",
@@ -5605,9 +5634,11 @@ function () {
           _this.nestedGroups[_level] = {};
         }
 
-        _$labelAndFieldWrapperDiv.addClass(_group);
+        var _groupId = "".concat(_this.PREFIX_GROUP).concat(_group);
 
-        _this.nestedGroups[_level][_group] = true;
+        _$labelAndFieldWrapperDiv.addClass(_groupId);
+
+        _this.nestedGroups[_level][_groupId] = true;
       });
     }
   }, {
@@ -5639,24 +5670,17 @@ function () {
     value: function _generateNestedGroups() {
       var _this2 = this;
 
-      this.nestedGroups.forEach(function (_groups) {
-        _.forEach(_groups, function (_v, _group) {
-          var _$wrapper = _this2.$('<div/>').attr('id', _group).addClass(_this2.DECORATOR_FORM_GROUP);
+      this.nestedGroups.forEach(function (_groupIds) {
+        _.forEach(_groupIds, function (_v, _groupId) {
+          var _$wrapper = _this2.$('<div/>').attr('id', _groupId).addClass(_this2.DECORATOR_FORM_GROUP);
 
-          _this2.$(".".concat(_group)).wrapAll(_$wrapper);
+          var _$toWrap = _this2.$(".".concat(_groupId));
+
+          _$toWrap.wrapAll(_$wrapper);
+
+          _$toWrap.removeClass(_groupId);
         });
       });
-    }
-  }, {
-    key: "_appendTitle",
-    value: function _appendTitle(_config) {
-      var _$elem = this.$('<div/>');
-
-      _$elem.append("<h2>".concat(_config.title, "</h2>"));
-
-      FormPreparator._appendClassesToElem(_$elem, _config.decoratorClasses.title);
-
-      this.QUICK_SELECTOR.getElemById(this.ID_FORM).prepend(_$elem);
     }
   }, {
     key: "init",
@@ -5666,7 +5690,7 @@ function () {
       FormPreparator._appendClassesToElem(this.QUICK_SELECTOR.getElemById(this.ID_FORM), _config.decoratorClasses.form);
 
       _config.fields.forEach(function (_fieldConfig) {
-        _this3._replaceField(_fieldConfig.id, _fieldConfig.replaceConfig);
+        _this3._treatFreeformAsNormalInput(_fieldConfig.id, _fieldConfig.bIsTextArea);
 
         _this3._decorateFieldWithHelperClasses(_fieldConfig.id, _fieldConfig.decoratorClasses, _config.decoratorClasses);
 
@@ -5679,18 +5703,26 @@ function () {
 
       this._generateNestedGroups();
 
-      this._appendTitle(_config);
-
       return this;
     }
   }], [{
     key: "_appendClassesToElem",
     value: function _appendClassesToElem(_$elem, _classes) {
-      if (_$elem.length === 0 || !Array.isArray(_classes) || _classes.length === 0) {
+      if (_$elem.length === 0) {
         return;
       }
 
-      return _$elem.addClass(_classes.join(' '));
+      if (typeof _classes === 'string') {
+        return _$elem.addClass(_classes);
+      }
+
+      if (Array.isArray(_classes)) {
+        if (_classes.length === 0) {
+          return;
+        }
+
+        return _$elem.addClass(_classes.join(' '));
+      }
     }
   }]);
 
@@ -5703,6 +5735,70 @@ module.exports = FormPreparator;
 /* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
+var content = __webpack_require__(21);
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(3)(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {
+	module.hot.accept("!!../node_modules/css-loader/index.js!../node_modules/postcss-loader/lib/index.js??ref--3-2!../node_modules/sass-loader/lib/loader.js!./FormPreparator.scss", function() {
+		var newContent = require("!!../node_modules/css-loader/index.js!../node_modules/postcss-loader/lib/index.js??ref--3-2!../node_modules/sass-loader/lib/loader.js!./FormPreparator.scss");
+
+		if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+
+		var locals = (function(a, b) {
+			var key, idx = 0;
+
+			for(key in a) {
+				if(!b || a[key] !== b[key]) return false;
+				idx++;
+			}
+
+			for(key in b) idx--;
+
+			return idx === 0;
+		}(content.locals, newContent.locals));
+
+		if(!locals) throw new Error('Aborting CSS HMR due to changed css-modules locals.');
+
+		update(newContent);
+	});
+
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(2)(false);
+// imports
+
+
+// module
+exports.push([module.i, ".alx-non-resizable-textarea {\n  resize: none; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -5711,6 +5807,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var LOCAL_IDENTIFIER_LOGO_CONTAINER = 'alx-logo';
+var LOCAL_IDENTIFIER_PAGE_TITLE_CONTAINER = 'alx-page-title';
 
 var FormDecorator =
 /*#__PURE__*/
@@ -5733,9 +5832,9 @@ function () {
 
       var _logoSrc = _config.logo.indexOf('http') === -1 ? "data:image/png;base64, ".concat(_config.logo) : _config.logo;
 
-      _$heading.append("<div id=\"logo\"><img src=\"".concat(_logoSrc, "\"></div>"));
+      _$heading.append("<div id=\"".concat(LOCAL_IDENTIFIER_LOGO_CONTAINER, "\"><img src=\"").concat(_logoSrc, "\"></div>"));
 
-      _$heading.append("<div id=\"heading\"><h1>".concat(_config.heading, "</h1></div>"));
+      _$heading.append("<div id=\"".concat(LOCAL_IDENTIFIER_PAGE_TITLE_CONTAINER, "\"><h1>").concat(_config.pageTitle, "</h1></div>"));
 
       this.$('body').prepend(_$heading);
     }
@@ -5747,30 +5846,37 @@ function () {
   }, {
     key: "_appendFooter",
     value: function _appendFooter() {
-      var _$footer = this.$('<footer/>');
-
-      this.$('body').append(_$footer);
+      this.$('body').append(this.$('<footer/>'));
     }
   }, {
     key: "_appendPageNavBarContainers",
     value: function _appendPageNavBarContainers() {
-      this.$topNavBarContainer = this.$('<div/>').attr('id', 'page-navigation-top');
-      this.$bottomNavBarContainer = this.$('<div/>').attr('id', 'page-navigation-bottom');
-      this.$('main').prepend(this.$topNavBarContainer);
-      this.QUICK_SELECTOR.getElemById(this.ID_FORM).append(this.$bottomNavBarContainer);
+      this.$('main').prepend(this.$('<div/>').attr('id', this.IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER));
+      this.QUICK_SELECTOR.getElemById(this.ID_FORM).append(this.$('<div/>').attr('id', this.IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER));
     }
   }, {
-    key: "_appendSaveAndLoadContainers",
-    value: function _appendSaveAndLoadContainers() {
-      var _$saveAndLoadButtonContainer = this.$('<div/>').attr('id', 'save-load-buttons');
-
-      this.$('main').append(_$saveAndLoadButtonContainer);
+    key: "_appendSaveAndLoadButtonContainers",
+    value: function _appendSaveAndLoadButtonContainers() {
+      this.$('main').append(this.$('<div/>').attr('id', this.IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER));
     }
   }, {
     key: "_moveButtons",
     value: function _moveButtons() {
-      this.$('button[type="button"]').appendTo('#save-load-buttons');
-      this.$('#target_form_logout').appendTo('#save-load-buttons');
+      this.$('button[type="button"]').appendTo("#".concat(this.IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER));
+      this.$('#target_form_logout').appendTo("#".concat(this.IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER));
+    }
+  }, {
+    key: "_appendFormTitle",
+    value: function _appendFormTitle() {
+      var _formTitle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+      var _$elem = this.$('<div/>');
+
+      _$elem.attr('id', this.IDENTIFIER_FORM_TITLE_CONTAINER);
+
+      _$elem.append("<h2>".concat(_formTitle, "</h2>"));
+
+      this.QUICK_SELECTOR.getElemById(this.ID_FORM).prepend(_$elem);
     }
   }, {
     key: "init",
@@ -5783,23 +5889,15 @@ function () {
 
       this._appendPageNavBarContainers();
 
-      this._appendSaveAndLoadContainers();
+      this._appendSaveAndLoadButtonContainers();
 
       this._moveButtons();
 
       this._appendFooter();
 
+      this._appendFormTitle(_config.formTitle);
+
       return this;
-    }
-  }, {
-    key: "getPaginationTopNavBarContainer",
-    value: function getPaginationTopNavBarContainer() {
-      return this.$topNavBarContainer;
-    }
-  }, {
-    key: "getPaginationBottomNavBarContainer",
-    value: function getPaginationBottomNavBarContainer() {
-      return this.$bottomNavBarContainer;
     }
   }]);
 
@@ -5809,7 +5907,7 @@ function () {
 module.exports = FormDecorator;
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5829,32 +5927,30 @@ function () {
   function LookupFieldSynchronizer() {
     _classCallCheck(this, LookupFieldSynchronizer);
 
-    this._primaryLookupFieldMethod = null;
+    this._checkIfLookupFieldNeedsSyncing = this._checkIfLookupFieldNeedsSyncing.bind(this);
   }
 
   _createClass(LookupFieldSynchronizer, [{
     key: "_initGlobalEventListeners",
     value: function _initGlobalEventListeners() {
-      var _this2 = this;
+      var _this = this;
 
-      this.QUICK_SELECTOR.getElemById(this.ID_FORM).on(this.FORM_EVENTS.EVENT_CHECK_IF_LOOKUP_FIELD_NEEDS_SYNCING, function (_event, _config) {
+      this.FORM_EVENTS.registerToFormEvent(this.FORM_EVENTS.EVENT_CHECK_IF_FIELD_NEEDS_SYNCING, function (_event, _$field, _newVal) {
         _event.preventDefault();
 
-        return _this2._syncLookupField(_config.elem, _config.arguments);
+        return _this._checkIfLookupFieldNeedsSyncing(_$field, _newVal);
       });
     }
   }, {
-    key: "_syncLookupField",
-    value: function _syncLookupField(_this, _arguments) {
-      var _this3 = this;
+    key: "_checkIfLookupFieldNeedsSyncing",
+    value: function _checkIfLookupFieldNeedsSyncing(_$field, _newVal) {
+      var _this2 = this;
 
-      var _$field = this.$(_this);
-
-      if (_arguments[0] !== undefined && _$field.attr('id') === this.primaryField) {
+      if (_newVal !== undefined && _$field.attr('id') === this.primaryField) {
         var _$lookupSelector = this.QUICK_SELECTOR.getElemById("".concat(this.PREFIX_LOOKUP_ID).concat(this.primaryField));
 
         var _listedValuesInLookupSelector = this.$('option', _$lookupSelector).toArray().map(function (_elem) {
-          return _this3.$(_elem).text();
+          return _this2.$(_elem).text();
         });
 
         if (_listedValuesInLookupSelector.indexOf(_$field.val().toString()) !== -1) {
@@ -5887,7 +5983,7 @@ function () {
 module.exports = LookupFieldSynchronizer;
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5900,10 +5996,10 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var _ = {
-  forEach: __webpack_require__(2),
+  forEach: __webpack_require__(4),
   set: __webpack_require__(6)
 };
-var LOCAL_DECORATOR_TRIGGER_DEPENDENCY_CHANGE = 'alx-identifier-trigger-dependency-change';
+var LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE = 'alx-trigger-conditional-change';
 
 var Conditionals =
 /*#__PURE__*/
@@ -5911,8 +6007,8 @@ function () {
   function Conditionals(_$) {
     _classCallCheck(this, Conditionals);
 
-    this.dependencies = null;
-    this.dependencyMap = {};
+    this.validStatesConfigs = null;
+    this.conditionalsMap = {};
     this.bInitialized = false;
     this.animationConfig = {
       duration: 0
@@ -5921,73 +6017,73 @@ function () {
 
   _createClass(Conditionals, [{
     key: "_setDefaultStateAndBuildDependencyMap",
-    value: function _setDefaultStateAndBuildDependencyMap(_dependencies) {
+    value: function _setDefaultStateAndBuildDependencyMap(_validStatesConfigs) {
       var _this = this;
 
-      this.dependencies = _dependencies;
+      this.validStatesConfigs = _validStatesConfigs;
 
-      _.forEach(_dependencies, function (_dependencyConfig, _field) {
-        _this._setState(_dependencyConfig.type, _field, _dependencyConfig.defaultState);
+      _.forEach(this.validStatesConfigs, function (_validStateConfig, _toChangeId) {
+        _this._setState(_validStateConfig.type, _toChangeId, _validStateConfig.defaultState);
 
-        _dependencyConfig.validStates.forEach(function (_validState) {
+        _validStateConfig.validStates.forEach(function (_validState) {
           _validState.criterias.forEach(function (_criteria) {
-            _.set(_this.dependencyMap, [_criteria.target, _field], true);
+            if (!_this.conditionalsMap.hasOwnProperty(_criteria.target)) {
+              _this.QUICK_SELECTOR.getElemById(_criteria.target).addClass(LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE);
+            }
+
+            _.set(_this.conditionalsMap, [_criteria.target, _toChangeId], true);
           });
         });
       });
-
-      this.$(Object.keys(this.dependencyMap).map(Conditionals._generateIdSelector).join(',')).addClass(LOCAL_DECORATOR_TRIGGER_DEPENDENCY_CHANGE);
     }
   }, {
     key: "_initEventListeners",
     value: function _initEventListeners() {
       var _this2 = this;
 
-      this.$(".".concat(LOCAL_DECORATOR_TRIGGER_DEPENDENCY_CHANGE)).on('change', function (_event) {
+      this.$(".".concat(LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE)).on('change', function (_event) {
         _event.preventDefault();
 
-        return _this2._setConditionalFields(_this2.$(_event.target));
+        return _this2._setConditionalsOnFieldChange(_this2.$(_event.target).attr('id'));
       });
     }
   }, {
-    key: "_setConditionalFields",
-    value: function _setConditionalFields(_$field) {
+    key: "_setConditionalsOnFieldChange",
+    value: function _setConditionalsOnFieldChange(_fieldId) {
       var _this3 = this;
 
-      var _idSelector = _$field.attr('id');
-
-      if (!this.dependencyMap.hasOwnProperty(_idSelector)) {
+      if (!this.conditionalsMap.hasOwnProperty(_fieldId)) {
         return;
       }
 
-      _.forEach(this.dependencyMap[_idSelector], function (_v, _toChange) {
-        var _type = _this3.dependencies[_toChange].type;
+      _.forEach(this.conditionalsMap[_fieldId], function (_v, _toChangeId) {
+        var _type = _this3.validStatesConfigs[_toChangeId].type;
 
-        var _state = _this3._getValidState(_this3.dependencies[_toChange]);
+        var _state = _this3._getValidState(_this3.validStatesConfigs[_toChangeId]);
 
-        _this3._setState(_type, _toChange, _state);
+        _this3._setState(_type, _toChangeId, _state);
       });
 
       this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_DEPENDENCY_CHANGED);
     }
   }, {
     key: "_setState",
-    value: function _setState(_type, _toChange, _state) {
+    value: function _setState(_type, _toChangeId, _state) {
       if (_type === 'field') {
-        return this._setFieldState(_toChange, _state);
+        return this._setFieldState(this.QUICK_SELECTOR.getElemById(_toChangeId), _state);
       }
 
       if (_type === 'group') {
-        return this._setGroupState(_toChange, _state);
+        return this._setGroupState(this.QUICK_SELECTOR.getElemById("".concat(this.PREFIX_GROUP).concat(_toChangeId)), _state);
       }
+
+      throw new Error("Invalid type -> ".concat(_type));
     }
   }, {
     key: "_setFieldState",
-    value: function _setFieldState(_toChange, _state) {
-      var _$field = this.$(Conditionals._generateIdSelector(_toChange));
-
+    value: function _setFieldState(_$field, _state) {
       if (_state.hasOwnProperty('visible')) {
-        var _$wrapper = _$field.closest('.form-element');
+        var _$wrapper = _$field.closest(".".concat(this.DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER));
 
         var _method = _state.visible === true ? 'slideDown' : 'slideUp';
 
@@ -6010,9 +6106,7 @@ function () {
     }
   }, {
     key: "_setGroupState",
-    value: function _setGroupState(_toChange, _state) {
-      var _$group = this.$(Conditionals._generateIdSelector(_toChange));
-
+    value: function _setGroupState(_$group, _state) {
       if (_state.hasOwnProperty('visible')) {
         var _method = _state.visible === true ? 'slideDown' : 'slideUp';
 
@@ -6030,12 +6124,24 @@ function () {
   }, {
     key: "_isValidCriteria",
     value: function _isValidCriteria(_criteria) {
-      var _value = this.$(Conditionals._generateIdSelector(_criteria.target)).val();
+      var _value = this.QUICK_SELECTOR.getElemById(_criteria.target).val();
 
-      for (var _i = 0, _iMax = _criteria.values.length; _i < _iMax; _i++) {
-        if (_value === _criteria.values[_i]) {
-          return true;
+      if (_criteria.values) {
+        for (var _i = 0, _iMax = _criteria.values.length; _i < _iMax; _i++) {
+          if (_value === _criteria.values[_i]) {
+            return true;
+          }
         }
+      }
+
+      if (_criteria.not) {
+        for (var _i2 = 0, _iMax2 = _criteria.not.length; _i2 < _iMax2; _i2++) {
+          if (_value === _criteria.not[_i2]) {
+            return false;
+          }
+        }
+
+        return true;
       }
 
       return false;
@@ -6045,20 +6151,20 @@ function () {
     value: function _isValidState(_state) {
       for (var _i = 0, _iMax = _state.criterias.length; _i < _iMax; _i++) {
         if (!this._isValidCriteria(_state.criterias[_i])) {
-          return null;
+          return false;
         }
       }
 
-      return _state;
+      return true;
     }
   }, {
     key: "_getValidState",
     value: function _getValidState(_dependencyConfig) {
       for (var _i = 0, _iMax = _dependencyConfig.validStates.length; _i < _iMax; _i++) {
-        var _validState = this._isValidState(_dependencyConfig.validStates[_i]);
+        var _state = _dependencyConfig.validStates[_i];
 
-        if (_validState) {
-          return _validState;
+        if (this._isValidState(_state)) {
+          return _state;
         }
       }
 
@@ -6066,8 +6172,8 @@ function () {
     }
   }, {
     key: "init",
-    value: function init(_dependencyConfig) {
-      this._setDefaultStateAndBuildDependencyMap(_dependencyConfig);
+    value: function init(_validStatesConfig) {
+      this._setDefaultStateAndBuildDependencyMap(_validStatesConfig);
 
       this._initEventListeners();
 
@@ -6077,11 +6183,6 @@ function () {
       };
       return this;
     }
-  }], [{
-    key: "_generateIdSelector",
-    value: function _generateIdSelector(_id) {
-      return "#".concat(_id);
-    }
   }]);
 
   return Conditionals;
@@ -6090,7 +6191,7 @@ function () {
 module.exports = Conditionals;
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6102,13 +6203,16 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-__webpack_require__(24);
+__webpack_require__(26);
 
 var LOCAL_DECORATOR_TRIGGER_MOVE_TO_PAGE = 'alx-trigger-move-to-page';
 var LOCAL_DECORATOR_PAGE = 'alx-page';
 var LOCAL_DECORATOR_ACTIVE_PAGE = 'alx-page-active';
 var LOCAL_DATA_PAGE_ID = 'alx-page-id';
 var LOCAL_DATA_PAGE_LABEL = 'alx-page-label';
+var LOCAL_DECORATOR_PAGE_NAVIGATION_BUTTON = 'alx-page-navigation-button';
+var LOCAL_DECORATOR_PAGE_NAVIGATION_NEXT_BUTTON = 'alx-page-navigation-next-button';
+var LOCAL_DECORATOR_PAGE_NAVIGATION_PREVIOUS_BUTTON = 'alx-page-navigation-previous-button';
 
 var Paginator =
 /*#__PURE__*/
@@ -6116,40 +6220,26 @@ function () {
   function Paginator() {
     _classCallCheck(this, Paginator);
 
-    this.$pages = null;
-    this.$topNavBarContainer = null;
-    this.$bottomNavBarContainer = null;
     this.animationConfig = {
       duration: 0
     };
+    this._moveToPage = this._moveToPage.bind(this);
   }
 
   _createClass(Paginator, [{
-    key: "setTopNavBarContainer",
-    value: function setTopNavBarContainer(_$elem) {
-      this.$topNavBarContainer = _$elem;
-      return this;
-    }
-  }, {
-    key: "setBottomNavBarContainer",
-    value: function setBottomNavBarContainer(_$elem) {
-      this.$bottomNavBarContainer = _$elem;
-      return this;
-    }
-  }, {
     key: "_initGlobalEventListeners",
     value: function _initGlobalEventListeners() {
       var _this = this;
 
-      this.QUICK_SELECTOR.getElemById(this.ID_FORM).on(this.FORM_EVENTS.EVENT_CHANGE_PAGINATION, function (_event, _pageId) {
+      this.FORM_EVENTS.registerToFormEvent(this.FORM_EVENTS.EVENT_CHANGE_PAGINATION, function (_event, _pageId) {
         _event.preventDefault();
 
         return _this._moveToPage(_pageId);
       });
-      this.QUICK_SELECTOR.getElemById(this.ID_FORM).on(this.FORM_EVENTS.EVENT_MOVE_TO_ELEM_PAGE, function (_event, _config) {
+      this.FORM_EVENTS.registerToFormEvent(this.FORM_EVENTS.EVENT_MOVE_TO_ELEM_PAGE, function (_event, _$elem) {
         _event.preventDefault();
 
-        return _this._moveToPage(_this.$(_config.elem.closest(".".concat(LOCAL_DECORATOR_PAGE))).attr('id'));
+        return _this._moveToPage(_$elem.closest(".".concat(LOCAL_DECORATOR_PAGE)).attr('id'));
       });
     }
   }, {
@@ -6166,11 +6256,11 @@ function () {
   }, {
     key: "_getActivePageIndex",
     value: function _getActivePageIndex() {
-      var _$activePage = this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_ACTIVE_PAGE);
+      var _this3 = this;
 
-      var _idSelector = Paginator._generateIdSelector(this.$(".".concat(LOCAL_DECORATOR_ACTIVE_PAGE)).attr('id'));
-
-      return this.$pages.selector.split(',').indexOf(_idSelector);
+      return this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).toArray().map(function (_elem) {
+        return "#".concat(_this3.$(_elem).attr('id'));
+      }).indexOf("#".concat(this.$(".".concat(LOCAL_DECORATOR_ACTIVE_PAGE)).attr('id')));
     }
   }, {
     key: "_traverseToNextValidPageId",
@@ -6180,12 +6270,12 @@ function () {
       while (true) {
         _pointer = _pointerTraverseMethod(_pointer);
 
-        if (_pointer < 0 || _pointer > this.$pages.length - 1) {
+        if (_pointer < 0 || _pointer > this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).length - 1) {
           return null;
         }
 
-        if (!this.$pages.eq(_pointer).hasClass(this.DECORATOR_STATE_HIDDEN)) {
-          return this.$pages.eq(_pointer).attr('id');
+        if (!this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).eq(_pointer).hasClass(this.DECORATOR_STATE_HIDDEN)) {
+          return this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).eq(_pointer).attr('id');
         }
       }
     }
@@ -6215,14 +6305,14 @@ function () {
   }, {
     key: "_generateSubmitButton",
     value: function _generateSubmitButton() {
-      var _this3 = this;
+      var _this4 = this;
 
-      var _$submitButton = this.$('<button/>').text('Submit').addClass('page-navigation-button page-navigation-next-button');
+      var _$submitButton = this.$('<button/>').text('Submit').addClass(LOCAL_DECORATOR_PAGE_NAVIGATION_BUTTON).addClass(LOCAL_DECORATOR_PAGE_NAVIGATION_NEXT_BUTTON);
 
       _$submitButton.on('click', function (_event) {
         _event.preventDefault();
 
-        _this3.FORM_EVENTS.trigger(_this3.FORM_EVENTS.EVENT_SUBMIT_FORM);
+        _this4.FORM_EVENTS.trigger(_this4.FORM_EVENTS.EVENT_SUBMIT_FORM);
       });
 
       return _$submitButton;
@@ -6234,7 +6324,7 @@ function () {
         return _val - 1;
       });
 
-      return this._generateNavButton('Previous', _validPageId, ['page-navigation-button', 'page-navigation-prev-button']);
+      return this._generateNavButton('Previous', _validPageId, [LOCAL_DECORATOR_PAGE_NAVIGATION_BUTTON, LOCAL_DECORATOR_PAGE_NAVIGATION_PREVIOUS_BUTTON]);
     }
   }, {
     key: "_generateNextButton",
@@ -6243,21 +6333,21 @@ function () {
         return _val + 1;
       });
 
-      return this._generateNavButton('Next', _validPageId, ['page-navigation-button', 'page-navigation-next-button'], this._generateSubmitButton());
+      return this._generateNavButton('Next', _validPageId, [LOCAL_DECORATOR_PAGE_NAVIGATION_BUTTON, LOCAL_DECORATOR_PAGE_NAVIGATION_NEXT_BUTTON], this._generateSubmitButton());
     }
   }, {
     key: "_generateNavBar",
     value: function _generateNavBar() {
-      var _this4 = this;
+      var _this5 = this;
 
       var _$ul = this.$('<ul/>');
 
-      this.$pages.each(function (_index, _page) {
-        var _$page = _this4.$(_page);
+      this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).each(function (_index, _page) {
+        var _$page = _this5.$(_page);
 
-        var _$li = _this4.$('<li/>');
+        var _$li = _this5.$('<li/>');
 
-        var _$a = _this4.$('<a/>');
+        var _$a = _this5.$('<a/>');
 
         _$a.attr('href', '#').data(LOCAL_DATA_PAGE_ID, _$page.attr('id')).addClass(LOCAL_DECORATOR_TRIGGER_MOVE_TO_PAGE).text(_$page.data(LOCAL_DATA_PAGE_LABEL));
 
@@ -6265,25 +6355,25 @@ function () {
 
         _$ul.append(_$li);
       });
-      return _$ul;
+      this.QUICK_SELECTOR.getElemById(this.IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER).append(_$ul);
     }
   }, {
     key: "_toggleNavBarVisibility",
     value: function _toggleNavBarVisibility() {
-      var _this5 = this;
+      var _this6 = this;
 
-      var _$navBarButtons = this.$topNavBarContainer.find('li');
+      var _$navBarButtons = this.QUICK_SELECTOR.getElemById(this.IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER).find('li');
 
       var _activePageIndex = this._getActivePageIndex();
 
-      this.$pages.each(function (_index, _page) {
-        var _$page = _this5.$(_page);
+      this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).each(function (_index, _page) {
+        var _$page = _this6.$(_page);
 
-        var _method = _$page.hasClass(_this5.DECORATOR_STATE_HIDDEN) ? 'hide' : 'show';
+        var _method = _$page.hasClass(_this6.DECORATOR_STATE_HIDDEN) ? 'hide' : 'show';
 
         var _$navBarButton = _$navBarButtons.eq(_index);
 
-        _$navBarButton.find('a')[_method](_this5.animationConfig);
+        _$navBarButton.find('a')[_method](_this6.animationConfig);
 
         _$navBarButton.toggleClass('page-menu-active', _index === _activePageIndex);
       });
@@ -6291,25 +6381,22 @@ function () {
   }, {
     key: "_prepareGroupsForPagination",
     value: function _prepareGroupsForPagination(_pages) {
-      var _this6 = this;
+      var _this7 = this;
 
-      var _pageSelectors = _pages.map(function (_page, _index) {
-        var _$page = _this6.QUICK_SELECTOR.getElemById(_page.id);
+      return _pages.map(function (_page, _index) {
+        var _$page = _this7.QUICK_SELECTOR.getElemById("".concat(_this7.PREFIX_GROUP).concat(_page.id));
 
         _$page.addClass(LOCAL_DECORATOR_PAGE);
 
         _$page.data(LOCAL_DATA_PAGE_LABEL, _page.label);
 
         return "#".concat(_$page.attr('id'));
-      }).join(',');
-
-      this.$pages = this.$(_pageSelectors);
+      });
     }
   }, {
     key: "_setActivePage",
     value: function _setActivePage(_pageId) {
-      this.$pages.removeClass(LOCAL_DECORATOR_ACTIVE_PAGE); //this.$(Paginator._generateIdSelector(_pageId)).addClass(LOCAL_DECORATOR_ACTIVE_PAGE);
-
+      this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).removeClass(LOCAL_DECORATOR_ACTIVE_PAGE);
       this.QUICK_SELECTOR.getElemById(_pageId).addClass(LOCAL_DECORATOR_ACTIVE_PAGE);
     }
   }, {
@@ -6321,7 +6408,7 @@ function () {
 
       this._toggleNavBarVisibility();
 
-      this.$bottomNavBarContainer.empty().append(this._generatePreviousButton()).append(this._generateNextButton());
+      this.QUICK_SELECTOR.getElemById(this.IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER).empty().append(this._generatePreviousButton()).append(this._generateNextButton());
 
       this._initLocalEventListeners();
 
@@ -6331,25 +6418,20 @@ function () {
     key: "init",
     value: function init(_pagesConfig) {
       if (!_pagesConfig || _pagesConfig.length === 0) {
-        return this.$bottomNavBarContainer.append(this._generateSubmitButton());
+        return this.QUICK_SELECTOR.getElemById(this.IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER).append(this._generateSubmitButton());
       }
 
       this._initGlobalEventListeners();
 
       this._prepareGroupsForPagination(_pagesConfig);
 
-      this.$topNavBarContainer.append(this._generateNavBar());
+      this._generateNavBar();
 
-      this._moveToPage(_pagesConfig[0].id);
+      this._moveToPage("".concat(this.PREFIX_GROUP).concat(_pagesConfig[0].id));
 
       this.animationConfig = {
         duration: 600
       };
-    }
-  }], [{
-    key: "_generateIdSelector",
-    value: function _generateIdSelector(_id) {
-      return "#".concat(_id);
     }
   }]);
 
@@ -6359,11 +6441,11 @@ function () {
 module.exports = Paginator;
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(25);
+var content = __webpack_require__(27);
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -6377,7 +6459,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(4)(content, options);
+var update = __webpack_require__(3)(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -6409,10 +6491,10 @@ if(false) {
 }
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(false);
+exports = module.exports = __webpack_require__(2)(false);
 // imports
 
 
@@ -6423,11 +6505,11 @@ exports.push([module.i, ".alx-page {\n  opacity: 0;\n  height: 0;\n  overflow: h
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
- //require("./Validator.scss");
+
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6435,13 +6517,13 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-__webpack_require__(27);
+__webpack_require__(29);
 
 var _ = {
-  forEach: __webpack_require__(2)
+  forEach: __webpack_require__(4)
 };
-var LOCAL_IDENTIFIER_TRIGGER_VALIDATE_FIELD = 'alx-validate-field';
-var LOCAL_IDENTIFIER_DATA_OLD_VALUE = 'alx-old-value';
+var LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD = 'alx-validate-field';
+var LOCAL_DECORATOR_DATA_OLD_VALUE = 'alx-old-value';
 
 var Validator =
 /*#__PURE__*/
@@ -6473,22 +6555,22 @@ function () {
   }, {
     key: "_decorateFieldForValidation",
     value: function _decorateFieldForValidation(_fieldId, _config) {
-      var _$elem = this.QUICK_SELECTOR.getElemById(_fieldId);
+      var _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
 
       if (_config.required === true) {
-        _$elem.addClass(this.DECORATOR_STATE_REQUIRED);
+        _$field.addClass(this.DECORATOR_STATE_REQUIRED);
       }
 
-      _$elem.rules('add', _config);
+      _$field.rules('add', _config);
 
-      _$elem.addClass(LOCAL_IDENTIFIER_TRIGGER_VALIDATE_FIELD);
+      _$field.addClass(LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD);
     }
   }, {
     key: "_initLocalEventListeners",
     value: function _initLocalEventListeners() {
       var _this = this;
 
-      this.$(".".concat(LOCAL_IDENTIFIER_TRIGGER_VALIDATE_FIELD)).on('change', function (_event) {
+      this.$(".".concat(LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD)).on('change', function (_event) {
         _event.preventDefault();
 
         return _this._validateElem(_this.$(_event.target));
@@ -6504,10 +6586,10 @@ function () {
 
         return _this2._validateForm(_bForSubmission);
       });
-      this.FORM_EVENTS.registerToFormEvent(this.FORM_EVENTS.EVENT_VALIDATE_FIELD, function (_event, _config) {
+      this.FORM_EVENTS.registerToFormEvent(this.FORM_EVENTS.EVENT_VALIDATE_FIELD, function (_event, _fieldId) {
         _event.preventDefault();
 
-        return _this2._validateElem(_this2.QUICK_SELECTOR.getElemById(_config.fieldId));
+        return _this2._validateElem(_this2.QUICK_SELECTOR.getElemById(_fieldId));
       });
     }
   }, {
@@ -6518,9 +6600,9 @@ function () {
   }, {
     key: "_validateElem",
     value: function _validateElem(_$elem) {
-      var _oldValue = _$elem.data(LOCAL_IDENTIFIER_DATA_OLD_VALUE);
+      var _oldValue = _$elem.data(LOCAL_DECORATOR_DATA_OLD_VALUE);
 
-      _$elem.data(LOCAL_IDENTIFIER_DATA_OLD_VALUE, _$elem.val());
+      _$elem.data(LOCAL_DECORATOR_DATA_OLD_VALUE, _$elem.val());
 
       if (_$elem.val() === '' || _$elem.val() === _oldValue) {
         return;
@@ -6533,11 +6615,7 @@ function () {
     value: function _validateForm(_bForSubmission) {
       var _bIsValid = this.QUICK_SELECTOR.getElemById(this.ID_FORM).valid();
 
-      this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_FORM_VALIDATED, [{
-        bIsValid: _bIsValid,
-        bForSubmission: _bForSubmission || false,
-        erroredElements: this._getErroredElements()
-      }]);
+      this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_FORM_VALIDATED, [_bIsValid, _bForSubmission || false, this._getErroredElements()]);
     }
   }, {
     key: "init",
@@ -6570,7 +6648,7 @@ function () {
 module.exports = Validator;
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -6583,7 +6661,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
  */
 (function( factory ) {
 	if ( true ) {
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(28)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(30)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -8179,13 +8257,13 @@ return $;
 }));
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports) {
 
 module.exports = jQuery;
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8211,7 +8289,7 @@ function () {
     this.EVENT_FORM_VALIDATED = 'alx-event-form-validated';
     this.EVENT_SUBMIT_FORM = 'alx-event-change-pagination';
     this.EVENT_MOVE_TO_ELEM_PAGE = 'alx-event-move-to-elem-page';
-    this.EVENT_CHECK_IF_LOOKUP_FIELD_NEEDS_SYNCING = 'alx-event-sync-lookup-field';
+    this.EVENT_CHECK_IF_FIELD_NEEDS_SYNCING = 'alx-event-sync-lookup-field';
     this.EVENT_SYNC_LOOKUP_FIELD = 'alx-event-lookup-field-synced';
     this.EVENT_FIELD_VALUE_CHANGED = 'alx-event-field-value-changed';
   }
@@ -8227,68 +8305,99 @@ function () {
       this.QUICK_SELECTOR.getElemById(this.ID_FORM).trigger(_formEventName, _variables);
     }
   }, {
-    key: "init",
-    value: function init() {
+    key: "_initDependencyChangedListener",
+    value: function _initDependencyChangedListener(_$form) {
       var _this2 = this;
-
-      var _$form = this.QUICK_SELECTOR.getElemById(this.ID_FORM);
 
       _$form.on(this.EVENT_DEPENDENCY_CHANGED, function (_event) {
         _event.preventDefault();
 
         _$form.trigger(_this2.EVENT_CHANGE_PAGINATION, []);
       });
-
+    }
+  }, {
+    key: "_initPaginationChangedListener",
+    value: function _initPaginationChangedListener(_$form) {
       _$form.on(this.EVENT_PAGINATION_CHANGED, function (_event) {
         _event.preventDefault();
       });
+    }
+  }, {
+    key: "_initSubmitFormListener",
+    value: function _initSubmitFormListener(_$form) {
+      var _this3 = this;
 
       _$form.on(this.EVENT_SUBMIT_FORM, function (_event) {
         _event.preventDefault();
 
-        _$form.trigger(_this2.EVENT_VALIDATE_FORM, [true]);
+        _$form.trigger(_this3.EVENT_VALIDATE_FORM, [true]);
       });
+    }
+  }, {
+    key: "_initFormValidatedListener",
+    value: function _initFormValidatedListener(_$form) {
+      var _this4 = this;
 
-      _$form.on(this.EVENT_FORM_VALIDATED, function (_event, _config) {
+      _$form.on(this.EVENT_FORM_VALIDATED, function (_event, _bIsValid, _bForSubmission, _$erroredElems) {
         _event.preventDefault();
 
-        if (_config.bIsValid) {
-          if (_config.bForSubmission) {
-            return _this2.QUICK_SELECTOR.getElemById(_this2.ID_FORM).submit();
+        if (_bIsValid) {
+          if (_bForSubmission) {
+            return _this4.QUICK_SELECTOR.getElemById(_this4.ID_FORM).submit();
           }
 
           return;
         }
 
-        _$form.trigger(_this2.EVENT_MOVE_TO_ELEM_PAGE, [{
-          elem: _config.erroredElements.eq(0)
-        }]);
+        _$form.trigger(_this4.EVENT_MOVE_TO_ELEM_PAGE, [_$erroredElems.eq(0)]);
       });
+    }
+  }, {
+    key: "_initFieldValueChangedLister",
+    value: function _initFieldValueChangedLister(_$form) {
+      var _this5 = this;
 
       _$form.on(this.EVENT_FIELD_VALUE_CHANGED, function (_event, _this, _arguments) {
         _event.preventDefault();
 
-        _$form.trigger(_this2.EVENT_CHECK_IF_LOOKUP_FIELD_NEEDS_SYNCING, [{
-          elem: _this,
-          arguments: _arguments
-        }]);
+        _$form.trigger(_this5.EVENT_CHECK_IF_FIELD_NEEDS_SYNCING, [_this5.$(_this), _arguments[0]]);
       });
+    }
+  }, {
+    key: "_initSyncLookupFieldListener",
+    value: function _initSyncLookupFieldListener(_$form) {
+      var _this6 = this;
 
       _$form.on(this.EVENT_SYNC_LOOKUP_FIELD, function (_event, _config) {
         _event.preventDefault();
 
         if (_config.bValidateForm === true) {
-          return _$form.trigger(_this2.EVENT_VALIDATE_FORM, [false]);
+          return _$form.trigger(_this6.EVENT_VALIDATE_FORM, [false]);
         }
 
         if (_config.fieldsToValidate) {
           _config.fieldsToValidate.forEach(function (_fieldToValidate) {
-            return _$form.trigger(_this2.EVENT_VALIDATE_FIELD, [{
-              fieldId: _fieldToValidate
-            }]);
+            return _$form.trigger(_this6.EVENT_VALIDATE_FIELD, [_fieldToValidate]);
           });
         }
       });
+    }
+  }, {
+    key: "init",
+    value: function init() {
+      var _$form = this.QUICK_SELECTOR.getElemById(this.ID_FORM);
+
+      this._initDependencyChangedListener(_$form);
+
+      this._initPaginationChangedListener(_$form);
+
+      this._initSubmitFormListener(_$form);
+
+      this._initFormValidatedListener(_$form);
+
+      this._initFieldValueChangedLister(_$form);
+
+      this._initSyncLookupFieldListener(_$form);
 
       return this;
     }
@@ -8300,7 +8409,7 @@ function () {
 module.exports = FormEvents;
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8312,10 +8421,10 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var Inputmask = __webpack_require__(31);
+var Inputmask = __webpack_require__(33);
 
 var _ = {
-  forEach: __webpack_require__(2)
+  forEach: __webpack_require__(4)
 };
 
 var InputMask =
@@ -8359,13 +8468,13 @@ function () {
 module.exports = InputMask;
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(32);
-__webpack_require__(33);
 __webpack_require__(34);
 __webpack_require__(35);
+__webpack_require__(36);
+__webpack_require__(37);
 
 // require("./dist/inputmask/phone-codes/phone-be");
 // require("./dist/inputmask/phone-codes/phone-nl");
@@ -8377,7 +8486,7 @@ module.exports = __webpack_require__(1);
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -8865,7 +8974,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -8970,7 +9079,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -9317,7 +9426,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -9384,7 +9493,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9427,7 +9536,7 @@ function () {
 module.exports = Bugfix;
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

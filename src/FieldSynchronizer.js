@@ -2,9 +2,16 @@
 
 const LOOKUP_ID_PREFIX = '_acl_';
 
-class LookupFieldSynchronizer {
+class FieldSynchronizer {
     constructor() {
+        this._lookupFieldIds = {};
         this._checkIfLookupFieldNeedsSyncing = this._checkIfLookupFieldNeedsSyncing.bind(this);
+    }
+
+    _cacheIdsOfLookupFields() {
+        this.$(`.${this.DECORATOR_LOOKUP_FIELD}`).each((_index, _field) => {
+            this._lookupFieldIds[this.$(_field).attr('id')] = true;
+        });
     }
 
     _initGlobalEventListeners() {
@@ -16,8 +23,10 @@ class LookupFieldSynchronizer {
     }
 
     _checkIfLookupFieldNeedsSyncing(_$field, _newVal) {
-        if (_newVal !== undefined && _$field.attr('id') === this.primaryField) {
-            const _$lookupSelector = this.QUICK_SELECTOR.getElemById(`${this.PREFIX_LOOKUP_ID}${this.primaryField}`);
+        const _fieldId = _$field.attr('id');
+
+        if (_newVal !== undefined && this._lookupFieldIds[_fieldId] === true) {
+            const _$lookupSelector = this.QUICK_SELECTOR.getElemById(`${this.PREFIX_LOOKUP_ID}${_fieldId}`);
             const _listedValuesInLookupSelector = this.$('option', _$lookupSelector).toArray().map(_elem => {
                 return this.$(_elem).text();
             });
@@ -31,17 +40,17 @@ class LookupFieldSynchronizer {
 
             return this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_SYNC_LOOKUP_FIELD, [{
                 bValidateForm: false,
-                fieldsToValidate: [this.primaryField, `${this.PREFIX_LOOKUP_ID}${this.primaryField}`]
+                fieldsToValidate: [_fieldId, `${this.PREFIX_LOOKUP_ID}${_fieldId}`]
             }]);
         }
     }
 
     init(_lookupConfigs) {
-        this.primaryField = _lookupConfigs.primary;
+        this._cacheIdsOfLookupFields();
         this._initGlobalEventListeners();
 
         return this;
     }
 }
 
-module.exports = LookupFieldSynchronizer;
+module.exports = FieldSynchronizer;

@@ -6,6 +6,7 @@ const _ = {
     forEach: require('lodash.foreach')
 };
 
+const LOCAL_DECORATOR_STATE_REQUIRED = 'alx-required';
 const LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD = 'alx-validate-field';
 const LOCAL_DECORATOR_DATA_OLD_VALUE = 'alx-old-value';
 
@@ -33,12 +34,20 @@ class Validator {
     _decorateFieldForValidation(_fieldId, _config) {
         const _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
 
-        if (_config.required === true) {
-            _$field.addClass(this.DECORATOR_STATE_REQUIRED);
+        if (_$field.prop('required') || _config.required === true) {
+            _$field.addClass(LOCAL_DECORATOR_STATE_REQUIRED);
         }
 
         _$field.rules('add', _config);
         _$field.addClass(LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD);
+    }
+
+    _excludeLookupSelectFromValidation(_fieldId) {
+        const _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
+
+        if (_$field.hasClass(this.DECORATOR_LOOKUP_FIELD)) {
+            this.QUICK_SELECTOR.getElemById(`${this.PREFIX_LOOKUP_ID}${_fieldId}`).addClass(`${this.DECORATOR_STATE_IGNORE}`);
+        }
     }
 
     _initLocalEventListeners() {
@@ -95,10 +104,7 @@ class Validator {
 
         _.forEach(_fieldValidatorConfigs, (_fieldValidatorConfig, _fieldId) => {
             this._decorateFieldForValidation(_fieldId, _fieldValidatorConfig);
-
-            if (_lookupFields.primary === _fieldId) {
-                this.QUICK_SELECTOR.getElemById(`${this.PREFIX_LOOKUP_ID}${_fieldId}`).addClass(`${this.DECORATOR_STATE_IGNORE}`);
-            }
+            this._excludeLookupSelectFromValidation(_fieldId);
         });
 
         this._initLocalEventListeners();

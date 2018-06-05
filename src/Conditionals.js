@@ -5,7 +5,7 @@ const _ = {
     set: require('lodash.set')
 };
 
-const LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE = 'alx-identifier-trigger-conditional-change';
+const LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE = 'alx-trigger-conditional-change';
 
 class Conditionals {
     constructor(_$) {
@@ -60,19 +60,21 @@ class Conditionals {
 
     _setState(_type, _toChangeId, _state) {
         if (_type === 'field') {
-            return this._setFieldState(this.QUICK_SELECTOR.getElemById(_toChangeId), _state);
+            return this._setFieldState(_toChangeId, _state);
         }
 
         if (_type === 'group') {
-            return this._setGroupState(this.QUICK_SELECTOR.getElemById(_toChangeId), _state);
+            return this._setGroupState(this.QUICK_SELECTOR.getElemById(`${this.PREFIX_GROUP}${_toChangeId}`), _state);
         }
 
         throw new Error(`Invalid type -> ${_type}`);
     }
 
-    _setFieldState(_$field, _state) {
+    _setFieldState(_toChangeId, _state) {
+        const _$field = this.QUICK_SELECTOR.getElemById(_toChangeId);
+
         if (_state.hasOwnProperty('visible')) {
-            const _$wrapper = _$field.closest(`.${this.DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER}`);
+            const _$wrapper = this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_toChangeId);
             const _method = _state.visible === true ? 'slideDown' : 'slideUp';
 
             if (!this.bInitialized) {
