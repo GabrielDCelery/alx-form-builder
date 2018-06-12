@@ -1,15 +1,16 @@
 "use strict";
 
 require('./customstyle.scss');
-require('purecss');
 
 const config = require('./config/form.json');
 
 const DependencyInjector = require('./DependencyInjector');
 const QuickSelector = require('./QuickSelector');
-const FormPreparator = require('./FormPreparator');
-const FormDecorator = require('./FormDecorator');
-const FormRestructurizer = require('./FormRestructurizer');
+const NestedGroupsGenerator = require('./NestedGroupsGenerator');
+const PageDecorator = require('./PageDecorator');
+const GroupDecorator = require('./GroupDecorator');
+const FieldDecorator = require('./FieldDecorator');
+const ElemRelocator = require('./ElemRelocator');
 const FieldSynchronizer = require('./FieldSynchronizer');
 const Conditionals = require('./Conditionals');
 const Paginator = require('./Paginator');
@@ -30,7 +31,6 @@ const DECORATOR_LOOKUP_FIELD = 'alx-lookup-field';
 
 const IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER = 'alx-page-navigation-top-container';
 const IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER = 'alx-page-navigation-bottom-container';
-const IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER = 'alx-save-load-buttons-container';
 
 $(document).ready(() => {
   const dependencyInjector = new DependencyInjector();
@@ -40,40 +40,55 @@ $(document).ready(() => {
     ['$', $]
   ]);
 
-  const formPreparator = new FormPreparator();
+  const nestedGroupsGenerator = new NestedGroupsGenerator();
 
-  dependencyInjector.setTargetInstance(formPreparator).inject([
+  dependencyInjector.setTargetInstance(nestedGroupsGenerator).inject([
     ['$', $],
-    ['ID_FORM', ID_FORM],
     ['QUICK_SELECTOR', quickSelector],
-    ['PREFIX_GROUP', PREFIX_GROUP],
-    ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
+    ['PREFIX_GROUP', PREFIX_GROUP]
   ]);
 
-  formPreparator.init(config.fields)
+  nestedGroupsGenerator.start(config.groups);
 
-  const formRestructurizer = new FormRestructurizer();
+  const pageDecorator = new PageDecorator(config.globalDecoratorClasses.page);
 
-  dependencyInjector.setTargetInstance(formRestructurizer).inject([
+  dependencyInjector.setTargetInstance(pageDecorator).inject([
     ['$', $],
     ['ID_FORM', ID_FORM],
     ['QUICK_SELECTOR', quickSelector],
     ['IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER],
-    ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER],
-    ['IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER', IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER]
+    ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER]
   ]);
 
-  formRestructurizer.init(config)
+  pageDecorator.start(config.pageDecorators);
 
-  const formDecorator = new FormDecorator();
+  const fieldDecorator = new FieldDecorator(config.globalDecoratorClasses.field).setFieldsToDecorate(nestedGroupsGenerator.getFieldIds());
 
-  dependencyInjector.setTargetInstance(formDecorator).inject([
+  dependencyInjector.setTargetInstance(fieldDecorator).inject([
     ['$', $],
-    ['ID_FORM', ID_FORM],
     ['QUICK_SELECTOR', quickSelector]
   ]);
 
-  formDecorator.init(config);
+  fieldDecorator.start(config.fieldDecorators);
+
+  const groupDecorator = new GroupDecorator(config.globalDecoratorClasses.group).setGroupsToDecorate(nestedGroupsGenerator.getGroupIds());
+
+  dependencyInjector.setTargetInstance(groupDecorator).inject([
+    ['$', $],
+    ['QUICK_SELECTOR', quickSelector],
+    ['PREFIX_GROUP', PREFIX_GROUP]
+  ]);
+
+  groupDecorator.start(config.groupDecorators);
+
+  const elemRelocator = new ElemRelocator();
+
+  dependencyInjector.setTargetInstance(elemRelocator).inject([
+    ['$', $],
+    ['QUICK_SELECTOR', quickSelector]
+  ]);
+
+  elemRelocator.start(config.elemsToRelocate);
 
   const formEvents = new FormEvents();
 
@@ -173,4 +188,6 @@ $(document).ready(() => {
   nativeMethodOverrides.init();
 
   quickSelector.emptyCache();
+
+  require('./extra');
 });

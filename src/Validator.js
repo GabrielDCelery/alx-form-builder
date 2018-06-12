@@ -42,12 +42,10 @@ class Validator {
         _$field.addClass(LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD);
     }
 
-    _excludeLookupSelectFromValidation(_fieldId) {
-        const _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
-
-        if (_$field.hasClass(this.DECORATOR_LOOKUP_FIELD)) {
-            this.QUICK_SELECTOR.getElemById(`${this.PREFIX_LOOKUP_ID}${_fieldId}`).addClass(`${this.DECORATOR_STATE_IGNORE}`);
-        }
+    _excludeLookupSelectsFromValidation() {
+        this.$(`.${this.DECORATOR_LOOKUP_FIELD}`).each((_index, _field) => {
+            this.QUICK_SELECTOR.getElemById(`${this.PREFIX_LOOKUP_ID}${this.$(_field).attr('id')}`).addClass(`${this.DECORATOR_STATE_IGNORE}`);
+        });
     }
 
     _initLocalEventListeners() {
@@ -104,9 +102,9 @@ class Validator {
 
         _.forEach(_fieldValidatorConfigs, (_fieldValidatorConfig, _fieldId) => {
             this._decorateFieldForValidation(_fieldId, _fieldValidatorConfig);
-            this._excludeLookupSelectFromValidation(_fieldId);
         });
 
+        this._excludeLookupSelectsFromValidation();
         this._initLocalEventListeners();
         this._initGlobalEventListeners();
 

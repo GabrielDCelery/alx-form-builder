@@ -81,6 +81,10 @@ class QuickSelector {
         return this._getElemFromCache('elemsByClass', this.generateClassSelector(_class), this._getElem);
     }
 
+    getElem(_selector) {
+        return this._getElemFromCache('elem', _selector, this._getElem);
+    }
+
     generateIdSelector(_selector) {
         return _selector[0] === '#' ? _selector : `#${_selector}`;
     }
