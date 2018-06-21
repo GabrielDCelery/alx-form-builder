@@ -167,7 +167,7 @@ if (!String.prototype.startsWith) {
           }
         });
       }
-  
+
       var ajaxChosen = function(chosen) {
         // function that extend chosen instance to make ajax search requests
         var self = this,
@@ -189,11 +189,12 @@ if (!String.prototype.startsWith) {
             var endpoint = $this.data('endpoint'),
               param_name = $this.data('param'),
               params = $this.data('filters') || {};
-  
+
+
             params['api_key'] = __apik;
             params['limit'] = 10;
             params[param_name] = searchText;
-  
+
             if ($this.xhr) {
               $this.xhr.abort();
             }

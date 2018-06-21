@@ -1,6 +1,10 @@
 'user strict';
 
 class DependencyInjector {
+    constructor() {
+        this.targetInstance = null;
+    }
+
     setTargetInstance(_targetInstance) {
         this.targetInstance = _targetInstance;
 

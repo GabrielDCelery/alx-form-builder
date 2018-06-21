@@ -7,7 +7,8 @@ const _ = {
     defaultsDeep: require('lodash.defaultsdeep')
 }
 
-const DEFAULT_GLOBAL_PAGE_DECORATOR_CLASSES = {
+const DEFAULT_GLOBAL_DECORATOR_CLASSES_PAGE = {
+    form: [],
     title: [],
     logo: [],
     heading: [],
@@ -46,28 +47,28 @@ const DEFAULT_CONTENT_CONFIG_LOGO = {
     plainTextWrapper: null
 };
 
-const DEFAULT_CONTENT_CONFIG_HEADING_TITLE = {
+const DEFAULT_DECORATOR_CONFIG_HEADING_TITLE = {
     type: 'text',
     value: null,
     decoratorClasses: [],
     plainTextWrapper: 'h1'
 };
 
-const DEFAULT_CONTENT_CONFIG_MAIN_TITLE = {
+const DEFAULT_DECORATOR_CONFIG_MAIN_TITLE = {
     type: 'text',
     value: null,
     decoratorClasses: [],
     plainTextWrapper: 'h1'
 };
 
-const DEFAULT_CONTENT_CONFIG_SAVE_AND_LOAD_BUTTON_HELPER_TEXT = {
+const DEFAULT_DECORATOR_CONFIG_SAVE_AND_LOAD_BUTTON_HELPER_TEXT = {
     type: 'text',
     value: null,
     decoratorClasses: [],
     plainTextWrapper: 'p'
 };
 
-const DEFAULT_CONTENT_CONFIG_FOOTER_TITLE = {
+const DEFAULT_DECORATOR_CONFIG_FOOTER_TITLE = {
     type: 'text',
     value: null,
     decoratorClasses: [],
@@ -78,7 +79,7 @@ class FormDecorator extends Decorator {
     constructor(_globalDecoratorClasses) {
         super();
 
-        this.globalDecoratorClasses = _.defaultsDeep({}, _globalDecoratorClasses, DEFAULT_GLOBAL_PAGE_DECORATOR_CLASSES);
+        this.globalDecoratorClasses = _.defaultsDeep({}, _globalDecoratorClasses, DEFAULT_GLOBAL_DECORATOR_CLASSES_PAGE);
     }
 
     _generateHeading(_logoConfig, _headingTitleConfig) {
@@ -140,13 +141,14 @@ class FormDecorator extends Decorator {
     }
 
     start(_pageDecoratorsConfig) {
-        const _mainTitleConfig = FormDecorator._extractDecoratorConfig(_pageDecoratorsConfig, 'mainTitle', DEFAULT_CONTENT_CONFIG_MAIN_TITLE);
-        const _logoConfig = FormDecorator._extractDecoratorConfig(_pageDecoratorsConfig, 'logo', DEFAULT_CONTENT_CONFIG_LOGO);
-        const _headingTitleConfig = FormDecorator._extractDecoratorConfig(_pageDecoratorsConfig, 'headingTitle', DEFAULT_CONTENT_CONFIG_HEADING_TITLE);
-        const _saveAndLoadButtonHelperTextConfig = FormDecorator._extractDecoratorConfig(_pageDecoratorsConfig, 'saveAndLoadButtonHelperText', DEFAULT_CONTENT_CONFIG_SAVE_AND_LOAD_BUTTON_HELPER_TEXT);
-        const _footerTitleConfig = FormDecorator._extractDecoratorConfig(_pageDecoratorsConfig, 'footerTitle', DEFAULT_CONTENT_CONFIG_FOOTER_TITLE);
+        const _mainTitleConfig = FormDecorator._generateDecoratorConfig(_pageDecoratorsConfig, 'mainTitle', DEFAULT_DECORATOR_CONFIG_MAIN_TITLE);
+        const _logoConfig = FormDecorator._generateDecoratorConfig(_pageDecoratorsConfig, 'logo', DEFAULT_CONTENT_CONFIG_LOGO);
+        const _headingTitleConfig = FormDecorator._generateDecoratorConfig(_pageDecoratorsConfig, 'headingTitle', DEFAULT_DECORATOR_CONFIG_HEADING_TITLE);
+        const _saveAndLoadButtonHelperTextConfig = FormDecorator._generateDecoratorConfig(_pageDecoratorsConfig, 'saveAndLoadButtonHelperText', DEFAULT_DECORATOR_CONFIG_SAVE_AND_LOAD_BUTTON_HELPER_TEXT);
+        const _footerTitleConfig = FormDecorator._generateDecoratorConfig(_pageDecoratorsConfig, 'footerTitle', DEFAULT_DECORATOR_CONFIG_FOOTER_TITLE);
 
         this.$('body').attr('id', LOCAL_IDENTIFIER_BODY);
+        this._decorateElemWithCustomClasses(this.QUICK_SELECTOR.getElemById(this.ID_FORM), 'form');
         this._generateMain(_mainTitleConfig);
         this._generateHeading(_logoConfig, _headingTitleConfig);
         this._appendPageNavBarContainers();
@@ -156,7 +158,7 @@ class FormDecorator extends Decorator {
         this._removeSubmitButton();
     }
 
-    static _extractDecoratorConfig(_config, _name, _defaultValue) {
+    static _generateDecoratorConfig(_config, _name, _defaultValue) {
         return _.defaultsDeep({}, _.get(_config, _name, null), _defaultValue);
     }
 }

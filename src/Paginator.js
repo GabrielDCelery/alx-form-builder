@@ -15,6 +15,8 @@ const LOCAL_DECORATOR_PAGE_NAV_MENU_STEP_INDICATOR = 'alx-page-nav-menu-step-ind
 const LOCAL_DECORATOR_PAGE_NAV_MENU_STEP_ACTIVE = 'alx-page-nav-menu-step-active';
 const LOCAL_DECORATOR_PAGE_NAV_MENU_STEP_HIDDEN = 'alx-page-nav-menu-step-hidden';
 const LOCAL_DECORATOR_PAGE_NAV_MENU_STEP_LAST = 'alx-page-nav-menu-step-last';
+const LOCAL_ANIMATION_HIDE = 'fadeOut';
+const LOCAL_ANIMATION_SHOW = 'fadeIn';
 
 class Paginator {
     constructor() {
@@ -150,7 +152,7 @@ class Paginator {
         this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).each((_index, _page) => {
             const _$page = this.$(_page);
             const _bPageHidden = _$page.hasClass(this.DECORATOR_STATE_HIDDEN);
-            const _method = _bPageHidden === true ? 'hide' : 'show';
+            const _method = _bPageHidden === true ? LOCAL_ANIMATION_HIDE : LOCAL_ANIMATION_SHOW;
             const _$navBarButton = _$navBarButtons.eq(_index);
 
             if(!_lastPageIndex && _bPageHidden) {

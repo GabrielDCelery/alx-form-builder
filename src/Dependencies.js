@@ -6,9 +6,11 @@ const _ = {
 };
 
 const LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE = 'alx-trigger-conditional-change';
+const LOCAL_ANIMATION_HIDE = 'slideUp';
+const LOCAL_ANIMATION_SHOW = 'slideDown';
 
-class Conditionals {
-    constructor(_$) {
+class Dependencies {
+    constructor() {
         this.validStatesConfigs = null;
         this.conditionalsMap = {};
         this.bInitialized = false;
@@ -75,13 +77,14 @@ class Conditionals {
 
         if (_state.hasOwnProperty('visible')) {
             const _$wrapper = this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_toChangeId);
-            const _method = _state.visible === true ? 'slideDown' : 'slideUp';
+            const _method = _state.visible === true ? LOCAL_ANIMATION_SHOW : LOCAL_ANIMATION_HIDE;
 
             if (!this.bInitialized) {
                 _$wrapper.attr('style', 'display: none;');
             }
 
             _$field.toggleClass(this.DECORATOR_STATE_IGNORE, _state.visible === false);
+            _$field.prop('disabled', _state.visible === false);
             _$wrapper.toggleClass(this.DECORATOR_STATE_HIDDEN, _state.visible === false);
             _$wrapper[_method](this.animationConfig);
         }
@@ -95,14 +98,17 @@ class Conditionals {
 
     _setGroupState(_$group, _state) {
         if (_state.hasOwnProperty('visible')) {
-            const _method = _state.visible === true ? 'slideDown' : 'slideUp';
+            const _method = _state.visible === true ? LOCAL_ANIMATION_SHOW : LOCAL_ANIMATION_HIDE;
 
             if (!this.bInitialized) {
                 _$group.attr('style', 'display: none;');
             }
 
-            this.$('input, select, textarea', _$group).toggleClass(this.DECORATOR_STATE_IGNORE, _state.visible === false);
+            const _$fieldsInGroup = this.$('input, select, textarea', _$group);
 
+            _$fieldsInGroup.toggleClass(this.DECORATOR_STATE_IGNORE, _state.visible === false);
+            _$fieldsInGroup.prop('disabled', _state.visible === false);
+            
             _$group.toggleClass(this.DECORATOR_STATE_HIDDEN, _state.visible === false);
             _$group[_method](this.animationConfig);
         }
@@ -166,4 +172,4 @@ class Conditionals {
     }
 }
 
-module.exports = Conditionals;
+module.exports = Dependencies;

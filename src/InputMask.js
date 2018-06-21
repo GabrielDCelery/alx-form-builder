@@ -1,6 +1,6 @@
 'use strict';
 
-const Inputmask = require('inputmask')
+const Inputmask = require('inputmask');
 const _ = {
     forEach: require('lodash.foreach')
 };

@@ -4,26 +4,24 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --watch",
-    "start": "webpack-dev-server --open",
+    "dev": "webpack-dev-server --open",
     "build": "webpack"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "jquery-validation": "^1.17.0",
+    "lodash.defaultsdeep": "^4.6.0",
     "lodash.foreach": "^4.5.0",
     "lodash.get": "^4.4.2",
     "lodash.map": "^4.6.0",
     "lodash.set": "^4.3.2",
     "lodash.union": "^4.6.0",
-    "purecss": "^1.0.0",
-    "purecss-sass": "^1.0.0"
+    "query-string": "^6.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.49",
-    "@babel/preset-env": "^7.0.0-beta.49",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
     "autoprefixer": "^7.2.5",
     "babel-loader": "^8.0.0-beta.3",
     "css-loader": "^0.28.9",
@@ -38,7 +36,8 @@
     "precss": "^3.1.0",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.20.1",
-    "uglifyjs-webpack-plugin": "^1.1.8",
+    "ts-loader": "^4.4.1",
+    "uglifyjs-webpack-plugin": "^1.2.5",
     "url-loader": "^0.6.2",
     "webpack": "^3.12.0",
     "webpack-dev-server": "^2.11.2"

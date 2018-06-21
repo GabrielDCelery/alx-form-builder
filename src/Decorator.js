@@ -42,6 +42,16 @@ class Decorator {
         return this._decorateElemWithCustomClasses(_$div, _type, _config.decoratorClasses);
     }
 
+    _generateDecoratedElem(_type, _id, _config) {
+        const _$elem = this._generateHtmlContent(_config.type, _config.value, _config.plainTextWrapper);
+
+        if (_id) {
+            _$elem.attr('id', _id);
+        }
+
+        return this._decorateElemWithCustomClasses(_$elem, _type, _config.decoratorClasses);
+    }
+
     _decorateElemWithCustomClasses(_$elem, _type, _localDecoratorClasses) {
         if (_$elem.length === 0) {
             return _$elem;

@@ -1,6 +1,7 @@
 'use strict';
 
 require('jquery-validation');
+require('./Validator.scss');
 
 const _ = {
     forEach: require('lodash.foreach')
@@ -34,16 +35,13 @@ class Validator {
     _decorateFieldForValidation(_fieldId, _config) {
         const _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
 
-        if (_$field.prop('required') || _config.required === true) {
-            _$field.addClass(LOCAL_DECORATOR_STATE_REQUIRED);
-        }
-
+        _$field.addClass(LOCAL_DECORATOR_STATE_REQUIRED);
         _$field.rules('add', _config);
         _$field.addClass(LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD);
     }
 
     _excludeLookupSelectsFromValidation() {
-        this.$(`.${this.DECORATOR_LOOKUP_FIELD}`).each((_index, _field) => {
+        this.QUICK_SELECTOR.getElemsByClass(this.DECORATOR_LOOKUP_FIELD).each((_index, _field) => {
             this.QUICK_SELECTOR.getElemById(`${this.PREFIX_LOOKUP_ID}${this.$(_field).attr('id')}`).addClass(`${this.DECORATOR_STATE_IGNORE}`);
         });
     }

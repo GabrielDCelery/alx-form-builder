@@ -1,8 +1,4 @@
-"use strict";
-
-require('./customstyle.scss');
-
-const config = require('./config/form.json');
+'use strict';
 
 const DependencyInjector = require('./DependencyInjector');
 const QuickSelector = require('./QuickSelector');
@@ -12,18 +8,22 @@ const GroupDecorator = require('./GroupDecorator');
 const FieldDecorator = require('./FieldDecorator');
 const ElemRelocator = require('./ElemRelocator');
 const FieldSynchronizer = require('./FieldSynchronizer');
-const Conditionals = require('./Conditionals');
+const Dependencies = require('./Dependencies');
 const Paginator = require('./Paginator');
 const Validator = require('./Validator');
 const FormEvents = require('./FormEvents');
 const InputMask = require('./InputMask');
 const Bugfix = require('./Bugfix');
 const NativeMethodOverrides = require('./NativeMethodOverrides');
+const QueryStringEvaluator = require('./QueryStringEvaluator');
+
+const FORM_CONFIG_LOCATION = 'alx_dynamic_form_config';
 
 const ID_FORM = 'target_form';
 
 const PREFIX_LOOKUP_ID = '_acl_';
 const PREFIX_GROUP = 'alx-group-';
+const POSTFIX_LOOKUP_ID_CHOSEN = '_chosen';
 
 const DECORATOR_STATE_HIDDEN = 'alx-hidden';
 const DECORATOR_STATE_IGNORE = 'alx-ignore';
@@ -33,161 +33,177 @@ const IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER = 'alx-page-navigation-top-contai
 const IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER = 'alx-page-navigation-bottom-container';
 
 $(document).ready(() => {
-  const dependencyInjector = new DependencyInjector();
-  const quickSelector = new QuickSelector();
+    if (!window[FORM_CONFIG_LOCATION]) {
+        return;
+    }
 
-  dependencyInjector.setTargetInstance(quickSelector).inject([
-    ['$', $]
-  ]);
+    const config = typeof window[FORM_CONFIG_LOCATION] === 'string' ? JSON.parse(window[FORM_CONFIG_LOCATION]) : window[FORM_CONFIG_LOCATION];
 
-  const nestedGroupsGenerator = new NestedGroupsGenerator();
+    const dependencyInjector = new DependencyInjector();
+    const quickSelector = new QuickSelector();
 
-  dependencyInjector.setTargetInstance(nestedGroupsGenerator).inject([
-    ['$', $],
-    ['QUICK_SELECTOR', quickSelector],
-    ['PREFIX_GROUP', PREFIX_GROUP]
-  ]);
+    dependencyInjector.setTargetInstance(quickSelector).inject([
+        ['$', $]
+    ]);
 
-  nestedGroupsGenerator.start(config.groups);
+    const nestedGroupsGenerator = new NestedGroupsGenerator();
 
-  const pageDecorator = new PageDecorator(config.globalDecoratorClasses.page);
+    dependencyInjector.setTargetInstance(nestedGroupsGenerator).inject([
+        ['$', $],
+        ['QUICK_SELECTOR', quickSelector],
+        ['PREFIX_GROUP', PREFIX_GROUP]
+    ]);
 
-  dependencyInjector.setTargetInstance(pageDecorator).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['QUICK_SELECTOR', quickSelector],
-    ['IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER],
-    ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER]
-  ]);
+    nestedGroupsGenerator.start(config.groups);
 
-  pageDecorator.start(config.pageDecorators);
+    const formEvents = new FormEvents();
 
-  const fieldDecorator = new FieldDecorator(config.globalDecoratorClasses.field).setFieldsToDecorate(nestedGroupsGenerator.getFieldIds());
+    dependencyInjector.setTargetInstance(formEvents).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['QUICK_SELECTOR', quickSelector]
+    ]);
 
-  dependencyInjector.setTargetInstance(fieldDecorator).inject([
-    ['$', $],
-    ['QUICK_SELECTOR', quickSelector]
-  ]);
+    formEvents.init();
 
-  fieldDecorator.start(config.fieldDecorators);
+    const nativeMethodOverrides = new NativeMethodOverrides();
 
-  const groupDecorator = new GroupDecorator(config.globalDecoratorClasses.group).setGroupsToDecorate(nestedGroupsGenerator.getGroupIds());
+    dependencyInjector.setTargetInstance(nativeMethodOverrides).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['FORM_EVENTS', formEvents],
+        ['QUICK_SELECTOR', quickSelector]
+    ]);
 
-  dependencyInjector.setTargetInstance(groupDecorator).inject([
-    ['$', $],
-    ['QUICK_SELECTOR', quickSelector],
-    ['PREFIX_GROUP', PREFIX_GROUP]
-  ]);
+    nativeMethodOverrides.init();
 
-  groupDecorator.start(config.groupDecorators);
+    const pageDecorator = new PageDecorator(config.globalDecoratorClasses.page);
 
-  const elemRelocator = new ElemRelocator();
+    dependencyInjector.setTargetInstance(pageDecorator).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['QUICK_SELECTOR', quickSelector],
+        ['IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER],
+        ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER]
+    ]);
 
-  dependencyInjector.setTargetInstance(elemRelocator).inject([
-    ['$', $],
-    ['QUICK_SELECTOR', quickSelector]
-  ]);
+    pageDecorator.start(config.pageDecorators);
 
-  elemRelocator.start(config.elemsToRelocate);
+    const fieldDecorator = new FieldDecorator(config.globalDecoratorClasses.field).setFieldsToDecorate(nestedGroupsGenerator.getFieldIds());
 
-  const formEvents = new FormEvents();
+    dependencyInjector.setTargetInstance(fieldDecorator).inject([
+        ['$', $],
+        ['QUICK_SELECTOR', quickSelector],
+        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
+    ]);
 
-  dependencyInjector.setTargetInstance(formEvents).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['QUICK_SELECTOR', quickSelector]
-  ]);
+    fieldDecorator.start(config.fieldDecorators);
 
-  formEvents.init();
+    const groupDecorator = new GroupDecorator(config.globalDecoratorClasses.group).setGroupsToDecorate(nestedGroupsGenerator.getGroupIds());
 
-  const fieldSynchronizer = new FieldSynchronizer();
+    dependencyInjector.setTargetInstance(groupDecorator).inject([
+        ['$', $],
+        ['QUICK_SELECTOR', quickSelector],
+        ['PREFIX_GROUP', PREFIX_GROUP]
+    ]);
 
-  dependencyInjector.setTargetInstance(fieldSynchronizer).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['QUICK_SELECTOR', quickSelector],
-    ['FORM_EVENTS', formEvents],
-    ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
-    ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
-  ]);
+    groupDecorator.start(config.groupDecorators);
 
-  fieldSynchronizer.init();
+    const elemRelocator = new ElemRelocator();
 
-  const conditionals = new Conditionals();
+    dependencyInjector.setTargetInstance(elemRelocator).inject([
+        ['$', $],
+        ['QUICK_SELECTOR', quickSelector]
+    ]);
 
-  dependencyInjector.setTargetInstance(conditionals).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['QUICK_SELECTOR', quickSelector],
-    ['FORM_EVENTS', formEvents],
-    ['PREFIX_GROUP', PREFIX_GROUP],
-    ['DECORATOR_STATE_HIDDEN', DECORATOR_STATE_HIDDEN],
-    ['DECORATOR_STATE_IGNORE', DECORATOR_STATE_IGNORE]
-  ]);
+    elemRelocator.start(config.elemsToRelocate);
 
-  conditionals.init(config.dependencies);
+    const fieldSynchronizer = new FieldSynchronizer();
 
-  const paginator = new Paginator();
+    dependencyInjector.setTargetInstance(fieldSynchronizer).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['QUICK_SELECTOR', quickSelector],
+        ['FORM_EVENTS', formEvents],
+        ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
+        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
+    ]);
 
-  dependencyInjector.setTargetInstance(paginator).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['QUICK_SELECTOR', quickSelector],
-    ['FORM_EVENTS', formEvents],
-    ['PREFIX_GROUP', PREFIX_GROUP],
-    ['DECORATOR_STATE_HIDDEN', DECORATOR_STATE_HIDDEN],
-    ['IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER],
-    ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER]
-  ]);
+    fieldSynchronizer.init();
 
-  paginator.init(config.pages);
+    const dependencies = new Dependencies();
 
-  const validator = new Validator();
+    dependencyInjector.setTargetInstance(dependencies).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['QUICK_SELECTOR', quickSelector],
+        ['FORM_EVENTS', formEvents],
+        ['PREFIX_GROUP', PREFIX_GROUP],
+        ['DECORATOR_STATE_HIDDEN', DECORATOR_STATE_HIDDEN],
+        ['DECORATOR_STATE_IGNORE', DECORATOR_STATE_IGNORE]
+    ]);
 
-  dependencyInjector.setTargetInstance(validator).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['QUICK_SELECTOR', quickSelector],
-    ['FORM_EVENTS', formEvents],
-    ['DECORATOR_STATE_IGNORE', DECORATOR_STATE_IGNORE],
-    ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
-    ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
-  ]);
+    dependencies.init(config.dependencies);
 
-  validator.init(config.validation);
+    const paginator = new Paginator();
 
-  const inputMask = new InputMask();
+    dependencyInjector.setTargetInstance(paginator).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['QUICK_SELECTOR', quickSelector],
+        ['FORM_EVENTS', formEvents],
+        ['PREFIX_GROUP', PREFIX_GROUP],
+        ['DECORATOR_STATE_HIDDEN', DECORATOR_STATE_HIDDEN],
+        ['IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER],
+        ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER]
+    ]);
 
-  dependencyInjector.setTargetInstance(inputMask).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['QUICK_SELECTOR', quickSelector]
-  ]);
+    paginator.init(config.pages);
 
-  inputMask.init(config.inputMask);
+    const validator = new Validator();
 
-  const bugfix = new Bugfix();
+    dependencyInjector.setTargetInstance(validator).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['QUICK_SELECTOR', quickSelector],
+        ['FORM_EVENTS', formEvents],
+        ['DECORATOR_STATE_IGNORE', DECORATOR_STATE_IGNORE],
+        ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
+        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
+    ]);
 
-  dependencyInjector.setTargetInstance(bugfix).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['QUICK_SELECTOR', quickSelector]
-  ]);
+    validator.init(config.validation);
 
-  bugfix.init();
+    const inputMask = new InputMask();
 
-  const nativeMethodOverrides = new NativeMethodOverrides();
+    dependencyInjector.setTargetInstance(inputMask).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['QUICK_SELECTOR', quickSelector]
+    ]);
 
-  dependencyInjector.setTargetInstance(nativeMethodOverrides).inject([
-    ['$', $],
-    ['ID_FORM', ID_FORM],
-    ['FORM_EVENTS', formEvents],
-    ['QUICK_SELECTOR', quickSelector]
-  ]);
+    inputMask.init(config.inputMask);
 
-  nativeMethodOverrides.init();
+    const bugfix = new Bugfix();
 
-  quickSelector.emptyCache();
+    dependencyInjector.setTargetInstance(bugfix).inject([
+        ['$', $],
+        ['ID_FORM', ID_FORM],
+        ['QUICK_SELECTOR', quickSelector]
+    ]);
 
-  require('./extra');
+    bugfix.init();
+
+    const queryStringEvaluator = new QueryStringEvaluator(config.queryStringEvaluator);
+
+    dependencyInjector.setTargetInstance(queryStringEvaluator).inject([
+        ['$', $],
+        ['QUICK_SELECTOR', quickSelector],
+        ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
+        ['POSTFIX_LOOKUP_ID_CHOSEN', POSTFIX_LOOKUP_ID_CHOSEN]
+    ]);
+
+    queryStringEvaluator.process(window.location.href);
+
+    quickSelector.emptyCache();
 });

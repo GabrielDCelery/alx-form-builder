@@ -4,6 +4,12 @@ const _ = {
     forEach: require('lodash.foreach')
 }
 
+const POSITION_METHOD_LOOKUP = {
+    top: 'prepend',
+    bottom: 'append',
+    after: 'after'
+}
+
 class ElemRelocator {
     start(_elemsToRelocateConfig) {
         _.forEach(_elemsToRelocateConfig, (_elemToRelocateConfig, _toRelocate) => {
@@ -14,19 +20,13 @@ class ElemRelocator {
     }
 
     static _getMoveMethod(_position) {
-        if (_position === 'top') {
-            return 'prepend';
+        const _moveMethod = POSITION_METHOD_LOOKUP[_position];
+
+        if (!_moveMethod) {
+            throw new Error(`Invalid position for element -> ${_position}`);
         }
 
-        if (_position === 'bottom') {
-            return 'append';
-        }
-
-        if (_position === 'after') {
-            return 'after';
-        }
-
-        throw new Error(`Invalid position for element -> ${_position}`);
+        return _moveMethod;
     }
 }
 

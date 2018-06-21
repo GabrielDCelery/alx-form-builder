@@ -9,7 +9,7 @@ const _ = {
     defaultsDeep: require('lodash.defaultsdeep')
 }
 
-const DEFAULT_GLOBAL_FIELD_DECORATOR_CLASSES = {
+const DEFAULT_GLOBAL_DECORATOR_CLASSES_FIELD = {
     field: [],
     fieldWrapperDiv: [],
     label: [],
@@ -17,13 +17,7 @@ const DEFAULT_GLOBAL_FIELD_DECORATOR_CLASSES = {
     labelAndFieldWrapperDiv: []
 };
 
-const LOCAL_DECORATOR_HELPER_TEXT = 'alx-helper-text';
-const LOCAL_DECORATOR_FORM_FIELD_WRAPPER = 'alx-form-input-wrapper';
-const LOCAL_DECORATOR_FORM_LABEL_WRAPPER = 'alx-form-label-wrapper';
-const LOCAL_DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER = 'alx-form-element';
-const LOCAL_DECORATOR_NON_RESIZABLE_TEXTAREA = 'alx-non-resizable-textarea';
-
-const DEFAULT_CONTENT_CONFIG_FIELD = {
+const DEFAULT_DECORATOR_CONFIG_FIELD = {
     bIsLookupField: false,
     bIsTextArea: false,
     label: null,
@@ -43,11 +37,17 @@ const DEFAULT_CONTENT_CONFIG_FIELD = {
     }
 }
 
+const LOCAL_DECORATOR_HELPER_TEXT = 'alx-helper-text';
+const LOCAL_DECORATOR_FORM_FIELD_WRAPPER = 'alx-form-input-wrapper';
+const LOCAL_DECORATOR_FORM_LABEL_WRAPPER = 'alx-form-label-wrapper';
+const LOCAL_DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER = 'alx-form-element';
+const LOCAL_DECORATOR_NON_RESIZABLE_TEXTAREA = 'alx-non-resizable-textarea';
+
 class FieldDecorator extends Decorator {
     constructor(_globalFieldDecoratorClasses) {
         super();
 
-        this.globalDecoratorClasses = _.defaultsDeep({}, _globalFieldDecoratorClasses, DEFAULT_GLOBAL_FIELD_DECORATOR_CLASSES);
+        this.globalDecoratorClasses = _.defaultsDeep({}, _globalFieldDecoratorClasses, DEFAULT_GLOBAL_DECORATOR_CLASSES_FIELD);
     }
 
     _markLookupField(_fieldId, _bIsLookupField) {
@@ -58,9 +58,9 @@ class FieldDecorator extends Decorator {
         this.QUICK_SELECTOR.getElemById(_fieldId).addClass(this.DECORATOR_LOOKUP_FIELD);
     }
 
-    _treatFreeformAsNormalInput(_fieldId, _bIsTextArea) {
-        if (_bIsTextArea) {
-            return;
+    _treatFreeformAsNormalInput(_fieldId, _textAreaRows) {
+        if (_textAreaRows) {
+            return this.QUICK_SELECTOR.getElemById(_fieldId).attr('rows', _textAreaRows);
         }
 
         this.QUICK_SELECTOR.getElemById(_fieldId).addClass(LOCAL_DECORATOR_NON_RESIZABLE_TEXTAREA);
@@ -97,7 +97,7 @@ class FieldDecorator extends Decorator {
 
         const _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
 
-        if (_$field.is('input')) {
+        if (_$field.is('textarea') || _$field.is('input')) {
             return _$field.attr('placeholder', _placeholder);
         }
     }
@@ -107,7 +107,7 @@ class FieldDecorator extends Decorator {
             return;
         }
 
-        const _$helperText = this._generateDecoratedDivWithContent('helperText', null, _helperTextConfig);
+        const _$helperText = this._generateDecoratedElem('helperText', null, _helperTextConfig);
 
         _$helperText.addClass(LOCAL_DECORATOR_HELPER_TEXT);
 
@@ -122,10 +122,10 @@ class FieldDecorator extends Decorator {
 
     start(_fieldDecoratorsConfig) {
         this.fieldIds.forEach(_fieldId => {
-            const _fieldDecoratorConfig = FieldDecorator._generateFieldContentConfig(_fieldDecoratorsConfig, _fieldId);
+            const _fieldDecoratorConfig = FieldDecorator._generateDecoratorConfig(_fieldDecoratorsConfig, _fieldId);
 
             this._markLookupField(_fieldId, _fieldDecoratorConfig.bIsLookupField);
-            this._treatFreeformAsNormalInput(_fieldId, _fieldDecoratorConfig.bIsTextArea);
+            this._treatFreeformAsNormalInput(_fieldId, _fieldDecoratorConfig.textAreaRows);
             this._decorateFieldRelatedElems(_fieldId, _fieldDecoratorConfig.decoratorClasses);
             this._decorateFieldWithHelperClasses(_fieldId);
             this._replaceFieldLabel(_fieldId, _fieldDecoratorConfig.label);
@@ -136,14 +136,14 @@ class FieldDecorator extends Decorator {
         return this;
     }
 
-    static _generateFieldContentConfig(_fieldDecoratorsConfig, _fieldId) {
+    static _generateDecoratorConfig(_fieldDecoratorsConfig, _fieldId) {
         const _config = _.get(_fieldDecoratorsConfig, _fieldId, null);
 
         if (!_config) {
-            return DEFAULT_CONTENT_CONFIG_FIELD;
+            return DEFAULT_DECORATOR_CONFIG_FIELD;
         }
 
-        return _.defaultsDeep({}, _config, DEFAULT_CONTENT_CONFIG_FIELD);
+        return _.defaultsDeep({}, _config, DEFAULT_DECORATOR_CONFIG_FIELD);
     }
 }
 

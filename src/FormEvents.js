@@ -16,7 +16,11 @@ class FormEvents {
     }
 
     registerToFormEvent(_eventName, _methodToExecute) {
-        this.QUICK_SELECTOR.getElemById(this.ID_FORM).on(_eventName, _methodToExecute);
+        this.QUICK_SELECTOR.getElemById(this.ID_FORM).on(_eventName, function () {
+            return setTimeout(() => {
+                return Reflect.apply(_methodToExecute, undefined, arguments);
+            }, 0);
+        });
     }
 
     trigger(_formEventName, _variables) {
@@ -49,15 +53,13 @@ class FormEvents {
         _$form.on(this.EVENT_FORM_VALIDATED, (_event, _bIsValid, _bForSubmission, _$erroredElems) => {
             _event.preventDefault();
 
-            if (_bIsValid) {
-                if (_bForSubmission) {
-                    return this.QUICK_SELECTOR.getElemById(this.ID_FORM).submit();
-                }
-
-                return;
+            if (!_bIsValid) {
+                return _$form.trigger(this.EVENT_MOVE_TO_ELEM_PAGE, [_$erroredElems.eq(0)]);
             }
 
-            _$form.trigger(this.EVENT_MOVE_TO_ELEM_PAGE, [_$erroredElems.eq(0)]);
+            if (_bForSubmission) {
+                return this.QUICK_SELECTOR.getElemById(this.ID_FORM).submit();
+            }
         });
     }
 
@@ -70,15 +72,15 @@ class FormEvents {
     }
 
     _initSyncLookupFieldListener(_$form) {
-        _$form.on(this.EVENT_SYNC_LOOKUP_FIELD, (_event, _config) => {
+        _$form.on(this.EVENT_SYNC_LOOKUP_FIELD, (_event, _bValidateForm, _fieldsToValidate) => {
             _event.preventDefault();
 
-            if (_config.bValidateForm === true) {
+            if (_bValidateForm === true) {
                 return _$form.trigger(this.EVENT_VALIDATE_FORM, [false]);
             }
 
-            if (_config.fieldsToValidate) {
-                _config.fieldsToValidate.forEach(_fieldToValidate => {
+            if (_fieldsToValidate) {
+                _fieldsToValidate.forEach(_fieldToValidate => {
                     return _$form.trigger(this.EVENT_VALIDATE_FIELD, [_fieldToValidate]);
                 });
             }

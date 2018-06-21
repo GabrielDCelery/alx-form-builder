@@ -47,7 +47,7 @@ class NestedGroupsGenerator {
 
     _processGroupsOfTheLevel(_groupConfigs, _parentGroupIds) {
         _groupConfigs.forEach(_groupConfig => {
-            const _groupIds = _parentGroupIds.slice();
+            const _groupIds = _parentGroupIds.slice(0);
 
             this.groupIds.push(_groupConfig.id);
             _groupIds.push(_groupConfig.id);

@@ -11,19 +11,19 @@ const _ = {
     defaultsDeep: require('lodash.defaultsdeep')
 }
 
-const DEFAULT_GLOBAL_GROUP_DECORATOR_CLASSES = {
+const DEFAULT_GLOBAL_DECORATOR_CLASSES_GROUP = {
     groupTitle: [],
     groupDescription: []
 };
 
-const DEFAULT_CONTENT_CONFIG_GROUP_TITLE = {
+const DEFAULT_DECORATOR_CONFIG_GROUP_TITLE = {
     type: 'text',
     value: null,
     decoratorClasses: [],
     plainTextWrapper: 'h2'
 }
 
-const DEFAULT_CONTENT_CONFIG_GROUP_DESCRIPTION = {
+const DEFAULT_DECORATOR_CONFIG_GROUP_DESCRIPTION = {
     type: 'text',
     value: null,
     decoratorClasses: [],
@@ -34,7 +34,7 @@ class GroupDecorator extends Decorator {
     constructor(_globalGroupDecoratorClasses) {
         super();
 
-        this.globalDecoratorClasses = _.defaultsDeep({}, _globalGroupDecoratorClasses, DEFAULT_GLOBAL_GROUP_DECORATOR_CLASSES);
+        this.globalDecoratorClasses = _.defaultsDeep({}, _globalGroupDecoratorClasses, DEFAULT_GLOBAL_DECORATOR_CLASSES_GROUP);
     }
 
     _prependTitleToGroup(_groupId, _groupDecoratorConfig) {
@@ -42,7 +42,7 @@ class GroupDecorator extends Decorator {
             return;
         }
 
-        const _$groupTitle = this._generateDecoratedDivWithContent('groupTitle', null, _groupDecoratorConfig);
+        const _$groupTitle = this._generateDecoratedElem('groupTitle', null, _groupDecoratorConfig);
 
         _$groupTitle.addClass(LOCAL_DECORATOR_GROUP_TITLE);
 
@@ -54,7 +54,7 @@ class GroupDecorator extends Decorator {
             return;
         }
 
-        const _$groupDescription = this._generateDecoratedDivWithContent('groupDescription', null, _groupDecoratorConfig);
+        const _$groupDescription = this._generateDecoratedElem('groupDescription', null, _groupDecoratorConfig);
 
         _$groupDescription.addClass(LOCAL_DECORATOR_GROUP_DESCRIPTION);
 
@@ -69,8 +69,8 @@ class GroupDecorator extends Decorator {
 
     start(_groupDecoratorsConfig) {
         this.groupIds.forEach(_groupId => {
-            const _groupDescriptionConfig = GroupDecorator._generateContentConfig(_groupId, 'description', _groupDecoratorsConfig, DEFAULT_CONTENT_CONFIG_GROUP_DESCRIPTION);
-            const _groupTitleConfig = GroupDecorator._generateContentConfig(_groupId, 'title', _groupDecoratorsConfig, DEFAULT_CONTENT_CONFIG_GROUP_TITLE);
+            const _groupDescriptionConfig = GroupDecorator._generateDecoratorConfig(_groupId, 'description', _groupDecoratorsConfig, DEFAULT_DECORATOR_CONFIG_GROUP_DESCRIPTION);
+            const _groupTitleConfig = GroupDecorator._generateDecoratorConfig(_groupId, 'title', _groupDecoratorsConfig, DEFAULT_DECORATOR_CONFIG_GROUP_TITLE);
 
             this._prependDescriptionToGroup(_groupId, _groupDescriptionConfig);
             this._prependTitleToGroup(_groupId, _groupTitleConfig);
@@ -79,7 +79,7 @@ class GroupDecorator extends Decorator {
         return this;
     }
 
-    static _generateContentConfig(_id, _type, _decoratorsConfig = {}, _defaultConfig) {
+    static _generateDecoratorConfig(_id, _type, _decoratorsConfig = {}, _defaultConfig) {
         const _customConfig = _.get(_decoratorsConfig, [_id, _type], null);
 
         if (!_customConfig) {
