@@ -12,8 +12,8 @@ const _ = {
 }
 
 const DEFAULT_GLOBAL_DECORATOR_CLASSES_GROUP = {
-    groupTitle: [],
-    groupDescription: []
+    title: [],
+    description: []
 };
 
 const DEFAULT_DECORATOR_CONFIG_GROUP_TITLE = {
@@ -42,7 +42,7 @@ class GroupDecorator extends Decorator {
             return;
         }
 
-        const _$groupTitle = this._generateDecoratedElem('groupTitle', null, _groupDecoratorConfig);
+        const _$groupTitle = this._generateDecoratedElem('title', null, _groupDecoratorConfig);
 
         _$groupTitle.addClass(LOCAL_DECORATOR_GROUP_TITLE);
 
@@ -54,7 +54,7 @@ class GroupDecorator extends Decorator {
             return;
         }
 
-        const _$groupDescription = this._generateDecoratedElem('groupDescription', null, _groupDecoratorConfig);
+        const _$groupDescription = this._generateDecoratedElem('description', null, _groupDecoratorConfig);
 
         _$groupDescription.addClass(LOCAL_DECORATOR_GROUP_DESCRIPTION);
 

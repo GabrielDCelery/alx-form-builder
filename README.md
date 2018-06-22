@@ -1,5 +1,4 @@
 ### Form Builder
-------
 
 Upon initialization the form builder looks at the browser's `window` object's `alx_dynamic_form_config` property and if it finds a valid Javascript object or JSON text configuration, will apply the changes to the form.
 
@@ -15,9 +14,8 @@ The features include:
 * validating fields
 * adding input masks to fields
 
-### Usage
 ------
-
+### Usage
 
 Run the following command to build a distrubutable bundle (/dist/alx-dynamic-form-builder-bundle.min.js)
 
@@ -31,12 +29,10 @@ Run the following command if you want to develop on your local system
 npm run dev
 ```
 
-### Configuration
 ------
+### Configuration
 
 #### Main Configuration Object
-
-
 
 ```
 {
@@ -54,7 +50,7 @@ npm run dev
 }
 ```
 
-
+------
 #### Groups Configuration
 
 This option allows you to group fields wrapped by div elements and to generate multi-level nesting.
@@ -93,6 +89,33 @@ This option allows you to group fields wrapped by div elements and to generate m
 }
 ```
 
+##### Example Groups Configuration
+
+```
+[{
+	"id": "request-details",
+	"fields": ["id_field_agreement_type", "id_field_legal_opinion_required"],
+	"children": []
+}, {
+	"id": "aircraft-manufacturer",
+	"fields": ["id_field_manufacturer_serial_number", "id_field_aircraft_manufacturer"],
+	"children": []
+}, {
+	"id": "background",
+	"fields": ["id_field_parties_involved", "id_field_if_other_please_specify", "id_field_please_specify_deal_deadline"],
+	"children": [{
+		"id": "ewa",
+		"fields": ["id_field_purpose_of_ewa", "id_field_financial_structure", "id_field_are_there_any_amendments"],
+		"children": []
+	}, {
+		"id": "tewa",
+		"fields": ["id_field_deg_number_of_ewa_to_be_terminated", "id_field_date_of_original_ewa"],
+		"children": []
+	}]
+}]
+```
+
+------
 #### Pagination Configuration
 
 After generating the nested groups of the fields you can paginate the top/first level groups. The groups should be defined through the "Group Configuration" in order for the pagination to work.
@@ -119,6 +142,22 @@ After generating the nested groups of the fields you can paginate the top/first 
 }
 ```
 
+##### Example Pagination Configuration
+
+```
+[{
+	"label": "Request Details",
+	"id": "request-details"
+}, {
+	"label": "Aircraft Manufacturer",
+	"id": "aircraft-manufacturer"
+}, {
+	"label": "Background",
+	"id": "background"
+}]
+```
+
+------
 #### Validation Configuration
 
 The form builder uses the JQuery Validation plugin. For the built-in validation methods read the docs at https://jqueryvalidation.org/documentation Custom validators added to the plugin through the form builder:
@@ -139,23 +178,21 @@ The form builder uses the JQuery Validation plugin. For the built-in validation 
 }
 ```
 
-#### Dependencies Configuration
-
-Through this option you can set up default values for fields and dependencies between fields, groups and pages.
+##### Example Validation Configuration
 
 ```
 {
-    "title": "Dependencies Configuration",
-    "description": "Dependencies configuration for the fields, groups, pages",
-    "properties": {
-        "{{fieldId | groupId | pageId}}": {
-            "descryption": ""
-        }
-    }
+	"id_field_aircraft_manufacturer": {
+		"required": true,
+		"minlength": 10
+	},
+	"id_field_engine_serial_numbers": {
+		"pattern": "^([0-9]{3,10}) & ([0-9]{3,10})$"
+	}
 }
-
 ```
 
+------
 #### InputMask Configuration
 
 The form builder uses the inputmask plugin via the `Inputmask` class. For details see the documentation at https://github.com/RobinHerbots/Inputmask
@@ -169,45 +206,766 @@ The form builder uses the inputmask plugin via the `Inputmask` class. For detail
         "{{fieldID}}": {
             "description": "Configuration for a field, e.g. { mask: '99/99/9999' }",
             "type": "object"
-        }
     }
 }
 ```
 
-
-### Example Configuration
+##### Example InputMask Configuration
 
 ```
 {
-	"globalDecoratorClasses": {
-		"page": {
-			"form": ["pure-form"]
+	"id_field_please_specify_deal_deadline": {
+		"mask": "99/99/9999"
+	}
+}
+```
+
+------
+#### Dependencies Configuration
+
+Through this option you can set up default values for fields and dependencies between fields, groups and pages.
+
+```
+{
+    "title": "Dependencies Configuration",
+    "description": "Dependencies configuration for the fields, groups, pages",
+    "properties": {
+        "{{fieldId | groupId | pageId}}": {
+            "description": "",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "Type of the targeted element",
+					"type": "string",
+					"enum": ["field", "group"]
+				},
+				"defaultState": {
+					"description": "Configuration for the field or group's default state",
+					"type": "object",
+					"properties": {
+						"visible": {
+							"description": "State of visibility of the field or group",
+							"type": "boolean",
+							"enum": [true, false]
+						},
+						"value": {
+							"description": "Value of the elem (only for fields)",
+							"type": "string | integer"
+						}
+					}
+				},
+				"validStates": {
+					"description": "List of valid states for a field or a group",
+					"type": "array",
+					"items": {
+						"description": "A valid state for a field or a group",
+						"type": "object",
+						"properties": {
+							"visible":  {
+								"description": "State of visibility of the field or group",
+								"type": "boolean",
+								"enum": [true, false]
+							},
+							"value": {
+								"description": "Value of the elem (only for fields)",
+								"type": "string | integer"
+							},
+							"criterias": {
+								"description": "A list of conditions of other fields that have to be true for the state to replace the default state",
+								"type": "array",
+								"items": {
+									"description": "Configurations for the fields to be a valid criteria",
+									"type": "object",
+									"properties": {
+										"target": {
+											"description": "ID of the field"
+											"type": "string"
+										},
+										"values": {
+											"description": "Values of the field for it to be a valid criteria",
+											"type": "array":
+											"items": {
+												"description": "Value of the field for it to be a valid criteria",
+												"type": "string | integer"
+											}
+										},
+										"not": {
+											"description": "List of values that make the field an invalid criteria",
+											"type": "array":
+											"items": {
+												"description": "Value that makles the field an invalid criteria",
+												"type": "string | integer"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+        }
+    }
+}
+
+```
+
+##### Example InputMask Configuration
+
+```
+{
+	"id_field_if_other_please_provide_details": {
+		"type": "field",
+		"defaultState": {
+			"visible": false
 		},
-		"group": {},
-		"field": {
-			"field": ["pure-input-1"],
-			"fieldWrapperDiv": ["pure-u-2-3"],
-			"labelWrapperDiv": ["pure-u-1-3"],
-			"labelAndFieldWrapperDiv": ["pure-g"]
-		}
+		"validStates": [{
+			"value": "",
+			"visible": true,
+			"criterias": [{
+				"target": "id_field_governing_law",
+				"values": ["Other"]
+			}]
+		}]
 	},
-	"pageDecorators": {
+	"ewa": {
+		"type": "group",
+		"defaultState": {
+			"visible": false
+		},
+		"validStates": [{
+			"visible": true,
+			"criterias": [{
+				"target": "id_submitter",
+				"not": ["Rolls Royce"]
+			}, {
+				"target": "id_field_agreement_type",
+				"values": ["Engine Warranty Agreement"]
+			}]
+		}]
+	}
+}
+```
+
+------
+#### Global Decorator Classes Configuration
+
+```
+{
+	"title": "Global Decorator Classes",
+	"description": "Configuration for adding extra classes to certain elements",
+	"type": "object",
+	"properties": {
+		"field": {
+			"description": "Configuration for field related elems",
+			"type": "object",
+			"properties": {
+				"field": {
+					"description": "Extra classes for the field",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the field",
+						"type": "string"
+					}
+				},
+				"fieldWrapperDiv": {
+					"description": "Extra classes for the div wrapping the field",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the div wrapping the field",
+						"type": "string"
+					}
+				},
+				"label": {
+					"description": "Extra classes for the field's label",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the field's label",
+						"type": "string"
+					}
+				},
+				"labelWrapperDiv": {
+					"description": "Extra classes for the div wrapping the label",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the div wrapping the label",
+						"type": "string"
+					}
+				},
+				"labelAndFieldWrapperDiv": {
+					"description": "Extra classes for the div wrapping the label and the field",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the div wrapping the label and the field",
+						"type": "string"
+					}
+				}
+			}
+		},
+		"group": {
+			"description": "Configuration for every group's wrapping fields",
+			"type": "object",
+			"properties": {
+				"title": {
+					"description": "Extra classes for every group's title div",
+					"type": "array",
+					"items": {
+						"description": "Extra class for every group's title div",
+						"type": "string"
+					}
+				},
+				"description": {
+					"description": "Extra classes for every group's description div",
+					"type": "array",
+					"items": {
+						"description": "Extra class for every group's description div",
+						"type": "string"
+					}
+				}
+			}
+		},
+		"page": {
+			"description": "Configuration for specific page elements",
+			"type": "object",
+			"properties": {
+				"form": {
+					"description": "Extra classes for the form",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the form",
+						"type": "string"
+					}
+				},
+				"logo": {
+					"description": "Extra classes for the logo",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the logo",
+						"type": "string"
+					}
+				},
+				"heading": {
+					"description": "Extra classes for the heading outermost wrapper",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the heading outermost wrapper",
+						"type": "string"
+					}
+				},
+				"headingInner": {
+					"description": "Extra classes for the heading inner wrapper",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the heading inner wrapper",
+						"type": "string"
+					}
+				},
+				"headingInnerTitle": {
+					"description": "Extra classes for the heading's title",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the heading title",
+						"type": "string"
+					}
+				},
+				"main": {
+					"description": "Extra classes for the main outermost wrapper",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the main outermost wrapper",
+						"type": "string"
+					}
+				},
+				"mainInner": {
+					"description": "Extra classes for the main inner wrapper",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the main inner wrapper",
+						"type": "string"
+					}
+				},
+				"mainInnerTitle": {
+					"description": "Extra classes for the main title",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the main title",
+						"type": "string"
+					}
+				},
+				"footer": {
+					"description": "Extra classes for the footer outermost wrapper",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the footer outermost wrapper",
+						"type": "string"
+					}
+				},
+				"footerInner": {
+					"description": "Extra classes for the footer inner wrapper",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the footer inner wrapper",
+						"type": "string"
+					}
+				},
+				"footerInnerTitle": {
+					"description": "Extra classes for the footer title text",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the footer title text",
+						"type": "string"
+					}
+				},
+				"saveAndLoadButtonContainer": {
+					"description": "Extra classes for the save and load button container div",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the save and load button container div",
+						"type": "string"
+					}
+				},
+				"saveAndLoadButtonHelperText": {
+					"description": "Extra classes for the save and load button helper text",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the save and load button helper text",
+						"type": "string"
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+##### Example Global Decorator Classes Configuration
+
+```
+{
+	"page": {
+		"heading": ["header"],
+		"headingInner": ["header-inner"],
+		"main": ["main"],
+		"mainInner": ["main-inner"],
+		"mainTitle": [],
+		"footer": ["footer"],
+		"footerInner": ["footer-inner"],
+		"saveAndLoadButtonContainer": ["save-load"],
+		"saveAndLoadButtonHelperText": ["sl-help"]
+	},
+	"group": {
+		"groupDescription": ["help"]
+	},
+	"field": {
+		"fieldWrapperDiv": ["input"],
+		"labelWrapperDiv": ["label"],
+		"labelAndFieldWrapperDiv": ["form-element"]
+	}
+}
+```
+
+------
+#### Page Decorators Configuration
+
+```
+{
+	"title": "Page Decorators Configuration",
+	"description": "Configuration for appending extra elements to the page",
+	"type": "object",
+	"properties": {
 		"logo": {
-			"type": "img",
-			"value": "https://www.rolls-royce.com/~/media/Images/R/Rolls-Royce/logo/rebrand-svg-logo.svg?h=96&la=en&w=59",
-			"decoratorClasses": []
+			"description": "Config for appending a logo",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "Type of the injected content",
+					"type": "string",
+					"enum": ["img", "html"]
+				},
+				"value": {
+					"description": "Value of the injected content",
+					"type": "string"
+				},
+				"decoratorClasses": {
+					"description": "Extra classes to the injected elem",
+					"type": "array",
+					"items": {
+						"description": "Extra class to the injected elem",
+						"type": "string"
+					}
+				},
+				"plainTextWrapper": {
+					"description": "Tag for wrapping the injected element",
+					"type": "string"
+				}
+			}
 		},
 		"headingTitle": {
+			"description": "Config for appending a heading",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "Type of the injected content",
+					"type": "string",
+					"enum": ["text", "html"]
+				},
+				"value": {
+					"description": "Value of the injected content",
+					"type": "string"
+				},
+				"decoratorClasses": {
+					"description": "Extra classes to the injected elem",
+					"type": "array",
+					"items": {
+						"description": "Extra class to the injected elem",
+						"type": "string"
+					}
+				},
+				"plainTextWrapper": {
+					"description": "Tag for wrapping the injected element",
+					"type": "string"
+				}
+			}
+		},
+		"mainTitle": {
+			"description": "Config for appending a title to the main element",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "Type of the injected content",
+					"type": "string",
+					"enum": ["text", "html"]
+				},
+				"value": {
+					"description": "Value of the injected content",
+					"type": "string"
+				},
+				"decoratorClasses": {
+					"description": "Extra classes to the injected elem",
+					"type": "array",
+					"items": {
+						"description": "Extra class to the injected elem",
+						"type": "string"
+					}
+				},
+				"plainTextWrapper": {
+					"description": "Tag for wrapping the injected element",
+					"type": "string"
+				}
+			}
+		},
+		"saveAndLoadButtonHelperText": {
+			"description": "Config for appending a helper text to the save and load buttons",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "Type of the injected content",
+					"type": "string",
+					"enum": ["text", "html"]
+				},
+				"value": {
+					"description": "Value of the injected content",
+					"type": "string"
+				},
+				"decoratorClasses": {
+					"description": "Extra classes to the injected elem",
+					"type": "array",
+					"items": {
+						"description": "Extra class to the injected elem",
+						"type": "string"
+					}
+				},
+				"plainTextWrapper": {
+					"description": "Tag for wrapping the injected element",
+					"type": "string"
+				}
+			}
+		},
+		"footerTitle": {
+			"description": "Config for appending a title to the footer",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "Type of the injected content",
+					"type": "string",
+					"enum": ["text", "html"]
+				},
+				"value": {
+					"description": "Value of the injected content",
+					"type": "string"
+				},
+				"decoratorClasses": {
+					"description": "Extra classes to the injected elem",
+					"type": "array",
+					"items": {
+						"description": "Extra class to the injected elem",
+						"type": "string"
+					}
+				},
+				"plainTextWrapper": {
+					"description": "Tag for wrapping the injected element",
+					"type": "string"
+				}
+			}
+		}
+	}
+}
+```
+
+##### Example Page Decorators Configuration
+
+```
+{
+	"logo": {
+		"type": "img",
+		"value": "https://www.rolls-royce.com/~/media/Images/R/Rolls-Royce/logo/rebrand-svg-logo.svg?h=96&la=en&w=59",
+		"decoratorClasses": []
+	},
+	"headingTitle": {
+		"type": "text",
+		"value": null
+	},
+	"mainTitle": {
+		"type": "html",
+		"value": "<h1>Property Management Form</h1>"
+	},
+	"saveAndLoadButtonHelperText": {
+		"type": "text",
+		"value": "Don't have time to finish? Save your work in progress! Load it again when you are ready to submit your request!"
+	},
+	"footerTitle": {
+		"type": "text",
+		"value": "©2002-2017 T-MOBILE USA, INC."
+	}
+}
+```
+
+------
+#### Group Decorators Configuration
+
+```
+{
+	"title": "Group Decorators Configuration",
+	"description": "Configuration for injecting group titles and descriptions",
+	"type": "object",
+	"properties": {
+		"{{groupId}}": {
+			"description": "Configuration for injecting content for a group",
+			"type": "object",
+			"properties": {
+				"title": {
+					"description": "Configuration for injecting a title for a group",
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "Type of the injected content",
+							"type": "string",
+							"enum": ["text", "html"]
+						},
+						"value": {
+							"description": "Value of the injected content",
+							"type": "string"
+						},
+						"decoratorClasses": {
+							"description": "Extra classes to the injected elem",
+							"type": "array",
+							"items": {
+								"description": "Extra class to the injected elem",
+								"type": "string"
+							}
+						},
+						"plainTextWrapper": {
+							"description": "Tag for wrapping the injected element",
+							"type": "string"
+						}
+					}
+				},
+				"description": {
+					"description": "Configuration for injecting a description for a group"
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "Type of the injected content",
+							"type": "string",
+							"enum": ["text", "html"]
+						},
+						"value": {
+							"description": "Value of the injected content",
+							"type": "string"
+						},
+						"decoratorClasses": {
+							"description": "Extra classes to the injected elem",
+							"type": "array",
+							"items": {
+								"description": "Extra class to the injected elem",
+								"type": "string"
+							}
+						},
+						"plainTextWrapper": {
+							"description": "Tag for wrapping the injected element",
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+##### Example Group Decorators Configuration
+
+```
+{
+	"site-information": {
+		"title": {
+			"type": "html",
+			"value": "<h1>Site Information</h1>"
+		},
+		"description": {
 			"type": "text",
-			"value": "Engine Warranty Intake Form"
+			"value": "Please type the full Site ID. If this request does not have a Site ID, please type New_Site. Please ensure you do not include any spaces in this box.",
+			"decoratorClasses": ["help"]
 		}
 	},
-	"groupDecorators": {},
+	"updated-site-information": {
+		"title": {
+			"type": "text",
+			"value": "Please use the fields below to provide the correct site information.",
+			"plainTextWrapper": "h3"
+		}
+	}
+}
+```
+
+------
+#### Field Decorators Configuration
+
+```
+{
+	"title": "Field Decorators Configuration",
+	"description": "Configuration for injecting field related elements",
+	"type": "object",
+	"properties": {
+		"{{fieldId}}": {
+			"description": "Configuration for specific field to inject elements related to it",
+			"type": "object",
+			"properties": {
+				"bIsLookupField": {
+					"description": "Marks the field as a lookup field"
+					"type": "boolean",
+					"enum": [true]
+				},
+				"placeholder": {
+					"description": "Placeholder text for for field",
+					"type": "string"
+				},
+				"label": {
+					"description": "New label that replaces the default label",
+					"type": "string"
+				},
+				"textAreaRows": {
+					"description": "Sets an input field to a text area and makes it have multiple rows",
+					"type": "integer"
+				},
+				"decoratorClasses": {
+					"description": "Custom field related extra classes",
+					"type": "object",
+					"properties": {
+						"field": {
+							"description": "Extra classes for the field",
+							"type": "array",
+							"items": {
+								"description": "Extra class for the field",
+								"type": "string"
+							}
+						},
+						"fieldWrapperDiv": {
+							"description": "Extra classes for the div wrapping the field",
+							"type": "array",
+							"items": {
+								"description": "Extra class for the div wrapping the field",
+								"type": "string"
+							}
+						},
+						"label": {
+							"description": "Extra classes for the field's label",
+							"type": "array",
+							"items": {
+								"description": "Extra class for the field's label",
+								"type": "string"
+							}
+						},
+						"labelWrapperDiv": {
+							"description": "Extra classes for the div wrapping the label",
+							"type": "array",
+							"items": {
+								"description": "Extra class for the div wrapping the label",
+								"type": "string"
+							}
+						},
+						"labelAndFieldWrapperDiv": {
+							"description": "Extra classes for the div wrapping the label and the field",
+							"type": "array",
+							"items": {
+								"description": "Extra class for the div wrapping the label and the field",
+								"type": "string"
+							}
+						}
+					}
+				},
+				"helperText": {
+					"description": "Injector for extra helper text for the field",
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "Type of the injected content",
+							"type": "string",
+							"enum": ["text", "html"]
+						},
+						"value": {
+							"description": "Value of the injected content",
+							"type": "string"
+						},
+						"decoratorClasses": {
+							"description": "Extra classes to the injected elem",
+							"type": "array",
+							"items": {
+								"description": "Extra class to the injected elem",
+								"type": "string"
+							}
+						},
+						"plainTextWrapper": {
+							"description": "Tag for wrapping the injected element",
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+##### Example Field Decorators Configuration
+
+```
+{
 	"fieldDecorators": {
-		"id_field_reference_number": {
-			"bIsLookupField": true
-		},
-		"id_field_definitions_detail": {
+        "id_field_relationship_name": {
+            "bIsLookupField": true,
+            "decoratorClasses": {
+                "labelAndFieldWrapperDiv": ["id_field_relationship_name"]
+            }
+        },
+        "id_field_market_site_point_email": {\
+            "helperText": {
+                "type": "text",
+                "value": "Please note that this person will receive all email notifications relating to this matter going forward",
+                "decoratorClasses": ["help"]
+            }
+        },
+		"id_field_amendments_detail": {
 			"textAreaRows": 5
 		},
 		"id_field_engine_serial_numbers": {
@@ -216,165 +974,6 @@ The form builder uses the inputmask plugin via the `Inputmask` class. For detail
 		"id_field_lessee_the_above_is": {
 			"label": "The above is"
 		}
-	},
-	"elemsToRelocate": {},
-	"pages": [{
-		"label": "Request Details",
-		"id": "request-details"
-	}, {
-		"label": "Aircraft Manufacturer",
-		"id": "aircraft-manufacturer"
-	}, {
-		"label": "Background",
-		"id": "background"
-	}, {
-		"label": "Parties",
-		"id": "parties"
-	}, {
-		"label": "Current Agreements",
-		"id": "current-agreements"
-	}],
-	"groups": [{
-		"id": "request-details",
-		"fields": ["id_field_agreement_type", "id_field_legal_opinion_required"],
-		"children": []
-	}, {
-		"id": "aircraft-manufacturer",
-		"fields": ["id_field_manufacturer_serial_number", "id_field_aircraft_manufacturer", "id_field_engine_serial_numbers", "id_field_aircraft_type", "id_field_aircraft_registration_mark", "id_field_engine_type", "id_field_is_the_aircraft_part_of_a_fleet", "id_field_total_number_of_aircrafts_in_the_fleet", "id_field_number_of_this_aircraft_in_the_fleet"],
-		"children": []
-	}, {
-		"id": "background",
-		"fields": ["id_field_parties_involved", "id_field_if_other_please_specify", "id_field_please_specify_deal_deadline"],
-		"children": [{
-			"id": "ewa",
-			"fields": ["id_field_purpose_of_ewa", "id_field_financial_structure", "id_field_are_there_any_amendments"],
-			"children": []
-		}, {
-			"id": "tewa",
-			"fields": ["id_field_deg_number_of_ewa_to_be_terminated", "id_field_date_of_original_ewa"],
-			"children": []
-		}]
-	}, {
-		"id": "parties",
-		"fields": [],
-		"children": [{
-			"id": "lessee",
-			"fields": ["id_field_lessee_full_name", "id_field_lessee_country_of_incorporation"],
-			"children": []
-		}, {
-			"id": "lessor",
-			"fields": ["id_field_lessor_full_name", "id_field_lessor_country_of_incorporation", "id_field_lessor_address"],
-			"children": []
-		}, {
-			"id": "head-lessor",
-			"fields": ["id_field_head_lessor_full_name", "id_field_head_lessor_country_of_incorporation"],
-			"children": []
-		}, {
-			"id": "trustee",
-			"fields": ["id_field_trustee_full_name", "id_field_trustee_country_of_incorporation", "id_field_trustee_address"],
-			"children": []
-		}, {
-			"id": "pdp",
-			"fields": ["id_field_pdp_full_name", "id_field_pdp_country_of_incorporation", "id_field_pdp_address"],
-			"children": []
-		}]
-	}, {
-		"id": "current-agreements",
-		"fields": [],
-		"children": [{
-			"id": "dw",
-			"fields": ["id_field_is_there_a_direct_warranty"],
-			"children": [{
-				"id": "dw-details",
-				"fields": ["id_field_dw_between", "id_field_dw_between_other", "id_field_dw_and"],
-				"children": []
-			}]
-		}, {
-			"id": "sa",
-			"fields": ["id_field_is_there_a_security_agreement"],
-			"children": [{
-				"id": "sa-details",
-				"fields": ["id_field_sa_between", "id_field_sa_between_other", "id_field_sa_and", "id_field_sa_and_other", "id_field_sa_dated"],
-				"children": []
-			}]
-		}, {
-			"id": "la",
-			"fields": ["id_field_is_there_a_lease_agreement"],
-			"children": [{
-				"id": "la-details",
-				"fields": ["id_field_la_between", "id_field_la_between_other", "id_field_la_and", "id_field_la_and_other", "id_field_la_dated"],
-				"children": []
-			}]
-		}, {
-			"id": "hl",
-			"fields": ["id_field_is_there_a_head_lease"],
-			"children": [{
-				"id": "hl-details",
-				"fields": ["id_field_hl_between", "id_field_hl_between_other", "id_field_hl_and", "id_field_hl_and_other", "id_field_hl_dated"],
-				"children": []
-			}]
-		}]
-	}],
-	"dependencies": {
-		"id_field_legal_opinion_required": {
-			"type": "field",
-			"defaultState": {
-				"visible": false
-			},
-			"validStates": [{
-				"value": "",
-				"visible": true,
-				"criterias": [{
-					"target": "id_field_agreement_type",
-					"values": ["Engine Warranty Agreement"]
-				}]
-			}]
-		},
-		"ewa": {
-			"type": "group",
-			"defaultState": {
-				"visible": false
-			},
-			"validStates": [{
-				"visible": true,
-				"criterias": [{
-					"target": "id_field_agreement_type",
-					"not": ["Termination Of Engine Warranty Agreement"]
-				}]
-			}]
-		},
-		"parties": {
-			"type": "group",
-			"defaultState": {
-				"visible": false
-			},
-			"validStates": [{
-				"visible": true,
-				"criterias": [{
-					"target": "id_field_parties_involved",
-					"values": ["Lessor/Lessee", "Lessor/Lessee/Security Trustee", "Lessor/Lessee/Head Lessor/Security Trustee", "PDP Lender/Lessee"]
-				}]
-			}]
-		}
-	},
-	"validation": {
-		"id_field_agreement_type": {
-			"required": true
-		},
-		"id_field_if_other_please_provide_details": {
-			"minlength": 10
-		},
-		"id_field_engine_serial_numbers": {
-			"pattern": "^([0-9]{3,10}) & ([0-9]{3,10})$"
-		}
-	},
-	"inputMask": {
-		"id_field_please_specify_deal_deadline": {
-			"mask": "99/99/9999"
-		}
-	},
-	"queryStringEvaluator": {
-		"id": "id_field_manufacturer_serial_number"
-	}
+    }
 }
 ```

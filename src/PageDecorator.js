@@ -9,7 +9,6 @@ const _ = {
 
 const DEFAULT_GLOBAL_DECORATOR_CLASSES_PAGE = {
     form: [],
-    title: [],
     logo: [],
     heading: [],
     headingInner: [],
@@ -19,7 +18,7 @@ const DEFAULT_GLOBAL_DECORATOR_CLASSES_PAGE = {
     mainInnerTitle: [],
     footer: [],
     footerInner: [],
-    footerInnerText: [],
+    footerInnerTitle: [],
     saveAndLoadButtonContainer: [],
     saveAndLoadButtonHelperText: []
 };
@@ -36,7 +35,7 @@ const LOCAL_IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER = 'alx-save-load-button-co
 const LOCAL_IDENTIFIER_SAVE_AND_LOAD_BUTTON_HELPER_TEXT = 'alx-save-load-button-helper-text';
 const LOCAL_IDENTIFIER_FOOTER = 'alx-footer';
 const LOCAL_IDENTIFIER_FOOTER_INNER = 'alx-footer-inner';
-const LOCAL_IDENTIFIER_FOOTER_INNER_TEXT = 'alx-footer-inner-text';
+const LOCAL_IDENTIFIER_FOOTER_INNER_TITLE = 'alx-footer-inner-text';
 
 const DEFAULT_CONTENT_CONFIG_LOGO = {
     type: 'img',
@@ -118,7 +117,7 @@ class FormDecorator extends Decorator {
     _generateFooter(_footerTitleConfig) {
         const _$footer = this._generateDecoratedDivWithContent('footer', LOCAL_IDENTIFIER_FOOTER, {});
         const _$footerInner = this._generateDecoratedDivWithContent('footerInner', LOCAL_IDENTIFIER_FOOTER_INNER, {});
-        const _$footerInnerTitle = this._generateDecoratedDivWithContent('footerTitle', LOCAL_IDENTIFIER_FOOTER_INNER_TEXT, _footerTitleConfig);
+        const _$footerInnerTitle = this._generateDecoratedDivWithContent('footerInnerTitle', LOCAL_IDENTIFIER_FOOTER_INNER_TITLE, _footerTitleConfig);
 
         _$footerInner.append(_$footerInnerTitle);
         _$footer.append(_$footerInner);
