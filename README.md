@@ -44,9 +44,13 @@ npm run dev
         "pages": "see Pagination Configuration",
         "validation": "see Validation Configuration",
         "dependencies": "see Dependencies configuration",
-        "inputMask": "see InputMask Configuration"
-    },
-    "required": ["groups"]
+        "inputMask": "see InputMask Configuration",
+		"globalDecoratorClasses": "see Global Decorator Classes Configuration",
+		"pageDecorators": "see Page Decorators Configuration",
+		"groupDecorators": "see Group Decorators Configuration",
+		"fieldDecorators": "see Field Decorators Configuration",
+		"queryStringEvaluator": "see Query String Evaluator Configuration"
+    }
 }
 ```
 
@@ -57,35 +61,35 @@ This option allows you to group fields wrapped by div elements and to generate m
 
 ```
 {
-    "title": "Groups Configuration",
-    "description": "Configuration for generating nested groups",
-    "type": "array",
-    "items": {
-        "description": "Configuration of a single group",
-        "type": "object",
-        "properties": {
-            "id": {
-                "description": "Unique identifier of the group e.g. site-details",
-                "type": "string"
-            },
-            "fields": {
-                "description": "Field ids belonging to the group",
-                "type": "array",
-                "items": {
-                    "description": "field id e.g. id_field_head_lessor_full_name",
-                    "type": "string"
-                }
-            },
-            "children": {
-                "description": "Configuration for generating nested child groups",
-                "type": "array",
-                "items": {
-                    "description": "Group Configuration",
-                    "type": "object"
-                }
-            }
-        }
-    }
+	"title": "Groups Configuration",
+	"description": "Configuration for generating nested groups",
+	"type": "array",
+	"items": {
+		"description": "Configuration of a single group",
+		"type": "object",
+		"properties": {
+			"id": {
+				"description": "Unique identifier of the group e.g. site-details",
+				"type": "string"
+			},
+			"fields": {
+				"description": "Field ids belonging to the group",
+				"type": "array",
+				"items": {
+					"description": "field id e.g. id_field_head_lessor_full_name",
+					"type": "string"
+				}
+			},
+			"children": {
+				"description": "Configuration for generating nested child groups",
+				"type": "array",
+				"items": {
+					"description": "Group Configuration",
+					"type": "object"
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -122,23 +126,23 @@ After generating the nested groups of the fields you can paginate the top/first 
 
 ```
 {
-    "title": "Pagination Configuration",
-    "description": "Configuration for generating navigable pages",
-    "type": "array",
-    "items": {
-        "description": "Page configuration",
-        "type": "object",
-        "properties": {
-            "label": {
-                "description": "Label for the page e.g. Site Details",
-                "type": "string"
-            },
-            "id": {
-                "description": "ID of the group e.g. site-details",
-                type": "string"
-            }
-        }
-    }
+	"title": "Pagination Configuration",
+	"description": "Configuration for generating navigable pages",
+	"type": "array",
+	"items": {
+		"description": "Page configuration",
+		"type": "object",
+		"properties": {
+			"label": {
+				"description": "Label for the page e.g. Site Details",
+				"type": "string"
+			},
+			"id": {
+				"description": "ID of the group e.g. site-details",
+				"type": "string"
+			}
+		}
+	}
 }
 ```
 
@@ -166,15 +170,15 @@ The form builder uses the JQuery Validation plugin. For the built-in validation 
 
 ```
 {
-    "title": "Validation Configuration",
-    "description": "Validation configuration for the individual fields",
-    "type": "object",
-    "properties": {
-        "{{fieldID}}": {
-            "description": "Configuration for a field, e.g. { required: true, minlength: 10 }",
-            "type": "object"
-        }
-    }
+	"title": "Validation Configuration",
+	"description": "Validation configuration for the individual fields",
+	"type": "object",
+	"properties": {
+		"{{fieldID}}": {
+			"description": "Configuration for a field, e.g. { required: true, minlength: 10 }",
+			"type": "object"
+		}
+	}
 }
 ```
 
@@ -199,14 +203,15 @@ The form builder uses the inputmask plugin via the `Inputmask` class. For detail
 
 ```
 {
-    "title": "InputMask Configuration",
-    "description": "InputMask configuration for the individual fields",
-    "type": "object",
-    "properties": {
-        "{{fieldID}}": {
-            "description": "Configuration for a field, e.g. { mask: '99/99/9999' }",
-            "type": "object"
-    }
+	"title": "InputMask Configuration",
+	"description": "InputMask configuration for the individual fields",
+	"type": "object",
+	"properties": {
+		"{{fieldID}}": {
+			"description": "Configuration for a field, e.g. { mask: '99/99/9999' }",
+			"type": "object"
+		}
+	}
 }
 ```
 
@@ -227,11 +232,11 @@ Through this option you can set up default values for fields and dependencies be
 
 ```
 {
-    "title": "Dependencies Configuration",
-    "description": "Dependencies configuration for the fields, groups, pages",
-    "properties": {
-        "{{fieldId | groupId | pageId}}": {
-            "description": "",
+	"title": "Dependencies Configuration",
+	"description": "Dependencies configuration for the fields, groups, pages",
+	"properties": {
+		"{{fieldId | groupId | pageId}}": {
+			"description": "Configuration for a field or a group",
 			"type": "object",
 			"properties": {
 				"type": {
@@ -261,7 +266,7 @@ Through this option you can set up default values for fields and dependencies be
 						"description": "A valid state for a field or a group",
 						"type": "object",
 						"properties": {
-							"visible":  {
+							"visible": {
 								"description": "State of visibility of the field or group",
 								"type": "boolean",
 								"enum": [true, false]
@@ -278,12 +283,12 @@ Through this option you can set up default values for fields and dependencies be
 									"type": "object",
 									"properties": {
 										"target": {
-											"description": "ID of the field"
+											"description": "ID of the field",
 											"type": "string"
 										},
 										"values": {
 											"description": "Values of the field for it to be a valid criteria",
-											"type": "array":
+											"type": "array",
 											"items": {
 												"description": "Value of the field for it to be a valid criteria",
 												"type": "string | integer"
@@ -291,7 +296,7 @@ Through this option you can set up default values for fields and dependencies be
 										},
 										"not": {
 											"description": "List of values that make the field an invalid criteria",
-											"type": "array":
+											"type": "array",
 											"items": {
 												"description": "Value that makles the field an invalid criteria",
 												"type": "string | integer"
@@ -304,10 +309,9 @@ Through this option you can set up default values for fields and dependencies be
 					}
 				}
 			}
-        }
-    }
+		}
+	}
 }
-
 ```
 
 ##### Example InputMask Configuration
@@ -349,6 +353,8 @@ Through this option you can set up default values for fields and dependencies be
 
 ------
 #### Global Decorator Classes Configuration
+
+
 
 ```
 {
@@ -781,7 +787,7 @@ Through this option you can set up default values for fields and dependencies be
 					}
 				},
 				"description": {
-					"description": "Configuration for injecting a description for a group"
+					"description": "Configuration for injecting a description for a group",
 					"type": "object",
 					"properties": {
 						"type": {
@@ -852,7 +858,7 @@ Through this option you can set up default values for fields and dependencies be
 			"type": "object",
 			"properties": {
 				"bIsLookupField": {
-					"description": "Marks the field as a lookup field"
+					"description": "Marks the field as a lookup field",
 					"type": "boolean",
 					"enum": [true]
 				},
@@ -952,19 +958,19 @@ Through this option you can set up default values for fields and dependencies be
 ```
 {
 	"fieldDecorators": {
-        "id_field_relationship_name": {
-            "bIsLookupField": true,
-            "decoratorClasses": {
-                "labelAndFieldWrapperDiv": ["id_field_relationship_name"]
-            }
-        },
-        "id_field_market_site_point_email": {\
-            "helperText": {
-                "type": "text",
-                "value": "Please note that this person will receive all email notifications relating to this matter going forward",
-                "decoratorClasses": ["help"]
-            }
-        },
+		"id_field_relationship_name": {
+			"bIsLookupField": true,
+			"decoratorClasses": {
+				"labelAndFieldWrapperDiv": ["id_field_relationship_name"]
+			}
+		},
+		"id_field_market_site_point_email": {
+			"helperText": {
+				"type": "text",
+				"value": "Please note that this person will receive all email notifications relating to this matter going forward",
+				"decoratorClasses": ["help"]
+			}
+		},
 		"id_field_amendments_detail": {
 			"textAreaRows": 5
 		},
@@ -974,6 +980,32 @@ Through this option you can set up default values for fields and dependencies be
 		"id_field_lessee_the_above_is": {
 			"label": "The above is"
 		}
-    }
+	}
+}
+```
+
+------
+#### Query String Evaluator Configuration
+
+```
+{
+	"title": "Query String Evaluator Configuration",
+	"description": "Configuration for using query string parameters to populate fields",
+	"type": "object",
+	"parameters": {
+		"id": {
+			"description": "Configuration for query parameter to which field to target",
+			"type": "string"
+		}
+	}
+}
+```
+
+
+##### Example Query String Evaluator Configuration
+
+```
+{
+    "id": "id_field_manufacturer_serial_number"
 }
 ```
