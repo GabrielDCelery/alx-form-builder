@@ -1,17 +1,17 @@
 'user strict';
 
 class DependencyInjector {
-    constructor() {
+    constructor () {
         this.targetInstance = null;
     }
 
-    setTargetInstance(_targetInstance) {
+    setTargetInstance (_targetInstance) {
         this.targetInstance = _targetInstance;
 
         return this;
     }
 
-    inject(_injectConfigs) {
+    inject (_injectConfigs) {
         _injectConfigs.forEach(_injectConfig => {
             if (this.targetInstance.hasOwnProperty(_injectConfig[0])) {
                 throw new Error(`Invalid dependency injection, key already exists -> ${JSON.stringify(_injectConfig[0])}`);

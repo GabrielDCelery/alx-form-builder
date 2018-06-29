@@ -1,7 +1,7 @@
 'use strict';
 
 class NativeMethodOverrides {
-    _overrideJqueryVal() {
+    _overrideJqueryVal () {
         const self = this;
         const _originalMethod = self.$.fn.val;
 
@@ -14,7 +14,7 @@ class NativeMethodOverrides {
         };
     }
 
-    init() {
+    init () {
         this._overrideJqueryVal();
 
         return this;

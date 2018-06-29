@@ -7,7 +7,7 @@ const Decorator = require('./Decorator');
 const _ = {
     get: require('lodash.get'),
     defaultsDeep: require('lodash.defaultsdeep')
-}
+};
 
 const DEFAULT_GLOBAL_DECORATOR_CLASSES_FIELD = {
     field: [],
@@ -33,24 +33,23 @@ const DEFAULT_DECORATOR_CONFIG_FIELD = {
         fieldWrapperDiv: [],
         label: [],
         labelWrapperDiv: [],
-        labelAndFieldWrapperDiv: [],
+        labelAndFieldWrapperDiv: []
     }
-}
+};
 
 const LOCAL_DECORATOR_HELPER_TEXT = 'alx-helper-text';
 const LOCAL_DECORATOR_FORM_FIELD_WRAPPER = 'alx-form-input-wrapper';
 const LOCAL_DECORATOR_FORM_LABEL_WRAPPER = 'alx-form-label-wrapper';
-const LOCAL_DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER = 'alx-form-element';
 const LOCAL_DECORATOR_NON_RESIZABLE_TEXTAREA = 'alx-non-resizable-textarea';
 
 class FieldDecorator extends Decorator {
-    constructor(_globalFieldDecoratorClasses) {
+    constructor (_globalFieldDecoratorClasses) {
         super();
 
         this.globalDecoratorClasses = _.defaultsDeep({}, _globalFieldDecoratorClasses, DEFAULT_GLOBAL_DECORATOR_CLASSES_FIELD);
     }
 
-    _markLookupField(_fieldId, _bIsLookupField) {
+    _markLookupField (_fieldId, _bIsLookupField) {
         if (!_bIsLookupField) {
             return;
         }
@@ -58,7 +57,7 @@ class FieldDecorator extends Decorator {
         this.QUICK_SELECTOR.getElemById(_fieldId).addClass(this.DECORATOR_LOOKUP_FIELD);
     }
 
-    _treatFreeformAsNormalInput(_fieldId, _textAreaRows) {
+    _treatFreeformAsNormalInput (_fieldId, _textAreaRows) {
         if (_textAreaRows) {
             return this.QUICK_SELECTOR.getElemById(_fieldId).attr('rows', _textAreaRows);
         }
@@ -66,15 +65,15 @@ class FieldDecorator extends Decorator {
         this.QUICK_SELECTOR.getElemById(_fieldId).addClass(LOCAL_DECORATOR_NON_RESIZABLE_TEXTAREA);
     }
 
-    _decorateFieldWithHelperClasses(_fieldId) {
+    _decorateFieldWithHelperClasses (_fieldId) {
         this.QUICK_SELECTOR.getFieldWrapperDiv(_fieldId).addClass(LOCAL_DECORATOR_FORM_FIELD_WRAPPER);
         this.QUICK_SELECTOR.getLabelWrapperDivOfField(_fieldId).addClass(LOCAL_DECORATOR_FORM_LABEL_WRAPPER);
         this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_fieldId)
-            .addClass(LOCAL_DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER)
+            .addClass(this.DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER)
             .attr('data-input-id', this.QUICK_SELECTOR.getElemById(_fieldId).attr('id'));
     }
 
-    _decorateFieldRelatedElems(_fieldId, _localDecoratorClasses) {
+    _decorateFieldRelatedElems (_fieldId, _localDecoratorClasses) {
         this._decorateElemWithCustomClasses(this.QUICK_SELECTOR.getElemById(_fieldId), 'field', _localDecoratorClasses.field);
         this._decorateElemWithCustomClasses(this.QUICK_SELECTOR.getFieldWrapperDiv(_fieldId), 'fieldWrapperDiv', _localDecoratorClasses.fieldWrapperDiv);
         this._decorateElemWithCustomClasses(this.QUICK_SELECTOR.getLabelOfField(_fieldId), 'label', _localDecoratorClasses.label);
@@ -82,7 +81,7 @@ class FieldDecorator extends Decorator {
         this._decorateElemWithCustomClasses(this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_fieldId), 'labelAndFieldWrapperDiv', _localDecoratorClasses.labelAndFieldWrapperDiv);
     }
 
-    _replaceFieldLabel(_fieldId, _newLabel) {
+    _replaceFieldLabel (_fieldId, _newLabel) {
         if (!_newLabel) {
             return;
         }
@@ -90,7 +89,7 @@ class FieldDecorator extends Decorator {
         return this.QUICK_SELECTOR.getLabelOfField(_fieldId).text(_newLabel);
     }
 
-    _replaceFieldPlaceholder(_fieldId, _placeholder) {
+    _replaceFieldPlaceholder (_fieldId, _placeholder) {
         if (!_placeholder) {
             return;
         }
@@ -102,7 +101,7 @@ class FieldDecorator extends Decorator {
         }
     }
 
-    _appendHelperTextToField(_fieldId, _helperTextConfig) {
+    _appendHelperTextToField (_fieldId, _helperTextConfig) {
         if (!_helperTextConfig.value) {
             return;
         }
@@ -114,13 +113,13 @@ class FieldDecorator extends Decorator {
         this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_fieldId).append(_$helperText);
     }
 
-    setFieldsToDecorate(_fieldIds) {
+    setFieldsToDecorate (_fieldIds) {
         this.fieldIds = _fieldIds;
 
         return this;
     }
 
-    start(_fieldDecoratorsConfig) {
+    start (_fieldDecoratorsConfig) {
         this.fieldIds.forEach(_fieldId => {
             const _fieldDecoratorConfig = FieldDecorator._generateDecoratorConfig(_fieldDecoratorsConfig, _fieldId);
 
@@ -136,7 +135,7 @@ class FieldDecorator extends Decorator {
         return this;
     }
 
-    static _generateDecoratorConfig(_fieldDecoratorsConfig, _fieldId) {
+    static _generateDecoratorConfig (_fieldDecoratorsConfig, _fieldId) {
         const _config = _.get(_fieldDecoratorsConfig, _fieldId, null);
 
         if (!_config) {

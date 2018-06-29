@@ -19,14 +19,14 @@ const LOCAL_ANIMATION_HIDE = 'fadeOut';
 const LOCAL_ANIMATION_SHOW = 'fadeIn';
 
 class Paginator {
-    constructor() {
+    constructor () {
         this.animationConfig = {
             duration: 0
         };
         this._moveToPage = this._moveToPage.bind(this);
     }
 
-    _initGlobalEventListeners() {
+    _initGlobalEventListeners () {
         this.FORM_EVENTS.registerToFormEvent(this.FORM_EVENTS.EVENT_CHANGE_PAGINATION, (_event, _pageId) => {
             _event.preventDefault();
 
@@ -40,7 +40,7 @@ class Paginator {
         });
     }
 
-    _initLocalEventListeners() {
+    _initLocalEventListeners () {
         this.$(`.${LOCAL_DECORATOR_TRIGGER_MOVE_TO_PAGE}`).off('click').on('click', _event => {
             _event.preventDefault();
 
@@ -48,13 +48,13 @@ class Paginator {
         });
     }
 
-    _getActivePageIndex() {
+    _getActivePageIndex () {
         return this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).toArray().map(_elem => {
             return `#${this.$(_elem).attr('id')}`;
         }).indexOf(`#${this.$(`.${LOCAL_DECORATOR_ACTIVE_PAGE}`).attr('id')}`);
     }
 
-    _traverseToNextValidPageId(_activePageIndex, _pointerTraverseMethod) {
+    _traverseToNextValidPageId (_activePageIndex, _pointerTraverseMethod) {
         let _pointer = _activePageIndex;
 
         while (true) {
@@ -70,7 +70,7 @@ class Paginator {
         }
     }
 
-    _generateNavButton(_label, _pageId, _customClasses, _$default) {
+    _generateNavButton (_label, _pageId, _customClasses, _$default) {
         if (_pageId == null) {
             if (_$default) {
                 return _$default;
@@ -89,7 +89,7 @@ class Paginator {
         return _$button;
     }
 
-    _generateSubmitButton() {
+    _generateSubmitButton () {
         const _$submitButton = this.$('<button/>')
             .text('Submit')
             .addClass(LOCAL_DECORATOR_PAGE_NAV_BUTTON)
@@ -104,9 +104,9 @@ class Paginator {
         return _$submitButton;
     }
 
-    _generatePreviousButton() {
+    _generatePreviousButton () {
         const _validPageId = this._traverseToNextValidPageId(this._getActivePageIndex(), _val => {
-            return _val - 1
+            return _val - 1;
         });
 
         return this._generateNavButton('Previous', _validPageId, [
@@ -115,9 +115,9 @@ class Paginator {
         ]);
     }
 
-    _generateNextButton() {
+    _generateNextButton () {
         const _validPageId = this._traverseToNextValidPageId(this._getActivePageIndex(), _val => {
-            return _val + 1
+            return _val + 1;
         });
 
         return this._generateNavButton('Next', _validPageId, [
@@ -126,7 +126,7 @@ class Paginator {
         ], this._generateSubmitButton());
     }
 
-    _generateNavBar() {
+    _generateNavBar () {
         const _$ul = this.$('<ul/>').addClass(LOCAL_DECORATOR_PAGE_NAV_MENU);
 
         this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).each((_index, _page) => {
@@ -144,7 +144,7 @@ class Paginator {
         this.QUICK_SELECTOR.getElemById(this.IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER).append(_$ul);
     }
 
-    _setActiveNavBarStep() {
+    _setActiveNavBarStep () {
         const _$navBarButtons = this.QUICK_SELECTOR.getElemById(this.IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER).find('li');
         const _activePageIndex = this._getActivePageIndex();
         let _lastPageIndex = null;
@@ -155,7 +155,7 @@ class Paginator {
             const _method = _bPageHidden === true ? LOCAL_ANIMATION_HIDE : LOCAL_ANIMATION_SHOW;
             const _$navBarButton = _$navBarButtons.eq(_index);
 
-            if(!_lastPageIndex && _bPageHidden) {
+            if (!_lastPageIndex && _bPageHidden) {
                 _lastPageIndex = _index - 1;
             }
 
@@ -168,7 +168,7 @@ class Paginator {
         _$navBarButtons.eq(_lastPageIndex || _$navBarButtons.length - 1).addClass(LOCAL_DECORATOR_PAGE_NAV_MENU_STEP_LAST);
     }
 
-    _prepareGroupsForPagination(_pages) {
+    _prepareGroupsForPagination (_pages) {
         return _pages.map((_page, _index) => {
             const _$page = this.QUICK_SELECTOR.getElemById(`${this.PREFIX_GROUP}${_page.id}`);
 
@@ -177,12 +177,12 @@ class Paginator {
         });
     }
 
-    _setActivePage(_pageId) {
+    _setActivePage (_pageId) {
         this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_PAGE).removeClass(LOCAL_DECORATOR_ACTIVE_PAGE);
         this.QUICK_SELECTOR.getElemById(_pageId).addClass(LOCAL_DECORATOR_ACTIVE_PAGE);
     }
 
-    _moveToPage(_pageId) {
+    _moveToPage (_pageId) {
         if (_pageId) {
             this._setActivePage(_pageId);
         }
@@ -196,7 +196,7 @@ class Paginator {
         this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_PAGINATION_CHANGED);
     }
 
-    init(_pagesConfig) {
+    init (_pagesConfig) {
         if (!_pagesConfig || _pagesConfig.length === 0) {
             return this.QUICK_SELECTOR.getElemById(this.IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER).append(this._generateSubmitButton());
         }

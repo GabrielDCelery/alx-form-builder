@@ -12,18 +12,18 @@ const LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD = 'alx-validate-field';
 const LOCAL_DECORATOR_DATA_OLD_VALUE = 'alx-old-value';
 
 class Validator {
-    constructor() {
+    constructor () {
         this._validateElem = this._validateElem.bind(this);
         this._validateForm = this._validateForm.bind(this);
     }
 
-    _extendValidatiorPluginWithCustomValidators() {
+    _extendValidatiorPluginWithCustomValidators () {
         this.$.validator.addMethod('pattern', (_value, _elem, _params) => {
             return new RegExp(_params).test(_value);
         }, 'Please enter a valid value in the correct format!');
     }
 
-    _initValidatorPlugin() {
+    _initValidatorPlugin () {
         this.QUICK_SELECTOR.getElemById(this.ID_FORM).validate({
             ignore: `.${this.DECORATOR_STATE_IGNORE}`,
             success: _label => {
@@ -32,7 +32,7 @@ class Validator {
         });
     }
 
-    _decorateFieldForValidation(_fieldId, _config) {
+    _decorateFieldForValidation (_fieldId, _config) {
         const _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
 
         _$field.addClass(LOCAL_DECORATOR_STATE_REQUIRED);
@@ -40,13 +40,13 @@ class Validator {
         _$field.addClass(LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD);
     }
 
-    _excludeLookupSelectsFromValidation() {
+    _excludeLookupSelectsFromValidation () {
         this.QUICK_SELECTOR.getElemsByClass(this.DECORATOR_LOOKUP_FIELD).each((_index, _field) => {
             this.QUICK_SELECTOR.getElemById(`${this.PREFIX_LOOKUP_ID}${this.$(_field).attr('id')}`).addClass(`${this.DECORATOR_STATE_IGNORE}`);
         });
     }
 
-    _initLocalEventListeners() {
+    _initLocalEventListeners () {
         this.$(`.${LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD}`).on('change', _event => {
             _event.preventDefault();
 
@@ -54,7 +54,7 @@ class Validator {
         });
     }
 
-    _initGlobalEventListeners() {
+    _initGlobalEventListeners () {
         this.FORM_EVENTS.registerToFormEvent(this.FORM_EVENTS.EVENT_VALIDATE_FORM, (_event, _bForSubmission) => {
             _event.preventDefault();
 
@@ -68,11 +68,11 @@ class Validator {
         });
     }
 
-    _getErroredElements() {
+    _getErroredElements () {
         return this.$('.error', this.QUICK_SELECTOR.getElemById(this.ID_FORM));
     }
 
-    _validateElem(_$elem) {
+    _validateElem (_$elem) {
         const _oldValue = _$elem.data(LOCAL_DECORATOR_DATA_OLD_VALUE);
 
         _$elem.data(LOCAL_DECORATOR_DATA_OLD_VALUE, _$elem.val());
@@ -81,10 +81,15 @@ class Validator {
             return;
         }
 
+        _$elem.closest(`.${this.DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER}`)
+            .find(`.${this.ALX_CLASS_BACKEND_ERROR}`)
+            .parent()
+            .remove();
+
         return _$elem.valid();
     }
 
-    _validateForm(_bForSubmission) {
+    _validateForm (_bForSubmission) {
         const _bIsValid = this.QUICK_SELECTOR.getElemById(this.ID_FORM).valid();
 
         this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_FORM_VALIDATED, [
@@ -94,7 +99,15 @@ class Validator {
         ]);
     }
 
-    init(_fieldValidatorConfigs, _lookupFields) {
+    _checkForBackendErrors() {
+        const _$backendErrors = this.QUICK_SELECTOR.getElemsByClass(this.ALX_CLASS_BACKEND_ERROR);
+
+        if (_$backendErrors.length > 0) {
+            return this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_BACKEND_ERRORED, [_$backendErrors]);
+        }
+    }
+
+    init (_fieldValidatorConfigs, _lookupFields) {
         this._extendValidatiorPluginWithCustomValidators();
         this._initValidatorPlugin();
 
@@ -105,6 +118,7 @@ class Validator {
         this._excludeLookupSelectsFromValidation();
         this._initLocalEventListeners();
         this._initGlobalEventListeners();
+        this._checkForBackendErrors();
 
         return this;
     }

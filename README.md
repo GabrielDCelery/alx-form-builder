@@ -354,7 +354,7 @@ Through this option you can set up default values for fields and dependencies be
 ------
 #### Global Decorator Classes Configuration
 
-
+This option allows you to add custom classes to various elems throughout the form.
 
 ```
 {
@@ -537,6 +537,30 @@ Through this option you can set up default values for fields and dependencies be
 						"description": "Extra class for the save and load button helper text",
 						"type": "string"
 					}
+				},
+				"backendErrorListContainers": {
+					"description": "Extra classes for the backend error containers",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the backend error containers",
+						"type": "string"
+					}
+				},
+				"backendErrorLists": {
+					"description": "Extra classes for the backend error list",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the backend error list",
+						"type": "string"
+					}
+				},
+				"backendErrorListElems": {
+					"description": "Extra classes for the backend error list elems",
+					"type": "array",
+					"items": {
+						"description": "Extra class for the backend error list elems",
+						"type": "string"
+					}
 				}
 			}
 		}
@@ -572,6 +596,8 @@ Through this option you can set up default values for fields and dependencies be
 
 ------
 #### Page Decorators Configuration
+
+This option allows you to inject custom titles and elems into the page.
 
 ```
 {
@@ -749,6 +775,8 @@ Through this option you can set up default values for fields and dependencies be
 ------
 #### Group Decorators Configuration
 
+This option allows you to inject custom titles and descriptions related to groups.
+
 ```
 {
 	"title": "Group Decorators Configuration",
@@ -846,6 +874,8 @@ Through this option you can set up default values for fields and dependencies be
 
 ------
 #### Field Decorators Configuration
+
+This option allows you to configure fields as lookup fields, change their label, or add placeholder text to them. It also allows you to inject custom elems related to fields.
 
 ```
 {
@@ -986,6 +1016,8 @@ Through this option you can set up default values for fields and dependencies be
 
 ------
 #### Query String Evaluator Configuration
+
+This option allows you to create a lookup between query string parameters and fields.
 
 ```
 {

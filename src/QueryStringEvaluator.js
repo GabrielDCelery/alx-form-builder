@@ -4,14 +4,14 @@ const queryString = require('querystring');
 
 const _ = {
     forEach: require('lodash.foreach')
-}
+};
 
 class QueryStringEvaluator {
-    constructor(_lookupMap) {
+    constructor (_lookupMap) {
         this.lookupMap = _lookupMap || {};
     }
 
-    process(_url) {
+    process (_url) {
         const _indexOfQueryString = _url.indexOf('?');
 
         if (!_indexOfQueryString) {

@@ -5,7 +5,7 @@ const Decorator = require('./Decorator');
 const _ = {
     get: require('lodash.get'),
     defaultsDeep: require('lodash.defaultsdeep')
-}
+};
 
 const DEFAULT_GLOBAL_DECORATOR_CLASSES_PAGE = {
     form: [],
@@ -20,7 +20,10 @@ const DEFAULT_GLOBAL_DECORATOR_CLASSES_PAGE = {
     footerInner: [],
     footerInnerTitle: [],
     saveAndLoadButtonContainer: [],
-    saveAndLoadButtonHelperText: []
+    saveAndLoadButtonHelperText: [],
+    backendErrorListContainers: [],
+    backendErrorLists: [],
+    backendErrorListElems: []
 };
 
 const LOCAL_IDENTIFIER_BODY = 'alx-body';
@@ -36,6 +39,7 @@ const LOCAL_IDENTIFIER_SAVE_AND_LOAD_BUTTON_HELPER_TEXT = 'alx-save-load-button-
 const LOCAL_IDENTIFIER_FOOTER = 'alx-footer';
 const LOCAL_IDENTIFIER_FOOTER_INNER = 'alx-footer-inner';
 const LOCAL_IDENTIFIER_FOOTER_INNER_TITLE = 'alx-footer-inner-text';
+const LOCAL_DECORATOR_BACKEND_ERROR = 'alx-backend-error';
 
 const DEFAULT_CONTENT_CONFIG_LOGO = {
     type: 'img',
@@ -75,13 +79,13 @@ const DEFAULT_DECORATOR_CONFIG_FOOTER_TITLE = {
 };
 
 class FormDecorator extends Decorator {
-    constructor(_globalDecoratorClasses) {
+    constructor (_globalDecoratorClasses) {
         super();
 
         this.globalDecoratorClasses = _.defaultsDeep({}, _globalDecoratorClasses, DEFAULT_GLOBAL_DECORATOR_CLASSES_PAGE);
     }
 
-    _generateHeading(_logoConfig, _headingTitleConfig) {
+    _generateHeading (_logoConfig, _headingTitleConfig) {
         const _$heading = this._generateDecoratedDivWithContent('heading', LOCAL_IDENTIFIER_HEADING, {});
         const _$headingInner = this._generateDecoratedDivWithContent('headingInner', LOCAL_IDENTIFIER_HEADING_INNER, {});
         const _$logo = this._generateDecoratedDivWithContent('logo', LOCAL_IDENTIFIER_LOGO, _logoConfig);
@@ -93,7 +97,7 @@ class FormDecorator extends Decorator {
         this.QUICK_SELECTOR.getElemById(LOCAL_IDENTIFIER_BODY).prepend(_$heading);
     }
 
-    _generateMain(_mainTitleConfig) {
+    _generateMain (_mainTitleConfig) {
         const _$main = this._generateDecoratedDivWithContent('main', LOCAL_IDENTIFIER_MAIN, {});
         const _$mainInner = this._generateDecoratedDivWithContent('mainInner', LOCAL_IDENTIFIER_MAIN_INNER, {});
         const _$mainInnerTitle = this._generateDecoratedDivWithContent('mainTitle', LOCAL_IDENTIFIER_MAIN_INNER_TITLE, _mainTitleConfig);
@@ -105,7 +109,7 @@ class FormDecorator extends Decorator {
         this.QUICK_SELECTOR.getElemById(LOCAL_IDENTIFIER_BODY).prepend(_$main);
     }
 
-    _generateSaveAndLoadButtonContainer(_saveAndLoadButtonHelperTextConfig) {
+    _generateSaveAndLoadButtonContainer (_saveAndLoadButtonHelperTextConfig) {
         const _$container = this._generateDecoratedDivWithContent('saveAndLoadButtonContainer', LOCAL_IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER, {});
         const _$helperText = this._generateDecoratedDivWithContent('saveAndLoadButtonHelperText', LOCAL_IDENTIFIER_SAVE_AND_LOAD_BUTTON_HELPER_TEXT, _saveAndLoadButtonHelperTextConfig);
 
@@ -114,7 +118,7 @@ class FormDecorator extends Decorator {
         this.QUICK_SELECTOR.getElemById(LOCAL_IDENTIFIER_MAIN).after(_$container);
     }
 
-    _generateFooter(_footerTitleConfig) {
+    _generateFooter (_footerTitleConfig) {
         const _$footer = this._generateDecoratedDivWithContent('footer', LOCAL_IDENTIFIER_FOOTER, {});
         const _$footerInner = this._generateDecoratedDivWithContent('footerInner', LOCAL_IDENTIFIER_FOOTER_INNER, {});
         const _$footerInnerTitle = this._generateDecoratedDivWithContent('footerInnerTitle', LOCAL_IDENTIFIER_FOOTER_INNER_TITLE, _footerTitleConfig);
@@ -125,21 +129,32 @@ class FormDecorator extends Decorator {
         this.QUICK_SELECTOR.getElemById(LOCAL_IDENTIFIER_BODY).append(_$footer);
     }
 
-    _moveButtons() {
+    _moveButtons () {
         this.QUICK_SELECTOR.getElemById(LOCAL_IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER).prepend(this.$('#target_form_logout'));
         this.QUICK_SELECTOR.getElemById(LOCAL_IDENTIFIER_SAVE_AND_LOAD_BUTTON_CONTAINER).prepend(this.$('button[type="button"]'));
     }
 
-    _removeSubmitButton() {
+    _removeSubmitButton () {
         this.$('#target_form_submit').remove();
     }
 
-    _appendPageNavBarContainers() {
+    _decorateBackendErrorMessages () {
+        const _$backendErrors = this.QUICK_SELECTOR.getElemsByClass(this.ALX_CLASS_BACKEND_ERROR);
+
+        this._decorateElemWithCustomClasses(_$backendErrors, 'backendErrorLists');
+
+        const _$backendErrorListContainers = _$backendErrors.parent().addClass(LOCAL_DECORATOR_BACKEND_ERROR);
+
+        this._decorateElemWithCustomClasses(_$backendErrorListContainers, 'backendErrorListContainers');
+        this._decorateElemWithCustomClasses(_$backendErrors.find('li'), 'backendErrorListElems');
+    }
+
+    _appendPageNavBarContainers () {
         this.QUICK_SELECTOR.getElemById(LOCAL_IDENTIFIER_MAIN).before(this.$('<div/>').attr('id', this.IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER));
         this.QUICK_SELECTOR.getElemById(this.ID_FORM).append(this.$('<div/>').attr('id', this.IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER));
     }
 
-    start(_pageDecoratorsConfig) {
+    start (_pageDecoratorsConfig) {
         const _mainTitleConfig = FormDecorator._generateDecoratorConfig(_pageDecoratorsConfig, 'mainTitle', DEFAULT_DECORATOR_CONFIG_MAIN_TITLE);
         const _logoConfig = FormDecorator._generateDecoratorConfig(_pageDecoratorsConfig, 'logo', DEFAULT_CONTENT_CONFIG_LOGO);
         const _headingTitleConfig = FormDecorator._generateDecoratorConfig(_pageDecoratorsConfig, 'headingTitle', DEFAULT_DECORATOR_CONFIG_HEADING_TITLE);
@@ -155,9 +170,10 @@ class FormDecorator extends Decorator {
         this._generateFooter(_footerTitleConfig);
         this._moveButtons();
         this._removeSubmitButton();
+        this._decorateBackendErrorMessages();
     }
 
-    static _generateDecoratorConfig(_config, _name, _defaultValue) {
+    static _generateDecoratorConfig (_config, _name, _defaultValue) {
         return _.defaultsDeep({}, _.get(_config, _name, null), _defaultValue);
     }
 }

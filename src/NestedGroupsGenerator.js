@@ -2,18 +2,18 @@
 
 const _ = {
     forEach: require('lodash.foreach')
-}
+};
 
 const LOCAL_DECORATOR_FORM_GROUP = 'alx-form-group';
 
 class NestedGroupsGenerator {
-    constructor() {
+    constructor () {
         this._nestedGroups = [];
         this.groupIds = [];
         this.fieldIds = [];
     }
 
-    _prepareFieldForNestedGrouping(_fieldId, _groups) {
+    _prepareFieldForNestedGrouping (_fieldId, _groups) {
         if (!_groups) {
             return;
         }
@@ -33,7 +33,7 @@ class NestedGroupsGenerator {
         });
     }
 
-    _generateNestedGroups() {
+    _generateNestedGroups () {
         this._nestedGroups.forEach(_groupIds => {
             _.forEach(_groupIds, (_v, _groupId) => {
                 const _$wrapper = this.$('<div/>').attr('id', _groupId).addClass(LOCAL_DECORATOR_FORM_GROUP);
@@ -45,7 +45,7 @@ class NestedGroupsGenerator {
         });
     }
 
-    _processGroupsOfTheLevel(_groupConfigs, _parentGroupIds) {
+    _processGroupsOfTheLevel (_groupConfigs, _parentGroupIds) {
         _groupConfigs.forEach(_groupConfig => {
             const _groupIds = _parentGroupIds.slice(0);
 
@@ -63,15 +63,15 @@ class NestedGroupsGenerator {
         });
     }
 
-    getFieldIds() {
+    getFieldIds () {
         return this.fieldIds;
     }
 
-    getGroupIds() {
+    getGroupIds () {
         return this.groupIds;
     }
 
-    start(_groupConfigs) {
+    start (_groupConfigs) {
         this._processGroupsOfTheLevel(_groupConfigs, []);
         this._generateNestedGroups();
     }

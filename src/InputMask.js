@@ -6,7 +6,7 @@ const _ = {
 };
 
 class InputMask {
-    init(_config) {
+    init (_config) {
         _.forEach(_config, (_maskConfig, _fieldId) => {
             const _fieldConfig = {
                 onincomplete: this._onInCompleteWrapper()
@@ -20,10 +20,10 @@ class InputMask {
         });
     }
 
-    _onInCompleteWrapper() {
+    _onInCompleteWrapper () {
         return _event => {
             return this.$(_event.target).val('');
-        }
+        };
     }
 }
 

@@ -10,7 +10,7 @@ const LOCAL_ANIMATION_HIDE = 'slideUp';
 const LOCAL_ANIMATION_SHOW = 'slideDown';
 
 class Dependencies {
-    constructor() {
+    constructor () {
         this.validStatesConfigs = null;
         this.conditionalsMap = {};
         this.bInitialized = false;
@@ -19,7 +19,7 @@ class Dependencies {
         };
     }
 
-    _setDefaultStateAndBuildDependencyMap(_validStatesConfigs) {
+    _setDefaultStateAndBuildDependencyMap (_validStatesConfigs) {
         this.validStatesConfigs = _validStatesConfigs;
 
         _.forEach(this.validStatesConfigs, (_validStateConfig, _toChangeId) => {
@@ -37,7 +37,7 @@ class Dependencies {
         });
     }
 
-    _initEventListeners() {
+    _initEventListeners () {
         this.$(`.${LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE}`).on('change', _event => {
             _event.preventDefault();
 
@@ -45,7 +45,7 @@ class Dependencies {
         });
     }
 
-    _setConditionalsOnFieldChange(_fieldId) {
+    _setConditionalsOnFieldChange (_fieldId) {
         if (!this.conditionalsMap.hasOwnProperty(_fieldId)) {
             return;
         }
@@ -60,7 +60,7 @@ class Dependencies {
         this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_DEPENDENCY_CHANGED);
     }
 
-    _setState(_type, _toChangeId, _state) {
+    _setState (_type, _toChangeId, _state) {
         if (_type === 'field') {
             return this._setFieldState(_toChangeId, _state);
         }
@@ -72,7 +72,7 @@ class Dependencies {
         throw new Error(`Invalid type -> ${_type}`);
     }
 
-    _setFieldState(_toChangeId, _state) {
+    _setFieldState (_toChangeId, _state) {
         const _$field = this.QUICK_SELECTOR.getElemById(_toChangeId);
 
         if (_state.hasOwnProperty('visible')) {
@@ -96,7 +96,7 @@ class Dependencies {
         _$field.trigger('change');
     }
 
-    _setGroupState(_$group, _state) {
+    _setGroupState (_$group, _state) {
         if (_state.hasOwnProperty('visible')) {
             const _method = _state.visible === true ? LOCAL_ANIMATION_SHOW : LOCAL_ANIMATION_HIDE;
 
@@ -108,13 +108,12 @@ class Dependencies {
 
             _$fieldsInGroup.toggleClass(this.DECORATOR_STATE_IGNORE, _state.visible === false);
             _$fieldsInGroup.prop('disabled', _state.visible === false);
-            
             _$group.toggleClass(this.DECORATOR_STATE_HIDDEN, _state.visible === false);
             _$group[_method](this.animationConfig);
         }
     }
 
-    _isValidCriteria(_criteria) {
+    _isValidCriteria (_criteria) {
         const _value = this.QUICK_SELECTOR.getElemById(_criteria.target).val();
 
         if (_criteria.values) {
@@ -138,7 +137,7 @@ class Dependencies {
         return false;
     }
 
-    _isValidState(_state) {
+    _isValidState (_state) {
         for (let _i = 0, _iMax = _state.criterias.length; _i < _iMax; _i++) {
             if (!this._isValidCriteria(_state.criterias[_i])) {
                 return false;
@@ -148,7 +147,7 @@ class Dependencies {
         return true;
     }
 
-    _getValidState(_dependencyConfig) {
+    _getValidState (_dependencyConfig) {
         for (let _i = 0, _iMax = _dependencyConfig.validStates.length; _i < _iMax; _i++) {
             const _state = _dependencyConfig.validStates[_i];
 
@@ -160,7 +159,7 @@ class Dependencies {
         return _dependencyConfig.defaultState;
     }
 
-    init(_validStatesConfig) {
+    init (_validStatesConfig) {
         this._setDefaultStateAndBuildDependencyMap(_validStatesConfig);
         this._initEventListeners();
         this.bInitialized = true;

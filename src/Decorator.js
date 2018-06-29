@@ -3,14 +3,14 @@
 const _ = {
     get: require('lodash.get'),
     union: require('lodash.union')
-}
+};
 
 class Decorator {
-    constructor() {
+    constructor () {
         this.globalDecoratorClasses = {};
     }
 
-    _generateHtmlContent(_type, _value, _plainTextWrapper) {
+    _generateHtmlContent (_type, _value, _plainTextWrapper) {
         if (_type === 'text') {
             return this.$(`<${_plainTextWrapper}/>`).text(_value);
         }
@@ -28,7 +28,7 @@ class Decorator {
         throw new Error(`Invalid content type -> ${_type}`);
     }
 
-    _generateDecoratedDivWithContent(_type, _id, _config) {
+    _generateDecoratedDivWithContent (_type, _id, _config) {
         const _$div = this.$('<div/>');
 
         if (_id) {
@@ -42,7 +42,7 @@ class Decorator {
         return this._decorateElemWithCustomClasses(_$div, _type, _config.decoratorClasses);
     }
 
-    _generateDecoratedElem(_type, _id, _config) {
+    _generateDecoratedElem (_type, _id, _config) {
         const _$elem = this._generateHtmlContent(_config.type, _config.value, _config.plainTextWrapper);
 
         if (_id) {
@@ -52,7 +52,7 @@ class Decorator {
         return this._decorateElemWithCustomClasses(_$elem, _type, _config.decoratorClasses);
     }
 
-    _decorateElemWithCustomClasses(_$elem, _type, _localDecoratorClasses) {
+    _decorateElemWithCustomClasses (_$elem, _type, _localDecoratorClasses) {
         if (_$elem.length === 0) {
             return _$elem;
         }

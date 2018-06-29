@@ -2,16 +2,16 @@
 
 const _ = {
     forEach: require('lodash.foreach')
-}
+};
 
 const POSITION_METHOD_LOOKUP = {
     top: 'prepend',
     bottom: 'append',
     after: 'after'
-}
+};
 
 class ElemRelocator {
-    start(_elemsToRelocateConfig) {
+    start (_elemsToRelocateConfig) {
         _.forEach(_elemsToRelocateConfig, (_elemToRelocateConfig, _toRelocate) => {
             const _moveMethod = ElemRelocator._getMoveMethod(_elemToRelocateConfig.position);
 
@@ -19,7 +19,7 @@ class ElemRelocator {
         });
     }
 
-    static _getMoveMethod(_position) {
+    static _getMoveMethod (_position) {
         const _moveMethod = POSITION_METHOD_LOOKUP[_position];
 
         if (!_moveMethod) {

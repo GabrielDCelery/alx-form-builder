@@ -24,10 +24,12 @@ const ID_FORM = 'target_form';
 const PREFIX_LOOKUP_ID = '_acl_';
 const PREFIX_GROUP = 'alx-group-';
 const POSTFIX_LOOKUP_ID_CHOSEN = '_chosen';
+const ALX_CLASS_BACKEND_ERROR = 'errorlist';
 
 const DECORATOR_STATE_HIDDEN = 'alx-hidden';
 const DECORATOR_STATE_IGNORE = 'alx-ignore';
 const DECORATOR_LOOKUP_FIELD = 'alx-lookup-field';
+const DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER = 'alx-form-element';
 
 const IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER = 'alx-page-navigation-top-container';
 const IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER = 'alx-page-navigation-bottom-container';
@@ -83,6 +85,7 @@ $(document).ready(() => {
         ['$', $],
         ['ID_FORM', ID_FORM],
         ['QUICK_SELECTOR', quickSelector],
+        ['ALX_CLASS_BACKEND_ERROR', ALX_CLASS_BACKEND_ERROR],
         ['IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER],
         ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER]
     ]);
@@ -94,7 +97,8 @@ $(document).ready(() => {
     dependencyInjector.setTargetInstance(fieldDecorator).inject([
         ['$', $],
         ['QUICK_SELECTOR', quickSelector],
-        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
+        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD],
+        ['DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER', DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER]
     ]);
 
     fieldDecorator.start(config.fieldDecorators);
@@ -169,7 +173,9 @@ $(document).ready(() => {
         ['FORM_EVENTS', formEvents],
         ['DECORATOR_STATE_IGNORE', DECORATOR_STATE_IGNORE],
         ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
-        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
+        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD],
+        ['ALX_CLASS_BACKEND_ERROR', ALX_CLASS_BACKEND_ERROR],
+        ['DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER', DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER]
     ]);
 
     validator.init(config.validation);
