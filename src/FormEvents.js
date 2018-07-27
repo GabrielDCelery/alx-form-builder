@@ -10,10 +10,10 @@ class FormEvents {
         this.EVENT_FORM_VALIDATED = 'alx-event-form-validated';
         this.EVENT_SUBMIT_FORM = 'alx-event-change-pagination';
         this.EVENT_MOVE_TO_ELEM_PAGE = 'alx-event-move-to-elem-page';
-        this.EVENT_CHECK_IF_FIELD_NEEDS_SYNCING = 'alx-event-sync-lookup-field';
-        this.EVENT_SYNC_LOOKUP_FIELD = 'alx-event-lookup-field-synced';
-        this.EVENT_FIELD_VALUE_CHANGED = 'alx-event-field-value-changed';
         this.EVENT_BACKEND_ERRORED = 'alx-event-backend-errored';
+        this.EVENT_AJAX_TARGET_DETAILS_FETCHED = 'alx-event-target-details-fetched';
+        this.EVENT_AJAX_TARGET_LIST_FETCHED = 'alx-event-target-list-fetched';
+        this.EVENT_SYNC_LOOKUP_FIELD = 'alx-event-sync-lookup-field';
     }
 
     registerToFormEvent (_eventName, _methodToExecute) {
@@ -64,26 +64,16 @@ class FormEvents {
         });
     }
 
-    _initFieldValueChangedLister (_$form) {
-        _$form.on(this.EVENT_FIELD_VALUE_CHANGED, (_event, _this, _arguments) => {
-            _event.preventDefault();
-
-            _$form.trigger(this.EVENT_CHECK_IF_FIELD_NEEDS_SYNCING, [this.$(_this), _arguments[0]]);
+    _initAjaxTargetListFetchedListener (_$form) {
+        _$form.on(this.EVENT_AJAX_TARGET_LIST_FETCHED, (_event) => {
+            _$form.trigger(this.EVENT_SYNC_LOOKUP_FIELD, []);
         });
     }
 
-    _initSyncLookupFieldListener (_$form) {
-        _$form.on(this.EVENT_SYNC_LOOKUP_FIELD, (_event, _bValidateForm, _fieldsToValidate) => {
-            _event.preventDefault();
-
+    _initAjaxTargetDetailsFetchedListener (_$form) {
+        _$form.on(this.EVENT_AJAX_TARGET_DETAILS_FETCHED, (_event, _bValidateForm) => {
             if (_bValidateForm === true) {
                 return _$form.trigger(this.EVENT_VALIDATE_FORM, [false]);
-            }
-
-            if (_fieldsToValidate) {
-                _fieldsToValidate.forEach(_fieldToValidate => {
-                    return _$form.trigger(this.EVENT_VALIDATE_FIELD, [_fieldToValidate]);
-                });
             }
         });
     }
@@ -101,8 +91,8 @@ class FormEvents {
         this._initPaginationChangedListener(_$form);
         this._initSubmitFormListener(_$form);
         this._initFormValidatedListener(_$form);
-        this._initFieldValueChangedLister(_$form);
-        this._initSyncLookupFieldListener(_$form);
+        this._initAjaxTargetListFetchedListener(_$form);
+        this._initAjaxTargetDetailsFetchedListener(_$form);
         this._initBackendErroredListener(_$form);
 
         return this;

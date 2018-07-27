@@ -1,23 +1,26 @@
 {
-  "name": "rolls-royce-styling",
-  "version": "1.0.0",
+  "name": "form-builder",
+  "version": "0.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --open",
     "build": "webpack"
   },
-  "author": "",
+  "author": {
+    "name": "Gabriel Celery",
+    "email": "gabriel.celery@autologyx.com"
+  },
   "license": "ISC",
   "dependencies": {
+    "inputmask": "^3.3.11",
+    "jquery-datepicker": "^1.12.3",
     "jquery-validation": "^1.17.0",
     "lodash.defaultsdeep": "^4.6.0",
     "lodash.foreach": "^4.5.0",
     "lodash.get": "^4.4.2",
     "lodash.map": "^4.6.0",
     "lodash.set": "^4.3.2",
-    "lodash.union": "^4.6.0",
-    "query-string": "^6.1.0"
+    "lodash.union": "^4.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.51",
@@ -25,12 +28,17 @@
     "autoprefixer": "^7.2.5",
     "babel-loader": "^8.0.0-beta.3",
     "css-loader": "^0.28.9",
+    "eslint": "^5.0.0",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
     "expose-loader": "^0.7.5",
     "file-loader": "^1.1.6",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^2.30.1",
     "imports-loader": "^0.8.0",
-    "inputmask": "^3.3.11",
     "node-sass": "^4.9.0",
     "postcss-loader": "^2.1.5",
     "precss": "^3.1.0",

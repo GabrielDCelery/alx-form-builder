@@ -16,7 +16,7 @@ class Decorator {
         }
 
         if (_type === 'html') {
-            return _value;
+            return this.$(_value);
         }
 
         if (_type === 'img') {

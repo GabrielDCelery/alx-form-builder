@@ -1361,8 +1361,80 @@ form {
     margin-bottom: 1em;
     border-bottom: 1px solid rgba(16, 6, 159, 0.4);
 }
-
+/*
 .alx-required,
 :required {
     background-color: #FFF !important;
+}
+*/
+.alert {
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    color: #FFF;
+    margin-left: auto;
+    box-sizing: border-box;
+}
+
+.alert.alert-info {
+    background-color: #10069f;
+    border-color: #10069f;
+}
+
+.alx-backend-error {
+    display: block;
+    margin-bottom: 0.5em;
+    font-size: 0.9em;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 0.25em;
+    background-color: #d9534f;
+    z-index: 2;
+}
+
+.alx-backend-error ul {
+    list-style: none;
+}
+
+.ui-datepicker {
+    background: #fff !important;
+}
+
+.ui-widget-header {
+    background: #10069f;
+    border: 1px solid #10069f;
+}
+
+.ui-state-default {
+    background: #fff8ff !important;
+    border: 1px solid #dcd9fe !important;
+    color: #1207b8 !important;
+}
+
+.ui-state-active,
+.ui-state-default:hover {
+    background: #c5c0fd !important;
+    border: 1px solid #978efc !important;
+}
+
+.ui-state-default.ui-state-highlight {
+    background: #FFFBCF !important;
+}
+
+.ui-state-default.ui-state-highlight:hover {
+    background: #fff79c !important;
+}
+
+.ui-state-hover {
+    cursor: pointer;
+}
+
+.ui-datepicker-month,
+.ui-datepicker-month option,
+.ui-datepicker-year,
+.ui-datepicker-year option {
+    background: #4339D2;
 }

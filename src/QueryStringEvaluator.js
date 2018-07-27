@@ -7,8 +7,29 @@ const _ = {
 };
 
 class QueryStringEvaluator {
-    constructor (_lookupMap) {
-        this.lookupMap = _lookupMap || {};
+    constructor (_queryToFieldIdMap) {
+        this.queryToFieldIdMap = _queryToFieldIdMap || {};
+        this.oneTimeInitialized = false;
+        this.numOfRequestsToWaitFor = 0;
+        this.numOfReqestsCameBack = 0;
+    }
+
+    _initGlobalEventListeners (_fieldIdsToLookup) {
+        this.FORM_EVENTS.registerToFormEvent(this.FORM_EVENTS.EVENT_SYNC_LOOKUP_FIELD, (_event) => {
+            this.numOfReqestsCameBack++;
+
+            if (this.oneTimeInitialized || this.numOfReqestsCameBack < this.numOfRequestsToWaitFor) {
+                return false;
+            }
+
+            _event.preventDefault();
+
+            this.oneTimeInitialized = true;
+
+            _fieldIdsToLookup.forEach(_fieldIdToLookup => {
+                return this.QUICK_SELECTOR.getElemById(_fieldIdToLookup).trigger('change');
+            });
+        });
     }
 
     process (_url) {
@@ -19,18 +40,31 @@ class QueryStringEvaluator {
         }
 
         const _queryString = _url.slice(_indexOfQueryString + 1);
-        const _parsedValues = queryString.parse(_queryString);
+        const _queryObj = queryString.parse(_queryString);
 
-        _.forEach(_parsedValues, (_value, _key) => {
-            const _fieldId = this.lookupMap[_key];
+        const _fieldsToLookup = [];
+
+        _.forEach(_queryObj, (_value, _key) => {
+            const _fieldId = this.queryToFieldIdMap[_key];
 
             if (_fieldId) {
-                this.QUICK_SELECTOR.getElemById(_fieldId).val(_value);
-
-                return setTimeout(() => {
-                    this.QUICK_SELECTOR.getElemById(_fieldId).trigger('change');
-                }, 1000);
+                _fieldsToLookup.push({
+                    id: _fieldId,
+                    value: _value
+                });
             }
+        });
+
+        this.numOfRequestsToWaitFor = _fieldsToLookup.length;
+
+        if (this.numOfRequestsToWaitFor === 0) {
+            return;
+        }
+
+        this._initGlobalEventListeners(_fieldsToLookup.map(_field => { return _field.id; }));
+
+        _fieldsToLookup.forEach(_fieldsToLookup => {
+            this.QUICK_SELECTOR.getFieldWrapperDiv(_fieldsToLookup.id).find('.chosen-search-input').val(_fieldsToLookup.value).keyup().blur();
         });
     }
 }

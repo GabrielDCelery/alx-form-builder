@@ -19,26 +19,38 @@ class Dependencies {
         };
     }
 
-    _setDefaultStateAndBuildDependencyMap (_validStatesConfigs) {
-        this.validStatesConfigs = _validStatesConfigs;
+    _buildConditionalsMap (_validStatesConfigs) {
+        const _conditionalsMap = {};
 
-        _.forEach(this.validStatesConfigs, (_validStateConfig, _toChangeId) => {
-            this._setState(_validStateConfig.type, _toChangeId, _validStateConfig.defaultState);
-
+        _.forEach(_validStatesConfigs, (_validStateConfig, _toChangeId) => {
             _validStateConfig.validStates.forEach(_validState => {
                 _validState.criterias.forEach(_criteria => {
-                    if (!this.conditionalsMap.hasOwnProperty(_criteria.target)) {
-                        this.QUICK_SELECTOR.getElemById(_criteria.target).addClass(LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE);
+                    const _toWatchId = _criteria.target;
+
+                    if (_toWatchId && !_conditionalsMap[_toWatchId]) {
+                        this.QUICK_SELECTOR.getElemById(_toWatchId).addClass(LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE);
                     }
 
-                    _.set(this.conditionalsMap, [_criteria.target, _toChangeId], true);
+                    _.set(_conditionalsMap, [_toWatchId, _toChangeId], true);
                 });
             });
         });
+
+        return _conditionalsMap;
+    }
+
+    _setDefaultState () {
+        _.forEach(this.validStatesConfigs, (_validStateConfig, _toChangeId) => {
+            this._setState(_validStateConfig.type, _toChangeId, _validStateConfig.defaultState);
+        });
+
+        return setTimeout(() => {
+            return this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE).trigger('change');
+        }, 0);
     }
 
     _initEventListeners () {
-        this.$(`.${LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE}`).on('change', _event => {
+        this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_TRIGGER_CONDITIONAL_CHANGE).on('change', _event => {
             _event.preventDefault();
 
             return this._setConditionalsOnFieldChange(this.$(_event.target).attr('id'));
@@ -66,7 +78,7 @@ class Dependencies {
         }
 
         if (_type === 'group') {
-            return this._setGroupState(this.QUICK_SELECTOR.getElemById(`${this.PREFIX_GROUP}${_toChangeId}`), _state);
+            return this._setGroupState(_toChangeId, _state);
         }
 
         throw new Error(`Invalid type -> ${_type}`);
@@ -96,7 +108,9 @@ class Dependencies {
         _$field.trigger('change');
     }
 
-    _setGroupState (_$group, _state) {
+    _setGroupState (_toChangeId, _state) {
+        const _$group = this.QUICK_SELECTOR.getElemById(`${this.PREFIX_GROUP}${_toChangeId}`);
+
         if (_state.hasOwnProperty('visible')) {
             const _method = _state.visible === true ? LOCAL_ANIMATION_SHOW : LOCAL_ANIMATION_HIDE;
 
@@ -105,11 +119,25 @@ class Dependencies {
             }
 
             const _$fieldsInGroup = this.$('input, select, textarea', _$group);
+            const _bHide = _state.visible === false;
 
-            _$fieldsInGroup.toggleClass(this.DECORATOR_STATE_IGNORE, _state.visible === false);
-            _$fieldsInGroup.prop('disabled', _state.visible === false);
-            _$group.toggleClass(this.DECORATOR_STATE_HIDDEN, _state.visible === false);
+            _$fieldsInGroup.toggleClass(this.DECORATOR_STATE_IGNORE, _bHide);
+            _$fieldsInGroup.prop('disabled', _bHide);
+            _$group.toggleClass(this.DECORATOR_STATE_HIDDEN, _bHide);
             _$group[_method](this.animationConfig);
+
+            if (_bHide) {
+                return;
+            }
+
+            _$fieldsInGroup.each((_index, _field) => {
+                const _$field = this.$(_field);
+                const _fieldId = _$field.attr('id');
+
+                if (this.conditionalsMap[_fieldId]) {
+                    return _$field.trigger('change');
+                }
+            });
         }
     }
 
@@ -160,7 +188,9 @@ class Dependencies {
     }
 
     init (_validStatesConfig) {
-        this._setDefaultStateAndBuildDependencyMap(_validStatesConfig);
+        this.validStatesConfigs = _validStatesConfig;
+        this.conditionalsMap = this._buildConditionalsMap(_validStatesConfig);
+        this._setDefaultState();
         this._initEventListeners();
         this.bInitialized = true;
         this.animationConfig = {

@@ -7,15 +7,17 @@ const PageDecorator = require('./PageDecorator');
 const GroupDecorator = require('./GroupDecorator');
 const FieldDecorator = require('./FieldDecorator');
 const ElemRelocator = require('./ElemRelocator');
-const FieldSynchronizer = require('./FieldSynchronizer');
 const Dependencies = require('./Dependencies');
 const Paginator = require('./Paginator');
 const Validator = require('./Validator');
 const FormEvents = require('./FormEvents');
 const InputMask = require('./InputMask');
 const Bugfix = require('./Bugfix');
-const NativeMethodOverrides = require('./NativeMethodOverrides');
 const QueryStringEvaluator = require('./QueryStringEvaluator');
+const AjaxRequestsObserver = require('./AjaxRequestsObserver');
+
+const FormState = require('./FormState');
+const FieldTypeFactory = require('./stateFactories/FieldTypeFactory');
 
 const FORM_CONFIG_LOCATION = 'alx_dynamic_form_config';
 
@@ -68,16 +70,15 @@ $(document).ready(() => {
 
     formEvents.init();
 
-    const nativeMethodOverrides = new NativeMethodOverrides();
+    const ajaxRequestsObserver = new AjaxRequestsObserver();
 
-    dependencyInjector.setTargetInstance(nativeMethodOverrides).inject([
+    dependencyInjector.setTargetInstance(ajaxRequestsObserver).inject([
         ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['FORM_EVENTS', formEvents],
-        ['QUICK_SELECTOR', quickSelector]
+        ['QUICK_SELECTOR', quickSelector],
+        ['FORM_EVENTS', formEvents]
     ]);
 
-    nativeMethodOverrides.init();
+    ajaxRequestsObserver.init();
 
     const pageDecorator = new PageDecorator(config.globalDecoratorClasses.page);
 
@@ -121,19 +122,6 @@ $(document).ready(() => {
     ]);
 
     elemRelocator.start(config.elemsToRelocate);
-
-    const fieldSynchronizer = new FieldSynchronizer();
-
-    dependencyInjector.setTargetInstance(fieldSynchronizer).inject([
-        ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['QUICK_SELECTOR', quickSelector],
-        ['FORM_EVENTS', formEvents],
-        ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
-        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD]
-    ]);
-
-    fieldSynchronizer.init();
 
     const dependencies = new Dependencies();
 
@@ -205,11 +193,29 @@ $(document).ready(() => {
     dependencyInjector.setTargetInstance(queryStringEvaluator).inject([
         ['$', $],
         ['QUICK_SELECTOR', quickSelector],
+        ['FORM_EVENTS', formEvents],
         ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
         ['POSTFIX_LOOKUP_ID_CHOSEN', POSTFIX_LOOKUP_ID_CHOSEN]
     ]);
 
     queryStringEvaluator.process(window.location.href);
+
+    const fieldTypeFactory = new FieldTypeFactory(config.queryStringEvaluator);
+
+    dependencyInjector.setTargetInstance(fieldTypeFactory).inject([
+        ['$', $],
+        ['QUICK_SELECTOR', quickSelector]
+    ]);
+
+    fieldTypeFactory.init();
+
+    const formState = new FormState();
+
+    dependencyInjector.setTargetInstance(formState).inject([
+        ['FIELD_TYPE_FACTORY', fieldTypeFactory]
+    ]);
+
+    formState.init(config);
 
     quickSelector.emptyCache();
 });

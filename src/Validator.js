@@ -10,6 +10,7 @@ const _ = {
 const LOCAL_DECORATOR_STATE_REQUIRED = 'alx-required';
 const LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD = 'alx-validate-field';
 const LOCAL_DECORATOR_DATA_OLD_VALUE = 'alx-old-value';
+const LOCAL_DECORATOR_DOCUMENT_FIELD = 'alx-document-field';
 
 class Validator {
     constructor () {
@@ -38,6 +39,10 @@ class Validator {
         _$field.addClass(LOCAL_DECORATOR_STATE_REQUIRED);
         _$field.rules('add', _config);
         _$field.addClass(LOCAL_DECORATOR_TRIGGER_VALIDATE_FIELD);
+
+        if (_$field.attr('type') === 'file') {
+            _$field.addClass(LOCAL_DECORATOR_DOCUMENT_FIELD);
+        }
     }
 
     _excludeLookupSelectsFromValidation () {
@@ -72,6 +77,21 @@ class Validator {
         return this.$('.error', this.QUICK_SELECTOR.getElemById(this.ID_FORM));
     }
 
+    _ignoreDocumentFieldIfHasAttachment (_$field) {
+        if (_$field.attr('type') !== 'file') {
+            return;
+        }
+
+        _$field.removeClass(this.DECORATOR_STATE_IGNORE);
+
+        const _bDocumentAttached = _$field.closest(`.${this.DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER}`)
+            .find('.formfileinput a').attr('href') !== '#';
+
+        if (_bDocumentAttached) {
+            _$field.addClass(this.DECORATOR_STATE_IGNORE);
+        }
+    }
+
     _validateElem (_$elem) {
         const _oldValue = _$elem.data(LOCAL_DECORATOR_DATA_OLD_VALUE);
 
@@ -90,6 +110,10 @@ class Validator {
     }
 
     _validateForm (_bForSubmission) {
+        this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_DOCUMENT_FIELD).each((_index, _elem) => {
+            this._ignoreDocumentFieldIfHasAttachment(this.$(_elem));
+        });
+
         const _bIsValid = this.QUICK_SELECTOR.getElemById(this.ID_FORM).valid();
 
         this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_FORM_VALIDATED, [
@@ -99,7 +123,7 @@ class Validator {
         ]);
     }
 
-    _checkForBackendErrors() {
+    _checkForBackendErrors () {
         const _$backendErrors = this.QUICK_SELECTOR.getElemsByClass(this.ALX_CLASS_BACKEND_ERROR);
 
         if (_$backendErrors.length > 0) {
