@@ -1164,7 +1164,7 @@ body {
     text-align: center;
     vertical-align: middle;
     float: right;
-    color: #001A71;
+    color: #10069f;
 }
 
 #alx-heading-inner-title h1 {
@@ -1204,7 +1204,7 @@ main {
 
 #alx-page-navigation-top-container ul li a {
     display: inline-block;
-    color: #001A71;
+    color: #10069f;
     text-align: center;
     text-decoration: none;
     padding: 1vh 2vw;
@@ -1212,7 +1212,7 @@ main {
 }
 
 #alx-page-navigation-top-container ul li.alx-page-nav-menu-step-active {
-    background-color: #001A71;
+    background-color: #10069f;
 }
 
 #alx-page-navigation-top-container ul li.alx-page-nav-menu-step-active a {
@@ -1241,29 +1241,28 @@ button,
     user-select: none;
     box-sizing: border-box;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 0.8rem;
     padding: 0.5em 2em;
     color: #fff8ff;
     border: 1px solid #fff8ff;
-    background-color: #001A71;
+    background-color: #10069f;
     text-decoration: none;
     border-radius: 0.2rem;
 }
 
 #alx-save-load-button-container #target_form_logout,
 #alx-save-load-button-container button {
-    font-size: 1rem;
-    color: #001A71;
+    font-size: 0.6rem;
+    color: #10069f;
     background-color: #fff;
-    border: 1px solid #001A71;
+    border: 1px solid #aea8fc;
     border-radius: 0.2rem;
     padding: 0.5em 2em;
-    font-size: 0.8rem;
+    margin-right: 0.5em;
 }
 
 #alx-save-load-button-container button {
     float: left;
-    margin-right: 0.2em;
 }
 
 #alx-save-load-button-container #target_form_logout {
@@ -1295,13 +1294,27 @@ button,
     clear: both;
 }
 
+.alx-form-element {
+    margin-bottom: 1rem;
+}
+
+form {
+    padding: 1rem;
+    margin-top: 1rem;
+    background-color: #fff8ff;
+    border-radius: 0.2rem;
+    opacity: 1;
+    font-size: 15px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+}
+
 .form-title {
     text-align: center;
 }
 
 .form-title h2 {
     margin-top: 0;
-    color: #001A71;
+    color: #10069f;
     font-weight: lighter;
 }
 
@@ -1366,8 +1379,8 @@ button,
 }
 
 .alert.alert-info {
-    background-color: #001A71;
-    border-color: #001A71;
+    background-color: #10069f;
+    border-color: #10069f;
 }
 
 .alx-backend-error {
@@ -1391,8 +1404,8 @@ button,
 }
 
 .ui-widget-header {
-    background: #001A71;
-    border: 1px solid #001A71;
+    background: #10069f;
+    border: 1px solid #10069f;
 }
 
 .ui-state-default {
@@ -1424,41 +1437,4 @@ button,
 .ui-datepicker-year,
 .ui-datepicker-year option {
     background: #4339D2;
-}
-
-.pcj-group-header {
-    color: #fff;
-    background-color: #001A71;
-    text-align: center;
-    padding: 0.5em;
-}
-
-.alx-form-group {
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    background-color: #eee;
-    opacity: 1;
-    font-size: 1rem;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-}
-
-.alx-form-element {
-    width: 80%;
-    margin: 0 auto;
-    margin-bottom: 1rem;
-}
-
-input[type=checkbox] {
-    transform: scale(2);
-}
-
-#alx-main-inner-title {
-    width: 60%;
-    margin: 0 auto;
-    margin-top: 2vh;
-    padding: 1em;
-    border: 1px solid #001A71;
-    box-sizing: border-box;
-    font-size: 1rem;
-    background-color: #a7cbeb;
 }

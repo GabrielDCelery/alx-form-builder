@@ -1264,166 +1264,385 @@
     </div>
 
     <script>
-        var __apik = "5ce9965adb932dfd9b8609577ced25f24aea2d39";
-        var __baseurl = "https://pcj.autologyx.com";
+        var __apik = "d96726174699f9b119b3281b3ad2380343088a17";
+        var __baseurl = "https://es-ignite.autologyx.com";
         var __useremail = "gabriel.celery@autologyx.com";
-      </script>
+    </script>
     <script>
         window.alx_dynamic_form_config = JSON.stringify({
-    "globalDecoratorClasses": {
-        "page": {
-            "form": [
-                "pure-form"
-            ],
-            "backendErrorListContainers": [
-                "pure-u-1-1"
-            ]
+	"globalDecoratorClasses": {
+		"page": {
+            "form": ["pure-form"],
+            "backendErrorListContainers": ["pure-u-1-1"]
+		},
+		"group": {},
+		"field": {
+			"field": ["pure-input-1"],
+			"fieldWrapperDiv": ["pure-u-2-3"],
+			"labelWrapperDiv": ["pure-u-1-3"],
+            "labelAndFieldWrapperDiv": ["pure-g"]
+		}
+	},
+	"pageDecorators": {
+		"logo": {
+			"type": "img",
+			"value": "https://www.rolls-royce.com/~/media/Images/R/Rolls-Royce/logo/rebrand-svg-logo.svg?h=96&la=en&w=59",
+			"decoratorClasses": []
+		},
+		"headingTitle": {
+			"type": "text",
+			"value": "Engine Warranty Intake Form"
+		}
+	},
+	"groupDecorators": {},
+	"fieldDecorators": {
+		"id_field_reference_number": {
+			"bIsLookupField": true
+		},
+		"id_field_financial_structure": {
+			"helperText": {
+				"type": "html",
+				"value": "<div>Please <strong><a href=\"https://es-ignite.autologyx.com/system/document-store/download/674/\" style=\"color: yellow\">click here</a></strong> for further information</div>",
+				"decoratorClasses": ["alert", "alert-info", "pure-u-2-3"]
+			}
+		},
+		"id_field_if_other_please_specify": {
+			"textAreaRows": 5,
+			"helperText": {
+				"type": "text",
+				"value": "As you selected ‘Other’ from the parties list please provide details regarding the involved companies, their respective roles on the deal, the country of incorporation, address of either their principle place of business or registered office",
+				"decoratorClasses": ["alert", "alert-info", "pure-u-2-3"]
+			}
+		},
+		"id_field_amendments_detail": {
+			"textAreaRows": 5
+		},
+		"id_field_definitions_detail": {
+			"textAreaRows": 5
+		},
+		"id_field_engine_serial_numbers": {
+			"placeholder": "e.g. 12345 & 54321"
         },
-        "group": {},
-        "field": {
-            "field": [
-                "pure-input-1"
-            ],
-            "fieldWrapperDiv": [
-                "pure-u-2-3"
-            ],
-            "labelWrapperDiv": [
-                "pure-u-1-3"
-            ],
-            "labelAndFieldWrapperDiv": [
-                "pure-g"
-            ]
-        }
-    },
-    "pageDecorators": {
-        "logo": {
-            "type": "img",
-            "value": "https://www.pertemps.co.uk/media/1135/pertemps-logo.png",
-            "decoratorClasses": []
+        "id_field_date_of_original_ewa": {
+            "label": "Date of original EWA :"
         },
-        "headingTitle": {
-            "type": "text",
-            "value": "Healthcare Application Form"
+        "id_field_please_specify_deal_deadline": {
+            "label": "Please specify deal deadline (day/month/year):"
         },
-        "mainTitle": {
-            "type": "text",
-            "value": "Below is our application form. Please complete within 5 days of recieving it. Do not hesistate to contact us on 0800 123 4567 if you need further information.",
-            "plainTextWrapper": "p"
-        }
-    },
-    "groupDecorators": {
-        "personal-details": {
-            "title": {
-                "type": "text",
-                "value": "Personal Details",
-                "decoratorClasses": ["pcj-group-header"],
-                "plainTextWrapper": "h2"
-            }
-        },
-        "nok-details": {
-            "title": {
-                "type": "text",
-                "value": "NOK Details",
-                "decoratorClasses": ["pcj-group-header"],
-                "plainTextWrapper": "h2"
-            }
-        },
-        "dbs": {
-            "title": {
-                "type": "text",
-                "value": "DBS",
-                "decoratorClasses": ["pcj-group-header"],
-                "plainTextWrapper": "h2"
-            }
-        },
-        "cv": {
-            "title": {
-                "type": "text",
-                "value": "CV",
-                "decoratorClasses": ["pcj-group-header"],
-                "plainTextWrapper": "h2"
-            }
-        },
-        "subscriptions": {
-            "title": {
-                "type": "text",
-                "value": "Subscriptions",
-                "decoratorClasses": ["pcj-group-header"],
-                "plainTextWrapper": "h2"
-            }
-        }
-    },
-    "fieldDecorators": {
-        "id_field_please_specify": {
-            "textAreaRows": 5
-        }
-    },
-    "elemsToRelocate": {},
-    "pages": [],
-    "groups": [
-        {
-            "id": "personal-details",
-            "fields": [
-                "id_field_salutation",
-                "id_field_firstname",
-                "id_field_lastname",
-                "id_field_email",
-                "id_field_address1",
-                "id_field_address2",
-                "id_field_city",
-                "id_field_county",
-                "id_field_postal_code",
-                "id_field_country",
-                "id_field_mobile",
-                "id_field_what_is_your_profession",
-                "id_field_what_is_your_professional_registration_body",
-                "id_field_nmc_pin",
-                "id_field_working_time_declaration"
-            ],
-            "children": []
-        },
-        {
-            "id": "nok-details",
-            "fields": [
-                "id_field_nok_name",
-                "id_field_relationship_to_nok",
-                "id_field_nok_current_address",
-                "id_field_nok_postcode",
-                "id_field_nok_email",
-                "id_field_nok_mobile",
-                "id_field_engine_type",
-                "id_field_is_the_aircraft_part_of_a_fleet",
-                "id_field_total_number_of_aircrafts_in_the_fleet",
-                "id_field_number_of_this_aircraft_in_the_fleet"
-            ],
-            "children": []
-        },
-        {
-            "id": "dbs",
-            "fields": [
-                "id_field_do_you_have_any_unspent_or_pending_criminal_convictions",
-                "id_field_please_specify",
-                "id_field_do_you_have_a_portable_dbs"
-            ],
-            "children": []
-        },
-        {
-            "id": "cv",
-            "fields": [
-                "id_field_cv"
-            ],
-            "children": []
-        },
-        {
-            "id": "subscriptions",
-            "fields": [
-                "id_field_are_you_happy_to_receive_updates_via_sms_text_service"
-            ],
-            "children": []
-        }
-    ],
-    "dependencies": {
-        "id_field_what_is_your_professional_registration_body": {
+		"id_field_lessee_the_above_is": {
+			"label": "The above is"
+		},
+		"id_field_lessor_the_above_is": {
+			"label": "The above is"
+		},
+		"id_field_head_lessor_the_above_is": {
+			"label": "The above is"
+		},
+		"id_field_trustee_the_above_is": {
+			"label": "The above is"
+		},
+		"id_field_pdp_the_above_is": {
+			"label": "The above is"
+		},
+		"id_field_dw_between": {
+			"label": "Between"
+		},
+		"id_field_dw_and": {
+			"label": "And"
+		},
+		"id_field_dw_dated": {
+			"label": "Dated (day/month/year)"
+		},
+		"id_field_sa_between": {
+			"label": "Between"
+		},
+		"id_field_sa_and": {
+			"label": "And"
+		},
+		"id_field_sa_dated": {
+			"label": "Dated (day/month/year)"
+		},
+		"id_field_la_between": {
+			"label": "Between"
+		},
+		"id_field_la_and": {
+			"label": "And"
+		},
+		"id_field_la_dated": {
+			"label": "Dated (day/month/year)"
+		},
+		"id_field_hl_between": {
+			"label": "Between"
+		},
+		"id_field_hl_and": {
+			"label": "And"
+		},
+		"id_field_hl_dated": {
+			"label": "Dated (day/month/year)"
+		}
+	},
+	"elemsToRelocate": {},
+	"pages": [{
+		"label": "Request Details",
+		"id": "request-details"
+	}, {
+		"label": "Aircraft Manufacturer",
+		"id": "aircraft-manufacturer"
+	}, {
+		"label": "Background",
+		"id": "background"
+	}, {
+		"label": "Parties",
+		"id": "parties"
+	}, {
+		"label": "Current Agreements",
+		"id": "current-agreements"
+	}],
+	"groups": [{
+		"id": "request-details",
+		"fields": [
+			"id_field_agreement_type",
+			"id_field_legal_opinion_required",
+			"id_field_governing_law",
+			"id_field_if_other_please_provide_details",
+			"id_field_customer_name",
+			"id_field_lead_party_company_name",
+			"id_field_counsel_acting_for_lead_party",
+			"id_field_acting_counsel_e_mail",
+			"id_field_lead_party_country"
+		],
+		"children": []
+	}, {
+		"id": "aircraft-manufacturer",
+		"fields": [
+			"id_field_manufacturer_serial_number",
+			"id_field_aircraft_manufacturer",
+			"id_field_engine_serial_numbers",
+			"id_field_reference_number",
+			"id_field_aircraft_type",
+			"id_field_aircraft_registration_mark",
+			"id_field_engine_type",
+			"id_field_is_the_aircraft_part_of_a_fleet",
+			"id_field_total_number_of_aircrafts_in_the_fleet",
+			"id_field_number_of_this_aircraft_in_the_fleet"
+		],
+		"children": []
+	}, {
+		"id": "background",
+		"fields": [
+			"id_field_parties_involved",
+			"id_field_if_other_please_specify",
+			"id_field_please_specify_deal_deadline"
+		],
+		"children": [{
+			"id": "ewa",
+			"fields": [
+				"id_field_purpose_of_ewa",
+				"id_field_financial_structure",
+				"id_field_are_there_any_amendments",
+				"id_field_amendments_detail",
+				"id_field_are_there_any_additional_definitions",
+				"id_field_definitions_detail"
+			],
+			"children": []
+		}, {
+			"id": "tewa",
+			"fields": [
+				"id_field_deg_number_of_ewa_to_be_terminated",
+				"id_field_date_of_original_ewa",
+				"id_field_please_confirm_all_parties_wish_to_terminate_the_agreement",
+				"id_field_original_executed_ewa"
+			],
+			"children": []
+		}]
+	}, {
+		"id": "parties",
+		"fields": [],
+		"children": [{
+			"id": "lessee",
+			"fields": [
+				"id_field_lessee_full_name",
+				"id_field_lessee_country_of_incorporation",
+				"id_field_lessee_address",
+				"id_field_lessee_the_above_is",
+				"id_field_lessee_name_of_authorised_signatory"
+			],
+			"children": []
+		}, {
+			"id": "lessor",
+			"fields": [
+				"id_field_lessor_full_name",
+				"id_field_lessor_country_of_incorporation",
+				"id_field_lessor_address",
+				"id_field_lessor_the_above_is",
+				"id_field_lessor_name_of_authorised_signatory"
+			],
+			"children": []
+		}, {
+			"id": "head-lessor",
+			"fields": [
+				"id_field_head_lessor_full_name",
+				"id_field_head_lessor_country_of_incorporation",
+				"id_field_head_lessor_address",
+				"id_field_head_lessor_the_above_is",
+				"id_field_head_lessor_name_of_authorised_signatory"
+			],
+			"children": []
+		}, {
+			"id": "trustee",
+			"fields": [
+				"id_field_trustee_full_name",
+				"id_field_trustee_country_of_incorporation",
+				"id_field_trustee_address",
+				"id_field_trustee_the_above_is",
+				"id_field_trustee_name_of_authorised_signatory"
+			],
+			"children": []
+		}, {
+			"id": "pdp",
+			"fields": [
+				"id_field_pdp_full_name",
+				"id_field_pdp_country_of_incorporation",
+				"id_field_pdp_address",
+				"id_field_pdp_the_above_is",
+				"id_field_pdp_name_of_authorised_signatory"
+			],
+			"children": []
+		}]
+	}, {
+		"id": "current-agreements",
+		"fields": [],
+		"children": [{
+			"id": "dw",
+			"fields": [
+				"id_field_is_there_a_direct_warranty"
+			],
+			"children": [{
+				"id": "dw-details",
+				"fields": [
+					"id_field_dw_between",
+					"id_field_dw_between_other",
+					"id_field_dw_and",
+					"id_field_dw_and_other",
+					"id_field_dw_dated",
+					"id_field_original_deg_number"
+				],
+				"children": []
+			}]
+		}, {
+			"id": "sa",
+			"fields": [
+				"id_field_is_there_a_security_agreement"
+			],
+			"children": [{
+				"id": "sa-details",
+				"fields": [
+					"id_field_sa_between",
+					"id_field_sa_between_other",
+					"id_field_sa_and",
+					"id_field_sa_and_other",
+					"id_field_sa_dated"
+				],
+				"children": []
+			}]
+		}, {
+			"id": "la",
+			"fields": [
+				"id_field_is_there_a_lease_agreement"
+			],
+			"children": [{
+				"id": "la-details",
+				"fields": [
+					"id_field_la_between",
+					"id_field_la_between_other",
+					"id_field_la_and",
+					"id_field_la_and_other",
+					"id_field_la_dated"
+				],
+				"children": []
+			}]
+		}, {
+			"id": "hl",
+			"fields": [
+				"id_field_is_there_a_head_lease"
+			],
+			"children": [{
+				"id": "hl-details",
+				"fields": [
+					"id_field_hl_between",
+					"id_field_hl_between_other",
+					"id_field_hl_and",
+					"id_field_hl_and_other",
+					"id_field_hl_dated"
+				],
+				"children": []
+			}]
+		}]
+	}],
+	"dependencies": {
+		"id_field_legal_opinion_required": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"value": "",
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_agreement_type",
+					"values": [
+						"Engine Warranty Agreement"
+					]
+				}]
+			}]
+		},
+		"id_field_if_other_please_provide_details": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"value": "",
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_governing_law",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"ewa": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_agreement_type",
+					"values": [
+						"Engine Warranty Agreement"
+					]
+				}]
+			}]
+		},
+		"tewa": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_agreement_type",
+					"values": [
+						"Termination Engine Warranty Agreement"
+					]
+				}]
+			}]
+		},
+		"id_field_amendments_detail": {
 			"type": "field",
 			"defaultState": {
 				"visible": false
@@ -1431,53 +1650,577 @@
 			"validStates": [{
 				"visible": true,
 				"criterias": [{
-					"target": "id_field_what_is_your_profession",
-					"values": [
-						"Nurse"
-					]
-				}]
-			}]
-        },
-        "id_field_nmc_pin": {
-            "type": "field",
-			"defaultState": {
-				"visible": false
-			},
-			"validStates": [{
-				"visible": true,
-				"criterias": [{
-					"target": "id_field_what_is_your_profession",
-					"values": [
-						"Nurse"
-					]
-				}, {
-                    "target": "id_field_what_is_your_professional_registration_body",
-                    "values": [
-                        "NMC"
-                    ]
-                }]
-			}]
-        },
-        "id_field_please_specify": {
-            "type": "field",
-			"defaultState": {
-				"visible": false
-			},
-			"validStates": [{
-				"visible": true,
-				"criterias": [{
-					"target": "id_field_do_you_have_any_unspent_or_pending_criminal_convictions",
+					"target": "id_field_are_there_any_amendments",
 					"values": [
 						"Yes"
 					]
 				}]
 			}]
-        }
+		},
+		"id_field_definitions_detail": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_are_there_any_additional_definitions",
+					"values": [
+						"Yes"
+					]
+				}]
+			}]
+		},
+		"parties": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_parties_involved",
+					"values": [
+						"Lessor/Lessee",
+						"Lessor/Lessee/Security Trustee",
+						"Lessor/Lessee/Head Lessor/Security Trustee",
+						"PDP Lender/Lessee"
+					]
+				}]
+			}]
+		},
+		"current-agreements": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_agreement_type",
+					"values": [
+						"Engine Warranty Agreement"
+					]
+				}]
+			}]
+		},
+		"id_field_total_number_of_aircrafts_in_the_fleet": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_is_the_aircraft_part_of_a_fleet",
+					"values": [
+						"Yes"
+					]
+				}]
+			}]
+		},
+		"id_field_number_of_this_aircraft_in_the_fleet": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_is_the_aircraft_part_of_a_fleet",
+					"values": [
+						"Yes"
+					]
+				}]
+			}]
+		},
+		"id_field_if_other_please_specify": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_parties_involved",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"lessee": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_parties_involved",
+					"values": [
+						"Lessor/Lessee",
+						"Lessor/Lessee/Security Trustee",
+						"Lessor/Lessee/Head Lessor/Security Trustee",
+						"PDP Lender/Lessee"
+					]
+				}]
+			}]
+		},
+		"lessor": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_parties_involved",
+					"values": [
+						"Lessor/Lessee",
+						"Lessor/Lessee/Security Trustee",
+						"Lessor/Lessee/Head Lessor/Security Trustee"
+					]
+				}]
+			}]
+		},
+		"head-lessor": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_parties_involved",
+					"values": [
+						"Lessor/Lessee/Head Lessor/Security Trustee"
+					]
+				}]
+			}]
+		},
+		"trustee": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_parties_involved",
+					"values": [
+						"Lessor/Lessee/Security Trustee",
+						"Lessor/Lessee/Head Lessor/Security Trustee"
+					]
+				}]
+			}]
+		},
+		"pdp": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_parties_involved",
+					"values": [
+						"PDP Lender/Lessee"
+					]
+				}]
+			}]
+		},
+		"dw-details": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_is_there_a_direct_warranty",
+					"values": [
+						"Yes"
+					]
+				}]
+			}]
+		},
+		"sa-details": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_is_there_a_security_agreement",
+					"values": [
+						"Yes"
+					]
+				}]
+			}]
+		},
+		"la-details": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_is_there_a_lease_agreement",
+					"values": [
+						"Yes"
+					]
+				}]
+			}]
+		},
+		"hl-details": {
+			"type": "group",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_is_there_a_head_lease",
+					"values": [
+						"Yes"
+					]
+				}]
+			}]
+		},
+		"id_field_dw_between_other": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_dw_between",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"id_field_sa_between_other": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_sa_between",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"id_field_la_between_other": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_la_between",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"id_field_hl_between_other": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_hl_between",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"id_field_dw_and_other": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_dw_and",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"id_field_sa_and_other": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_sa_and",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"id_field_la_and_other": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_la_and",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		},
+		"id_field_hl_and_other": {
+			"type": "field",
+			"defaultState": {
+				"visible": false
+			},
+			"validStates": [{
+				"visible": true,
+				"criterias": [{
+					"target": "id_field_hl_and",
+					"values": [
+						"Other"
+					]
+				}]
+			}]
+		}
+	},
+	"validation": {
+		"id_field_agreement_type": {
+			"required": true
+		},
+		"id_field_legal_opinion_required": {
+			"required": true
+		},
+		"id_field_governing_law": {
+			"required": true
+		},
+		"id_field_if_other_please_provide_details": {
+			"required": true
+		},
+		"id_field_reference_number": {
+			"required": true
+		},
+		"id_field_customer_name": {
+			"required": true
+		},
+		"id_field_lead_party_company_name": {
+			"required": true
+		},
+		"id_field_counsel_acting_for_lead_party": {
+			"required": true
+		},
+		"id_field_acting_counsel_e_mail": {
+			"required": true
+		},
+		"id_field_lead_party_country": {
+			"required": true
+		},
+		"id_field_manufacturer_serial_number": {
+			"required": true
+		},
+		"id_field_total_number_of_aircrafts_in_the_fleet": {
+			"required": true
+		},
+		"id_field_number_of_this_aircraft_in_the_fleet": {
+			"required": true
+		},
+		"id_field_parties_involved": {
+			"required": true
+		},
+		"id_field_if_other_please_specify": {
+			"required": true
+		},
+		"id_field_please_specify_deal_deadline": {
+			"required": true
+		},
+		"id_field_purpose_of_ewa": {
+			"required": true
+		},
+		"id_field_financial_structure": {
+			"required": true
+		},
+		"id_field_are_there_any_amendments": {
+			"required": true
+		},
+		"id_field_amendments_detail": {
+			"required": true
+		},
+		"id_field_are_there_any_additional_definitions": {
+			"required": true
+		},
+		"id_field_definitions_detail": {
+			"required": true
+		},
+		"id_field_deg_number_of_ewa_to_be_terminated": {
+			"required": true
+		},
+		"id_field_date_of_original_ewa": {
+			"required": true
+		},
+		"id_field_please_confirm_all_parties_wish_to_terminate_the_agreement": {
+			"required": true
+		},
+		"id_field_original_executed_ewa": {
+			"required": true
+		},
+		"id_field_lessee_full_name": {
+			"required": true
+		},
+		"id_field_lessee_country_of_incorporation": {
+			"required": true
+		},
+		"id_field_lessee_the_above_is": {
+			"required": true
+		},
+		"id_field_lessor_full_name": {
+			"required": true
+		},
+		"id_field_lessor_country_of_incorporation": {
+			"required": true
+		},
+		"id_field_lessor_the_above_is": {
+			"required": true
+		},
+		"id_field_head_lessor_full_name": {
+			"required": true
+		},
+		"id_field_head_lessor_country_of_incorporation": {
+			"required": true
+		},
+		"id_field_head_lessor_the_above_is": {
+			"required": true
+		},
+		"id_field_trustee_full_name": {
+			"required": true
+		},
+		"id_field_trustee_country_of_incorporation": {
+			"required": true
+		},
+		"id_field_trustee_the_above_is": {
+			"required": true
+		},
+		"id_field_pdp_full_name": {
+			"required": true
+		},
+		"id_field_pdp_country_of_incorporation": {
+			"required": true
+		},
+		"id_field_pdp_the_above_is": {
+			"required": true
+		},
+		"id_field_is_there_a_direct_warranty": {
+			"required": true
+		},
+		"id_field_dw_between": {
+			"required": true
+		},
+		"id_field_dw_between_other": {
+			"required": true
+		},
+		"id_field_dw_and": {
+			"required": true
+		},
+		"id_field_dw_and_other": {
+			"required": true
+		},
+		"id_field_is_there_a_security_agreement": {
+			"required": true
+		},
+		"id_field_sa_between": {
+			"required": true
+		},
+		"id_field_sa_between_other": {
+			"required": true
+		},
+		"id_field_sa_and": {
+			"required": true
+		},
+		"id_field_sa_and_other": {
+			"required": true
+		},
+		"id_field_is_there_a_lease_agreement": {
+			"required": true
+		},
+		"id_field_la_between": {
+			"required": true
+		},
+		"id_field_la_between_other": {
+			"required": true
+		},
+		"id_field_la_and": {
+			"required": true
+		},
+		"id_field_la_and_other": {
+			"required": true
+		},
+		"id_field_is_there_a_head_lease": {
+			"required": true
+		},
+		"id_field_hl_between": {
+			"required": true
+		},
+		"id_field_hl_between_other": {
+			"required": true
+		},
+		"id_field_hl_and": {
+			"required": true
+		},
+		"id_field_hl_and_other": {
+			"required": true
+		}
+	},
+	"inputMask": {},
+	"queryStringEvaluator": {
+		"id": "id_field_reference_number"
     },
-    "validation": {},
-    "inputMask": {},
-    "queryStringEvaluator": {},
-    "fieldTypes": {}
+    "fieldTypes": {
+        "id_field_please_specify_deal_deadline": {
+            "type": "date"
+        },
+        "id_field_date_of_original_ewa": {
+            "type": "date"
+        },
+        "id_field_dw_dated": {
+            "type": "date"
+        },
+        "id_field_sa_dated": {
+            "type": "date"
+        },
+        "id_field_la_dated": {
+            "type": "date"
+        },
+        "id_field_hl_dated": {
+            "type": "date"
+        }
+    }
 });
     </script>
 
