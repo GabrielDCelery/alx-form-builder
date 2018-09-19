@@ -1,0 +1,64 @@
+{
+    "classes": {
+        "field": {
+            "field": [
+                "pure-input-1"
+            ],
+            "fieldWrapperDiv": [
+                "pure-u-2-3"
+            ],
+            "label": [],
+            "labelWrapperDiv": [
+                "pure-u-1-3"
+            ],
+            "labelAndFieldWrapperDiv": [
+                "pure-g"
+            ],
+            "helperText": [
+                "alert",
+                "alert-info",
+                "pure-u-2-3"
+            ]
+        },
+        "group": {
+            "title": [
+                "pure-u-1-1"
+            ],
+            "description": [
+                "pure-u-1-2"
+            ]
+        },
+        "page": {
+            "heading": {
+                "heading": [],
+                "logo": [],
+                "inner": [],
+                "title": []
+            },
+            "main": {
+                "main": [],
+                "inner": [],
+                "title": [],
+                "form": [
+                    "pure-form"
+                ]
+            },
+            "footer": {
+                "footer": [],
+                "inner": [],
+                "title": []
+            },
+            "saveAndLoadButton": {
+                "container": [],
+                "helperText": []
+            }
+        },
+        "error": {
+            "backend": {
+                "container": [],
+                "list": [],
+                "listItem": []
+            }
+        }
+    }
+}

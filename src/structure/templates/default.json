@@ -1,0 +1,46 @@
+{
+    "classes": {
+        "field": {
+            "field": [],
+            "fieldWrapperDiv": [],
+            "label": [],
+            "labelWrapperDiv": [],
+            "labelAndFieldWrapperDiv": [],
+            "helperText": []
+        },
+        "group": {
+            "title": [],
+            "description": []
+        },
+        "page": {
+            "heading": {
+                "heading": [],
+                "logo": [],
+                "inner": [],
+                "title": []
+            },
+            "main": {
+                "main": [],
+                "inner": [],
+                "title": [],
+                "form": []
+            },
+            "footer": {
+                "footer": [],
+                "inner": [],
+                "title": []
+            },
+            "saveAndLoadButton": {
+                "container": [],
+                "helperText": []
+            }
+        },
+        "error": {
+            "backend": {
+                "container": [],
+                "list": [],
+                "listItem": []
+            }
+        }
+    }
+}

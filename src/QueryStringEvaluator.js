@@ -2,9 +2,7 @@
 
 const queryString = require('querystring');
 
-const _ = {
-    forEach: require('lodash.foreach')
-};
+const _ = require('lodash-core');
 
 class QueryStringEvaluator {
     constructor (_queryToFieldIdMap) {
@@ -26,7 +24,7 @@ class QueryStringEvaluator {
 
             this.oneTimeInitialized = true;
 
-            _fieldIdsToLookup.forEach(_fieldIdToLookup => {
+            _.forEach(_fieldIdsToLookup, _fieldIdToLookup => {
                 return this.QUICK_SELECTOR.getElemById(_fieldIdToLookup).trigger('change');
             });
         });
@@ -63,8 +61,8 @@ class QueryStringEvaluator {
 
         this._initGlobalEventListeners(_fieldsToLookup.map(_field => { return _field.id; }));
 
-        _fieldsToLookup.forEach(_fieldsToLookup => {
-            this.QUICK_SELECTOR.getFieldWrapperDiv(_fieldsToLookup.id).find('.chosen-search-input').val(_fieldsToLookup.value).keyup().blur();
+        _.forEach(_fieldsToLookup, _fieldToLookup => {
+            this.QUICK_SELECTOR.getFieldWrapperDiv(_fieldToLookup.id).find('.chosen-search-input').val(_fieldToLookup.value).keyup().blur();
         });
     }
 }

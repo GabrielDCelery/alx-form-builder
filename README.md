@@ -42,7 +42,10 @@ npm run dev
     "properties": {
         "groups": "see Groups Configuration", 
         "pages": "see Pagination Configuration",
-        "validation": "see Validation Configuration",
+        "validation": {
+			"fieldConfigs": "see Field Validation configuration",
+			"targetGroups": "see Target Group Validation configuration"
+		},
         "dependencies": "see Dependencies configuration",
         "inputMask": "see InputMask Configuration",
 		"globalDecoratorClasses": "see Global Decorator Classes Configuration",
@@ -162,21 +165,55 @@ After generating the nested groups of the fields you can paginate the top/first 
 ```
 
 ------
-#### Validation Configuration
+#### Field Validation Configuration
 
 The form builder uses the JQuery Validation plugin. For the built-in validation methods read the docs at https://jqueryvalidation.org/documentation Custom validators added to the plugin through the form builder:
 
-* pattern: RegExp string
-
 ```
 {
-	"title": "Validation Configuration",
+	"title": "Field Validation Configuration",
 	"description": "Validation configuration for the individual fields",
 	"type": "object",
 	"properties": {
 		"{{fieldID}}": {
 			"description": "Configuration for a field, e.g. { required: true, minlength: 10 }",
 			"type": "object"
+		}
+	}
+}
+```
+
+#### Target Group Validation Configuration
+
+This is the configuration for firing validation for target groups that have been fetched from the backend system:
+
+```
+{
+	"title": "Target Group Validation Configuration",
+	"description": "Validation configuration for dynamically fetched data from our system",
+	"type": "object",
+	"properties": {
+		"{{targetGrouId}}": {
+			"description": "Configuration for a target group",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Target Group description",
+					"type": "string"
+				},
+				"type": {
+					"description": "Target Group type (e.g. person)",
+					"type": "string"
+				},
+				"fields": {
+					"description": "List of field ids belonging to the target",
+					"type": "array",
+					"items": {
+						"description": "Id belonging to the target",
+						"type": "string"
+					}
+				}
+			}
 		}
 	}
 }

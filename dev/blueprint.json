@@ -1,0 +1,146 @@
+{
+    "template": "default",
+    "logo": "",
+    "title": "",
+    "structure": {
+        "groups": [
+            {
+                "id": null,
+                "fields": [],
+                "children": [
+                    {
+                        "id": null,
+                        "fields": [],
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "id": null,
+                "fields": [],
+                "children": []
+            }
+        ],
+        "pages": [
+            {
+                "label": null,
+                "id": null
+            }
+        ]
+    },
+    "state": {
+        "groups": {
+            "group_name_something": {
+                "defaultState": {
+                    "visible": null
+                },
+                "validStates": [
+                    {
+                        "visible": null,
+                        "criterias": []
+                    }
+                ]
+            }
+        },
+        "fields": {
+            "id_something": {
+                "defaultState": {
+                    "visible": null,
+                    "value": null,
+                    "inputMask": null,
+                    "validation": null
+                },
+                "validStates": [
+                    {
+                        "visible": null,
+                        "value": null,
+                        "inputMask": null,
+                        "validation": null,
+                        "criterias": []
+                    }
+                ]
+            }
+        }
+    },
+    "content": {
+        "global": {
+            "groups": {
+                "titles": [
+                    {
+                        "type": "text",
+                        "value": "Blahblah",
+                        "groups": [
+                            "legal-instruction"
+                        ]
+                    }
+                ],
+                "descriptions": [
+                    {
+                        "type": "text",
+                        "value": "regestrrtgdhtry",
+                        "groups": [
+                            "legal-instruction"
+                        ]
+                    }
+                ]
+            },
+            "fields": {
+                "labels": [
+                    {
+                        "value": "My label",
+                        "fields": [
+                            "id_something"
+                        ]
+                    }
+                ],
+                "placeholders": [],
+                "helperTexts": [
+                    {
+                        "type": "text",
+                        "value": "As you selected ‘Other’ from the parties list please provide details regarding the involved companies, their respective roles on the deal, the country of incorporation, address of either their principle place of business or registered office",
+                        "fields": [
+                            "id_something",
+                            "id_something_2"
+                        ]
+                    }
+                ],
+                "types": [
+                    {
+                        "type": "date",
+                        "config": {},
+                        "fields": []
+                    },
+                    {
+                        "type": "textarea",
+                        "config": {
+                            "rows": 5
+                        },
+                        "fields": []
+                    }
+                ]
+            }
+        },
+        "local": {
+            "groups": {
+                "legal-instruction": {
+                    "title": {
+                        "type": "text",
+                        "value": "Blahblah"
+                    },
+                    "description": {
+                        "type": "text",
+                        "value": "regestrrtgdhtry"
+                    }
+                }
+            },
+            "fields": {
+                "id_something": {
+                    "label": "My label",
+                    "placeholder": "",
+                    "helperText": {},
+                    "type": {}
+                }
+            }
+        }
+    }
+}
