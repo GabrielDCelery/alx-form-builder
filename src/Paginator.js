@@ -26,6 +26,8 @@ class Paginator {
     constructor (_dependencies) {
         _dependencies.DependencyInjector.inject(this, _dependencies, [
             '$',
+            'COLOUR_APPENDER',
+            'ELEM_CONSTRUCTOR',
             'PREFIX_GROUP',
             'QUICK_SELECTOR',
             'FORM_EVENTS',
@@ -82,30 +84,39 @@ class Paginator {
         }
     }
 
-    _generateNavButton (_label, _pageId, _customClasses, _$default) {
-        if (_pageId == null) {
-            if (_$default) {
-                return _$default;
-            }
-
-            return null;
-        }
-
-        const _$button = this.$('<button/>');
-
-        _$button.text(_label);
-        _$button.addClass(LOCAL_DECORATOR_CLASS_TRIGGER_MOVE_TO_PAGE);
-        _$button.addClass(_customClasses.join(' '));
-        _$button.data(LOCAL_DATA_PAGE_ID, _pageId);
+    _generateNavButton (_label, _pageId, _customClasses) {
+        const _$button = this.ELEM_CONSTRUCTOR.createElem('text', _label, 'button')
+            .addClass(LOCAL_DECORATOR_CLASS_TRIGGER_MOVE_TO_PAGE)
+            .addClass(_customClasses.join(' '))
+            .data(LOCAL_DATA_PAGE_ID, _pageId);
+        this.COLOUR_APPENDER.appendColourToElems(
+            _$button,
+            this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR,
+            this.COLOUR_APPENDER.COLOR_PRIMARY
+        );
+        this.COLOUR_APPENDER.appendColourToElems(
+            _$button,
+            this.COLOUR_APPENDER.PROPERTY_COLOUR,
+            this.COLOUR_APPENDER.COLOR_WHITE
+        );
 
         return _$button;
     }
 
     _generateSubmitButton () {
-        const _$submitButton = this.$('<button/>')
-            .text('Submit')
+        const _$submitButton = this.ELEM_CONSTRUCTOR.createElem('text', 'Submit', 'button')
             .addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_BUTTON)
             .addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_NEXT_BUTTON);
+        this.COLOUR_APPENDER.appendColourToElems(
+            _$submitButton,
+            this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR,
+            this.COLOUR_APPENDER.COLOR_PRIMARY
+        );
+        this.COLOUR_APPENDER.appendColourToElems(
+            _$submitButton,
+            this.COLOUR_APPENDER.PROPERTY_COLOUR,
+            this.COLOUR_APPENDER.COLOR_WHITE
+        );
 
         _$submitButton.on('click', _event => {
             _event.preventDefault();
@@ -121,6 +132,10 @@ class Paginator {
             return _val - 1;
         });
 
+        if (_validPageId === null) {
+            return;
+        }
+
         return this._generateNavButton('Previous', _validPageId, [
             LOCAL_DECORATOR_CLASS_PAGE_NAV_BUTTON,
             LOCAL_DECORATOR_CLASS_PAGE_NAV_PREVIOUS_BUTTON
@@ -132,27 +147,46 @@ class Paginator {
             return _val + 1;
         });
 
+        if (_validPageId === null) {
+            return this._generateSubmitButton();
+        }
+
         return this._generateNavButton('Next', _validPageId, [
             LOCAL_DECORATOR_CLASS_PAGE_NAV_BUTTON,
             LOCAL_DECORATOR_CLASS_PAGE_NAV_NEXT_BUTTON
-        ], this._generateSubmitButton());
+        ]);
     }
 
     _generateNavBar () {
-        const _$ul = this.$('<ul/>').addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU);
+        const _$ul = this.ELEM_CONSTRUCTOR.createWrapperElem('ul').addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU);
 
         this.QUICK_SELECTOR.getElemsByClass(LOCAL_DECORATOR_CLASS_PAGE).each((_index, _page) => {
             const _$page = this.$(_page);
-            const _$li = this.$('<li/>').addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_INDICATOR);
-            const _$a = this.$('<a/>').attr('href', '#')
-                .data(LOCAL_DATA_PAGE_ID, _$page.attr('id'))
+            const _$li = this.ELEM_CONSTRUCTOR.createWrapperElem('li').addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_INDICATOR);
+
+            const _$a = this.ELEM_CONSTRUCTOR.createElem('text', _$page.data(LOCAL_DATA_PAGE_LABEL), 'a')
                 .addClass(LOCAL_DECORATOR_CLASS_TRIGGER_MOVE_TO_PAGE)
-                .text(_$page.data(LOCAL_DATA_PAGE_LABEL));
+                .attr('href', '#')
+                .data(LOCAL_DATA_PAGE_ID, _$page.attr('id'));
+
+            this.COLOUR_APPENDER.appendColourToElems(
+                _$a,
+                this.COLOUR_APPENDER.PROPERTY_COLOUR,
+                this.COLOUR_APPENDER.COLOR_PRIMARY
+            );
 
             _$li.append(_$a);
             _$ul.append(_$li);
         });
-        this.QUICK_SELECTOR.getElemById(this.DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER).append(_$ul);
+
+        const _$topNavBar = this.QUICK_SELECTOR.getElemById(this.DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER);
+
+        this.COLOUR_APPENDER.appendColourToElems(
+            _$topNavBar,
+            this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR,
+            this.COLOUR_APPENDER.COLOR_SECONDARY
+        );
+        _$topNavBar.append(_$ul);
     }
 
     _setActiveNavBarStep () {
@@ -171,8 +205,23 @@ class Paginator {
             }
 
             _$navBarButton.toggleClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_HIDDEN, _$page.hasClass(this.DECORATOR_CLASS_HIDDEN));
-            _$navBarButton.find('a')[_animation](this._animationConfig);
-            _$navBarButton.toggleClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_ACTIVE, _index === _activePageIndex);
+
+            const _bIsActivePage = _index === _activePageIndex;
+            const _$navbarText = _$navBarButton.find('a');
+
+            _$navbarText[_animation](this._animationConfig);
+
+            this.COLOUR_APPENDER.appendColourToElems(
+                _$navBarButton,
+                this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR,
+                _bIsActivePage ? this.COLOUR_APPENDER.COLOR_PRIMARY : this.COLOUR_APPENDER.COLOR_NONE
+            );
+            this.COLOUR_APPENDER.appendColourToElems(
+                _$navbarText,
+                this.COLOUR_APPENDER.PROPERTY_COLOUR,
+                _bIsActivePage ? this.COLOUR_APPENDER.COLOR_WHITE : this.COLOUR_APPENDER.COLOR_WHITE
+            );
+            _$navBarButton.toggleClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_ACTIVE, _bIsActivePage);
         });
 
         _$navBarButtons.removeClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_LAST);

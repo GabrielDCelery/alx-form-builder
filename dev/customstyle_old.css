@@ -1164,6 +1164,7 @@ body {
     text-align: center;
     vertical-align: middle;
     float: right;
+    color: #10069f;
 }
 
 #alx-heading-inner-title h1 {
@@ -1178,7 +1179,7 @@ main {
 
 #alx-page-navigation-top-container {
     width: 100%;
-    /*background-color: #fff8ff;*/
+    background-color: #fff8ff;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -1203,7 +1204,7 @@ main {
 
 #alx-page-navigation-top-container ul li a {
     display: inline-block;
-    /*color: #10069f;*/
+    color: #10069f;
     text-align: center;
     text-decoration: none;
     padding: 1vh 2vw;
@@ -1211,11 +1212,11 @@ main {
 }
 
 #alx-page-navigation-top-container ul li.alx-page-nav-menu-step-active {
-    /*background-color: #10069f;*/
+    background-color: #10069f;
 }
 
 #alx-page-navigation-top-container ul li.alx-page-nav-menu-step-active a {
-    /*color: #fff8ff;*/
+    color: #fff8ff;
 }
 
 #alx-page-navigation-bottom-container:after {
@@ -1244,7 +1245,7 @@ button,
     padding: 0.5em 2em;
     color: #fff8ff;
     border: 1px solid #fff8ff;
-    /*background-color: #10069f;*/
+    background-color: #10069f;
     text-decoration: none;
     border-radius: 0.2rem;
 }

@@ -51,7 +51,7 @@ module.exports = {
                 loader: 'sass-loader'
             }]
         }]
-    },
+    }, /*
     plugins: [
         new UglifyJsPlugin({
             cache: true,
@@ -59,7 +59,7 @@ module.exports = {
             test: /\.js($|\?)/i,
             extractComments: true
         })
-    ],
+    ], */
     externals: {
         jquery: 'jQuery'
     }

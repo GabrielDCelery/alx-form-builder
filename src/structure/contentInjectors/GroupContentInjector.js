@@ -25,7 +25,7 @@ class ContentInjector extends _ContentInjectorInterface {
 
         this.QUICK_SELECTOR.getElemById(`${this.PREFIX_GROUP}${_groupId}`).prepend(_$groupDescription);
 
-        return this;
+        return _$groupDescription;
     }
 
     injectTitle (_groupId, _type, _value) {
@@ -39,7 +39,7 @@ class ContentInjector extends _ContentInjectorInterface {
 
         this.QUICK_SELECTOR.getElemById(`${this.PREFIX_GROUP}${_groupId}`).prepend(_$groupTitle);
 
-        return this;
+        return _$groupTitle;
     }
 }
 

@@ -1,8 +1,13 @@
 'use strict';
 
+const _ = require('lodash-core');
+
 const DependencyInjector = require('./helpers/DependencyInjector');
 const QuickSelector = require('./helpers/QuickSelector');
 const FormEvents = require('./FormEvents');
+
+const ElemConstructor = require('./styling/ElemConstructor');
+const ColourAppender = require('./styling/ColourAppender');
 
 const AjaxRequestsObserver = require('./AjaxRequestsObserver');
 const Paginator = require('./Paginator');
@@ -58,6 +63,11 @@ $(document).ready(() => {
         DependencyInjector: DependencyInjector,
         $: $
     });
+    const elemConstructor = new ElemConstructor({
+        DependencyInjector: DependencyInjector,
+        $: $
+    });
+    const colourAppender = new ColourAppender(_.get(config, ['styling', 'colours']));
     const targetGroupRecordProcessor = new TargetGroupRecordProcessor();
 
     const formEvents = new FormEvents({
@@ -77,6 +87,8 @@ $(document).ready(() => {
         DependencyInjector: DependencyInjector,
         $: $,
         QUICK_SELECTOR: quickSelector,
+        COLOUR_APPENDER: colourAppender,
+        ELEM_CONSTRUCTOR: elemConstructor,
         ALX_CLASS_BACKEND_ERROR: ALX_CLASS_BACKEND_ERROR,
         PREFIX_GROUP: PREFIX_GROUP,
         DECORATOR_ID_HEADING: DECORATOR_ID_HEADING,
@@ -119,6 +131,8 @@ $(document).ready(() => {
     new Paginator({
         DependencyInjector: DependencyInjector,
         $: $,
+        COLOUR_APPENDER: colourAppender,
+        ELEM_CONSTRUCTOR: elemConstructor,
         PREFIX_GROUP: PREFIX_GROUP,
         QUICK_SELECTOR: quickSelector,
         FORM_EVENTS: formEvents,

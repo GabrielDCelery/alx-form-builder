@@ -4,7 +4,7 @@ const _ = require('lodash-core');
 
 const NestedGroupsGenerator = require('./structure/NestedGroupsGenerator');
 const TemplateAppender = require('./structure/TemplateAppender');
-const FieldTypeModifier = require('./structure/FieldTypeModifier');
+const FieldTypeFactory = require('./structure/FieldTypeFactory');
 const ContentInjectorFactory = require('./structure/ContentInjectorFactory');
 
 const DEFAULT_MULTIPLE_GROUPS_CONFIG = {
@@ -47,89 +47,87 @@ class StructureBuilder {
     constructor (_dependencies, _templateName) {
         this.nestedGroupsGenerator = new NestedGroupsGenerator(_dependencies);
         this.templateAppender = new TemplateAppender(_dependencies);
-        this.fieldTypeModifier = new FieldTypeModifier(_dependencies);
+        this.fieldTypeFactory = new FieldTypeFactory(_dependencies);
         this.contentInjectorFactory = new ContentInjectorFactory(_dependencies);
     }
 
     _doPageModifications (_pageConfig) {
-        this.contentInjectorFactory.getInjector('page')
-            .injectMain(_pageConfig.heading)
-            .injectHeading(_pageConfig.logo, _pageConfig.title)
-            .injectNavBarContainers()
-            .injectSaveAndLoadButtonContainer()
-            .injectFooter(_pageConfig.footer)
-            .moveButtons();
+        const _pageContentInjector = this.contentInjectorFactory.getInjector('page');
+
+        _pageContentInjector.injectMain(_pageConfig.heading);
+        _pageContentInjector.injectHeading(_pageConfig.logo, _pageConfig.title);
+        _pageContentInjector.injectNavBarContainers();
+        _pageContentInjector.injectSaveAndLoadButtonContainer();
+        _pageContentInjector.injectFooter(_pageConfig.footer);
+        _pageContentInjector.moveButtons();
     }
 
     _doMultipleGroupModifications (_multipleGroupConfigs) {
+        const _groupContentInjector = this.contentInjectorFactory.getInjector('group');
+
         _.forEach(_multipleGroupConfigs.descriptions, _descriptionConfig => {
             _.forEach(_descriptionConfig.groups, _groupId => {
-                this.contentInjectorFactory
-                    .getInjector('group')
-                    .injectDescription(_groupId, _descriptionConfig.type, _descriptionConfig.value);
+                _groupContentInjector.injectDescription(_groupId, _descriptionConfig.type, _descriptionConfig.value);
             });
         });
 
         _.forEach(_multipleGroupConfigs.titles, _titleConfig => {
             _.forEach(_titleConfig.groups, _groupId => {
-                this.contentInjectorFactory
-                    .getInjector('group')
-                    .injectTitle(_groupId, _titleConfig.type, _titleConfig.value);
+                _groupContentInjector.injectTitle(_groupId, _titleConfig.type, _titleConfig.value);
             });
         });
     }
 
     _doMultipleFieldModifications (_multipleFieldConfigs) {
+        const _fieldContentInjector = this.contentInjectorFactory.getInjector('field');
+
         _.forEach(_multipleFieldConfigs.labels, _labelConfig => {
             _.forEach(_labelConfig.fields, _fieldId => {
-                this.contentInjectorFactory
-                    .getInjector('field')
-                    .replaceLabel(_fieldId, _labelConfig.value);
+                _fieldContentInjector.replaceLabel(_fieldId, _labelConfig.value);
             });
         });
 
         _.forEach(_multipleFieldConfigs.placeholders, _placeholderConfig => {
             _.forEach(_placeholderConfig.fields, _fieldId => {
-                this.contentInjectorFactory
-                    .getInjector('field')
-                    .replacePlaceholder(_fieldId, _placeholderConfig.value);
+                _fieldContentInjector.replacePlaceholder(_fieldId, _placeholderConfig.value);
             });
         });
 
         _.forEach(_multipleFieldConfigs.helperTexts, _helperTextConfig => {
             _.forEach(_helperTextConfig.fields, _fieldId => {
-                this.contentInjectorFactory
-                    .getInjector('field')
-                    .injectHelperText(_fieldId, _helperTextConfig.type, _helperTextConfig.value);
+                _fieldContentInjector.injectHelperText(_fieldId, _helperTextConfig.type, _helperTextConfig.value);
             });
         });
 
         _.forEach(_multipleFieldConfigs.types, _fieldTypeConfig => {
             _.forEach(_fieldTypeConfig.fields, _fieldId => {
-                this.fieldTypeModifier.init(_fieldId, _fieldTypeConfig.type, _fieldTypeConfig.config);
+                this.fieldTypeFactory.init(_fieldId, _fieldTypeConfig.type, _fieldTypeConfig.config);
             });
         });
     }
 
     _doSingleGroupModifications (_singleGroupConfigs) {
+        const _groupContentInjector = this.contentInjectorFactory.getInjector('group');
+
         _.forEach(_singleGroupConfigs, (_localGroupConfig, _groupId) => {
             const _config = _.defaultsDeep({}, _localGroupConfig, DEFAULT_SINGLE_GROUP_CONFIG);
 
-            this.contentInjectorFactory.getInjector('group')
-                .injectTitle(_groupId, _config.title.type, _config.title.value)
-                .injectDescription(_groupId, _config.description.type, _config.description.value);
+            _groupContentInjector.injectTitle(_groupId, _config.title.type, _config.title.value);
+            _groupContentInjector.injectDescription(_groupId, _config.description.type, _config.description.value);
         });
     }
 
     _doSingleFieldModifications (_singleFieldConfigs) {
+        const _fieldContentInjector = this.contentInjectorFactory.getInjector('field');
+
         _.forEach(_singleFieldConfigs, (_localFieldConfig, _fieldId) => {
             const _config = _.defaultsDeep({}, _localFieldConfig, DEFAULT_SINGLE_FIELD_CONFIG);
 
-            this.contentInjectorFactory.getInjector('field')
-                .replaceLabel(_fieldId, _config.label)
-                .replacePlaceholder(_fieldId, _config.placeholder)
-                .injectHelperText(_fieldId, _config.helperText.type, _config.helperText.value);
-            this.fieldTypeModifier.init(_fieldId, _config.type.value, _config.type.config);
+            _fieldContentInjector.replaceLabel(_fieldId, _config.label);
+            _fieldContentInjector.replacePlaceholder(_fieldId, _config.placeholder);
+            _fieldContentInjector.injectHelperText(_fieldId, _config.helperText.type, _config.helperText.value);
+
+            this.fieldTypeFactory.init(_fieldId, _config.type.value, _config.type.config);
         });
     }
 
@@ -141,7 +139,7 @@ class StructureBuilder {
             .getFieldIds()
             .forEach(_fieldId => {
                 // This is necessary because the backend renders all the normal input fields as textarea
-                this.fieldTypeModifier.convertTextareaToNormalInput(_fieldId);
+                this.fieldTypeFactory.convertTextareaToNormalInput(_fieldId);
                 this.templateAppender.decorateFieldWithClasses(_fieldId);
             });
 

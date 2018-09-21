@@ -14,17 +14,15 @@ class FieldContentInjector extends _ContentInjectorInterface {
 
     replaceLabel (_fieldId, _newLabel) {
         if (!FieldContentInjector._isValidContent(_newLabel)) {
-            return this;
+            return;
         }
 
-        this.QUICK_SELECTOR.getLabelOfField(_fieldId).text(_newLabel);
-
-        return this;
+        return this.QUICK_SELECTOR.getLabelOfField(_fieldId).text(_newLabel);
     }
 
     replacePlaceholder (_fieldId, _placeholder) {
         if (!FieldContentInjector._isValidContent(_placeholder)) {
-            return this;
+            return;
         }
 
         const _$field = this.QUICK_SELECTOR.getElemById(_fieldId);
@@ -32,13 +30,13 @@ class FieldContentInjector extends _ContentInjectorInterface {
         if (_$field.is('textarea') || _$field.is('input')) {
             _$field.attr('placeholder', _placeholder);
 
-            return this;
+            return _$field;
         }
     }
 
     injectHelperText (_fieldId, _type, _value) {
         if (!FieldContentInjector._isValidContent(_value)) {
-            return this;
+            return;
         }
 
         const _$helperText = this._generateContent(_type, _value, 'p');
@@ -47,7 +45,7 @@ class FieldContentInjector extends _ContentInjectorInterface {
 
         this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_fieldId).append(_$helperText);
 
-        return this;
+        return _$helperText;
     }
 }
 

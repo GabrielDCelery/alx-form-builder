@@ -1,5 +1,15 @@
 window.alx_dynamic_form_config = {
     template: 'basic',
+    styling: {
+        colours: {
+            primary: '#10069F',
+            secondary: '#fff8ff',
+            text: {
+                navbar: '',
+                buttons: ''
+            }
+        }
+    },
     structure: {
         groups: [
             {
