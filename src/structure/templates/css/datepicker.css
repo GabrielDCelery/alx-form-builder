@@ -1,0 +1,53 @@
+.ui-datepicker {
+    background: rgba(247, 247, 247, 1);
+    background: -moz-linear-gradient(left, rgba(247, 247, 247, 1) 0%, rgba(255, 255, 255, 1) 36%, rgba(255, 255, 255, 1) 61%, rgba(247, 247, 247, 1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(247, 247, 247, 1)), color-stop(36%, rgba(255, 255, 255, 1)), color-stop(61%, rgba(255, 255, 255, 1)), color-stop(100%, rgba(247, 247, 247, 1)));
+    background: -webkit-linear-gradient(left, rgba(247, 247, 247, 1) 0%, rgba(255, 255, 255, 1) 36%, rgba(255, 255, 255, 1) 61%, rgba(247, 247, 247, 1) 100%);
+    background: -o-linear-gradient(left, rgba(247, 247, 247, 1) 0%, rgba(255, 255, 255, 1) 36%, rgba(255, 255, 255, 1) 61%, rgba(247, 247, 247, 1) 100%);
+    background: -ms-linear-gradient(left, rgba(247, 247, 247, 1) 0%, rgba(255, 255, 255, 1) 36%, rgba(255, 255, 255, 1) 61%, rgba(247, 247, 247, 1) 100%);
+    background: linear-gradient(to right, rgba(247, 247, 247, 1) 0%, rgba(255, 255, 255, 1) 36%, rgba(255, 255, 255, 1) 61%, rgba(247, 247, 247, 1) 100%);
+}
+
+.ui-widget-header {
+    background: rgba(190, 190, 190, 1);
+    background: -moz-linear-gradient(left, rgba(190, 190, 190, 1) 0%, rgba(221, 221, 221, 1) 36%, rgba(221, 221, 221, 1) 61%, rgba(190, 190, 190, 1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(190, 190, 190, 1)), color-stop(36%, rgba(221, 221, 221, 1)), color-stop(61%, rgba(221,221, 221, 1)), color-stop(100%, rgba(190, 190, 190, 1)));
+    background: -webkit-linear-gradient(left, rgba(190, 190, 190, 1) 0%, rgba(221, 221, 221, 1) 36%, rgba(221, 221, 221, 1) 61%, rgba(190, 190, 190, 1) 100%);
+    background: -o-linear-gradient(left, rgba(190, 190, 190, 1) 0%, rgba(221, 221, 221, 1) 36%, rgba(221, 221, 221, 1) 61%, rgba(190, 190, 190, 1) 100%);
+    background: -ms-linear-gradient(left, rgba(190, 190, 190, 1) 0%, rgba(221, 221, 221, 1) 36%, rgba(221, 221, 221, 1) 61%, rgba(190, 190, 190, 1) 100%);
+    background: linear-gradient(to right, rgba(190, 190, 190, 1) 0%, rgba(221, 221, 221, 1) 36%, rgba(221, 221, 221, 1) 61%, rgba(190, 190, 190, 1) 100%);
+    border: 1px solid #aaa;
+}
+
+.ui-state-default {
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+    color: #000 !important;
+    border-radius: 0.1rem;
+}
+
+.ui-state-active,
+.ui-state-default:hover,
+.ui-state-default.ui-state-highlight:hover {
+    color: #fff !important;
+    background: #d68080 !important;
+    border-color: #a34d4d !important;
+}
+
+.ui-state-default.ui-state-highlight {
+    color: #000 !important;
+    background: #ddd !important;
+    border-color: #aaa !important;
+}
+
+.ui-state-hover {
+    cursor: pointer;
+}
+
+.ui-datepicker-month,
+.ui-datepicker-month option,
+.ui-datepicker-year,
+.ui-datepicker-year option {
+    color: #000;
+    background: #fff;
+}

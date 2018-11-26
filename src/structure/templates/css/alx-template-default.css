@@ -1,0 +1,436 @@
+/*******************************************************************
+TEMPLATE - BASIC
+*******************************************************************/
+
+/* HEADING */
+
+.alx-template-basic-page-heading {
+    display: block;
+    height: 10vh;
+    width: 100%;
+}
+
+.alx-template-basic-page-heading:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.alx-template-basic-page-logo {
+    width: 20vw;
+    float: left;
+    height: 10vh;
+    position: relative;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.alx-template-basic-page-logo img {
+    position: absolute;
+    height: 6vh;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.alx-template-basic-group-heading  {
+    text-align: center;
+    margin-bottom: 0.8rem;
+    padding: 0.5rem;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 0.1rem;
+    font-size: 0.8rem;
+}
+
+.alx-template-basic-page-heading-title {
+    position: relative;
+    width: 80vw;
+    height: 10vh;
+    text-align: center;
+    vertical-align: middle;
+    float: right;
+}
+
+.alx-template-basic-page-heading-title h1 {
+    position: relative;
+    left: -10vw;
+    font-weight: lighter;
+    top: 30%;
+    transform: translateY(-50%);
+}
+
+/* TOP NAVIGATION */
+
+.alx-template-basic-page-top-navbar {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 16px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+.alx-template-basic-page-top-navbar ul {
+    margin: 0 auto;
+    display: table;
+    width: 70%;
+    list-style-type: none;
+    height: inherit;
+}
+
+.alx-template-basic-page-top-navbar ul li {
+    display: table-cell;
+    text-align: center;
+    height: inherit;
+    vertical-align: middle;
+}
+
+.alx-template-basic-page-top-navbar ul li a {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    padding: 1vh 2vw;
+    font-weight: bold;
+    width: 100%;
+}
+
+.alx-template-basic-page-top-navbar ul li.alx-page-nav-menu-step-hidden {
+    display: none;
+}
+
+/* MAIN */
+
+.alx-template-basic-page-main {    
+    width: 50%;
+    margin: 0 auto;
+    margin-top: 2vh;
+}
+
+/* FIELDS */
+
+.alx-template-basic-label-wrapper {
+    box-sizing: border-box;
+    padding-right: 1rem;
+    padding-left: 1rem;
+}
+
+.alx-template-basic-label-and-field-wrapper {
+    margin-bottom: 1rem;
+}
+
+/* BOTTOM NAVIGATION */
+
+.alx-template-basic-page-bottom-navbar button {
+    display: inline-block;
+    zoom: 1;
+    line-height: normal;
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 0.5em 2em;
+    border: 1px solid #fff;
+    text-decoration: none;
+    border-radius: 0.2rem;
+}
+
+.alx-template-basic-page-bottom-navbar:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* FORM */
+
+.alx-template-basic-group-description,
+.alx-template-basic-field-description,
+.alx-template-basic-field-helper-text {
+    padding: 0.5rem;
+    margin-bottom: 0.8rem;
+    border-radius: 2px;
+    margin-left: auto;
+    box-sizing: border-box;
+    border-radius: 0.2rem;
+}
+
+.alx-template-basic-field-helper-text {
+    margin-top: 0.5rem;
+}
+
+
+/* MOBILE FRIENDLY QUICK HACK */
+
+
+@media only screen and (max-width: 1200px) {
+    .alx-template-basic-page-main {
+        width: 96%;
+    }
+
+    .alx-form-element {
+        width: 96%;
+    }
+    
+    .pure-u,
+    .pure-u-1,
+    .pure-u-1-1,
+    .pure-u-1-12,
+    .pure-u-1-2,
+    .pure-u-1-24,
+    .pure-u-1-3,
+    .pure-u-1-4,
+    .pure-u-1-5,
+    .pure-u-1-6,
+    .pure-u-1-8,
+    .pure-u-10-24,
+    .pure-u-11-12,
+    .pure-u-11-24,
+    .pure-u-12-24,
+    .pure-u-13-24,
+    .pure-u-14-24,
+    .pure-u-15-24,
+    .pure-u-16-24,
+    .pure-u-17-24,
+    .pure-u-18-24,
+    .pure-u-19-24,
+    .pure-u-2-24,
+    .pure-u-2-3,
+    .pure-u-2-5,
+    .pure-u-20-24,
+    .pure-u-21-24,
+    .pure-u-22-24,
+    .pure-u-23-24,
+    .pure-u-24-24,
+    .pure-u-3-24,
+    .pure-u-3-4,
+    .pure-u-3-5,
+    .pure-u-3-8,
+    .pure-u-4-24,
+    .pure-u-4-5,
+    .pure-u-5-12,
+    .pure-u-5-24,
+    .pure-u-5-5,
+    .pure-u-5-6,
+    .pure-u-5-8,
+    .pure-u-6-24,
+    .pure-u-7-12,
+    .pure-u-7-24,
+    .pure-u-7-8,
+    .pure-u-8-24,
+    .pure-u-9-24 {
+        width: 100%;
+        margin-bottom: 1em;
+    }
+    
+    .chosen-container.chosen-container-single {
+        width: 100%;
+    }
+    
+    .alx-page-nav-button {
+        width: 100%;
+        font-size: 1.2rem;
+    }
+    
+    #alx-heading {
+        width: 90%;
+        margin: 0 auto;
+        height: auto;
+    }
+    
+    #alx-logo {
+        width: 30%;
+        display: none;
+    }
+    
+    #alx-logo img {
+        position: relative;
+        height: 8vh;
+        top: 0;
+        transform: none;
+        display: none;
+    }
+    
+    #alx-heading-inner-title {
+        width: 100%;
+        height: auto;
+    }
+    
+    #alx-heading-inner-title h1 {
+        width: 100%;
+        left: 0;
+    }
+    
+    
+    input[type=checkbox],
+    input[type=radio] {
+        font-size: 2em;
+    }
+    
+    #alx-save-load-button-container {
+        width: 90%;
+    }
+    
+    #alx-save-load-button-container #target_form_logout,
+    #alx-save-load-button-container button {
+        font-size: 0.9rem;
+    }
+    
+    #alx-main-inner-title {
+        font-size: 16px;
+    }
+    
+    label {
+        font-size: 16px;
+    }
+    
+    .pure-form select:focus,
+    .pure-form textarea:focus,
+    .pure-form input:focus {
+        font-size: 16px;
+        background: #eee;
+    }
+    
+    .pure-form input[type=password],
+    .pure-form input[type=email],
+    .pure-form input[type=url],
+    .pure-form input[type=date],
+    .pure-form input[type=month],
+    .pure-form input[type=time],
+    .pure-form input[type=datetime],
+    .pure-form input[type=datetime-local],
+    .pure-form input[type=week],
+    .pure-form input[type=tel],
+    .pure-form input[type=color],
+    .pure-form input[type=number],
+    .pure-form input[type=search],
+    .pure-form input[type=text],
+    .pure-form select,
+    .pure-form textarea {
+        font-size: 16px;
+    }
+
+    .nwc-dialog {
+        width: 90%;
+    }
+
+    .nwc-dialog button {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .alx-form-element {
+        position: relative;
+    }
+
+    .alx-css-checkbox-parent {
+        display: block;
+    }
+
+    .alx-css-checkbox {
+        width: 10%;
+        float: left;
+        height: 40px;
+        display: table;
+    }
+
+    .alx-css-checkbox-label {
+        width: 90%;
+        float: right;
+    }
+
+    .alx-css-checkbox-parent::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    input[type=checkbox] {
+        transform: scale(1.5);
+        margin-top: 7px;
+    }
+
+    .alx-template-basic-page-top-navbar ul {
+        width: 100%;
+    }
+
+    .alx-template-basic-page-top-navbar ul li {
+        border-top: 1px solid #e0e0e0;
+        min-height: 24px;
+        display: block;
+        width: 100%;
+    }
+
+    #alx-save-load-button-container {
+        display: none;
+    }
+
+    .alx-template-basic-page-bottom-navbar button {
+        width: 45%;
+    }
+
+    .alx-checkbox .pure-u,
+    .alx-checkbox .pure-u-1,
+    .alx-checkbox .pure-u-1-1,
+    .alx-checkbox .pure-u-1-12,
+    .alx-checkbox .pure-u-1-2,
+    .alx-checkbox .pure-u-1-24,
+    .alx-checkbox .pure-u-1-3,
+    .alx-checkbox .pure-u-1-4,
+    .alx-checkbox .pure-u-1-5,
+    .alx-checkbox .pure-u-1-6,
+    .alx-checkbox .pure-u-1-8,
+    .alx-checkbox .pure-u-10-24,
+    .alx-checkbox .pure-u-11-12,
+    .alx-checkbox .pure-u-11-24,
+    .alx-checkbox .pure-u-12-24,
+    .alx-checkbox .pure-u-13-24,
+    .alx-checkbox .pure-u-14-24,
+    .alx-checkbox .pure-u-15-24,
+    .alx-checkbox .pure-u-16-24,
+    .alx-checkbox .pure-u-17-24,
+    .alx-checkbox .pure-u-18-24,
+    .alx-checkbox .pure-u-19-24,
+    .alx-checkbox .pure-u-2-24,
+    .alx-checkbox .pure-u-2-3,
+    .alx-checkbox .pure-u-2-5,
+    .alx-checkbox .pure-u-20-24,
+    .alx-checkbox .pure-u-21-24,
+    .alx-checkbox .pure-u-22-24,
+    .alx-checkbox .pure-u-23-24,
+    .alx-checkbox .pure-u-24-24,
+    .alx-checkbox .pure-u-3-24,
+    .alx-checkbox .pure-u-3-4,
+    .alx-checkbox .pure-u-3-5,
+    .alx-checkbox .pure-u-3-8,
+    .alx-checkbox .pure-u-4-24,
+    .alx-checkbox .pure-u-4-5,
+    .alx-checkbox .pure-u-5-12,
+    .alx-checkbox .pure-u-5-24,
+    .alx-checkbox .pure-u-5-5,
+    .alx-checkbox .pure-u-5-6,
+    .alx-checkbox .pure-u-5-8,
+    .alx-checkbox .pure-u-6-24,
+    .alx-checkbox .pure-u-7-12,
+    .alx-checkbox .pure-u-7-24,
+    .alx-checkbox .pure-u-7-8,
+    .alx-checkbox .pure-u-8-24,
+    .alx-checkbox .pure-u-9-24 {
+        width: 50%;
+        margin-bottom: 1em;
+    }
+
+    .alx-checkbox .alx-form-label-wrapper {
+        word-break: break-all;
+    }
+
+    .alx-checkbox .alx-form-input-wrapper {
+        text-align: center;
+    }
+}

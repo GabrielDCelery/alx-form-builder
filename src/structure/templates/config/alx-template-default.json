@@ -1,0 +1,87 @@
+{
+    "classes": {
+        "field": {
+            "field": [
+                "pure-input-1"
+            ],
+            "fieldWrapperDiv": [
+                "pure-u-2-3"
+            ],
+            "label": [],
+            "labelWrapperDiv": [
+                "pure-u-1-3",
+                "alx-template-basic-label-wrapper"
+            ],
+            "labelAndFieldWrapperDiv": [
+                "pure-g",
+                "alx-template-basic-label-and-field-wrapper"
+            ],
+            "helperText": [
+                "pure-u-2-3",
+                "alx-template-basic-field-helper-text"
+            ],
+            "description": [
+                "pure-u-1-1",
+                "alx-template-basic-field-description"
+            ]
+        },
+        "group": {
+            "title": [
+                "pure-u-1-1",
+                "alx-template-basic-group-heading"
+            ],
+            "description": [
+                "pure-u-1-1",
+                "alx-template-basic-group-description"
+            ]
+        },
+        "page": {
+            "heading": {
+                "heading": [
+                    "alx-template-basic-page-heading"
+                ],
+                "logo": [
+                    "alx-template-basic-page-logo"
+                ],
+                "inner": [],
+                "title": [
+                    "alx-template-basic-page-heading-title"
+                ]
+            },
+            "main": {
+                "container": [
+                    "alx-template-basic-page-main"
+                ],
+                "inner": [],
+                "title": [],
+                "form": [
+                    "pure-form"
+                ]
+            },
+            "footer": {
+                "footer": [],
+                "inner": [],
+                "title": []
+            },
+            "saveAndLoadButton": {
+                "container": [],
+                "helperText": []
+            },
+            "navBar": {
+                "top": {
+                    "container": ["alx-template-basic-page-top-navbar"]
+                },
+                "bottom": {
+                    "container": ["alx-template-basic-page-bottom-navbar"]
+                }
+            }
+        },
+        "error": {
+            "backend": {
+                "container": [],
+                "list": [],
+                "listItem": []
+            }
+        }
+    }
+}

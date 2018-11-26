@@ -1,221 +1,148 @@
 'use strict';
 
-const DependencyInjector = require('./DependencyInjector');
-const QuickSelector = require('./QuickSelector');
-const NestedGroupsGenerator = require('./NestedGroupsGenerator');
-const PageDecorator = require('./PageDecorator');
-const GroupDecorator = require('./GroupDecorator');
-const FieldDecorator = require('./FieldDecorator');
-const ElemRelocator = require('./ElemRelocator');
-const Dependencies = require('./Dependencies');
-const Paginator = require('./Paginator');
-const Validator = require('./Validator');
-const FormEvents = require('./FormEvents');
-const InputMask = require('./InputMask');
-const Bugfix = require('./Bugfix');
-const QueryStringEvaluator = require('./QueryStringEvaluator');
-const AjaxRequestsObserver = require('./AjaxRequestsObserver');
+const _ = require('lodash-core');
 
+const DependencyInjector = require('./helpers/DependencyInjector');
+const QuickSelector = require('./helpers/QuickSelector');
+const ElemConstructor = require('./helpers/ElemConstructor');
+const ColourAppender = require('./helpers/ColourAppender');
+
+const FormEvents = require('./FormEvents');
 const FormState = require('./FormState');
-const FieldTypeFactory = require('./stateFactories/FieldTypeFactory');
+const AlxAjaxRequestsProcessor = require('./AlxAjaxRequestsProcessor');
+
+const StructureBuilder = require('./structure/StructureBuilder');
+const StateCoordinator = require('./state/StateCoordinator');
 
 const FORM_CONFIG_LOCATION = 'alx_dynamic_form_config';
 
-const ID_FORM = 'target_form';
-
-const PREFIX_LOOKUP_ID = '_acl_';
-const PREFIX_GROUP = 'alx-group-';
-const POSTFIX_LOOKUP_ID_CHOSEN = '_chosen';
+const ALX_PREFIX_LOOKUP_ID = '_acl_';
 const ALX_CLASS_BACKEND_ERROR = 'errorlist';
+const ALX_ID_API_KEY_FIELD = 'id_api_key';
 
-const DECORATOR_STATE_HIDDEN = 'alx-hidden';
-const DECORATOR_STATE_IGNORE = 'alx-ignore';
-const DECORATOR_LOOKUP_FIELD = 'alx-lookup-field';
+const PREFIX_GROUP = 'alx-group-';
+const PREFIX_FIELD_ID = 'id_';
+
+const DECORATOR_ID_HEADING = 'alx-heading';
+const DECORATOR_ID_HEADING_INNER = 'alx-heading-inner';
+const DECORATOR_ID_HEADING_INNER_TITLE = 'alx-heading-inner-title';
+const DECORATOR_ID_LOGO = 'alx-logo';
+const DECORATOR_ID_MAIN = 'alx-main';
+const DECORATOR_ID_MAIN_INNER = 'alx-main-inner';
+const DECORATOR_ID_MAIN_INNER_TITLE = 'alx-main-inner-title';
+const DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER = 'alx-page-navigation-top-container';
+const DECORATOR_ID_PAGE_NAVIGATION_BOTTOM_CONTAINER = 'alx-page-navigation-bottom-container';
+const DECORATOR_ID_SAVE_AND_LOAD_BUTTON_CONTAINER = 'alx-save-load-button-container';
+const DECORATOR_ID_SAVE_AND_LOAD_BUTTON_HELPER_TEXT = 'alx-save-load-button-helper-text';
+const DECORATOR_ID_FOOTER = 'alx-footer';
+const DECORATOR_ID_FOOTER_INNER = 'alx-footer-inner';
+const DECORATOR_ID_FOOTER_INNER_TITLE = 'alx-footer-inner-text';
+
+const DECORATOR_FORM_FIELD_WRAPPER = 'alx-form-input-wrapper';
+const DECORATOR_FORM_LABEL_WRAPPER = 'alx-form-label-wrapper';
 const DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER = 'alx-form-element';
+const DECORATOR_FORM_FIELD_HELPER_TEXT = 'alx-form-field-helper-text';
+const DECORATOR_FORM_FIELD_DESCRIPTION = 'alx-form-field-description';
+const DECORATOR_FORM_NON_RESIZABLE_TEXTAREA = 'alx-form-non-resizable-textarea';
 
-const IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER = 'alx-page-navigation-top-container';
-const IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER = 'alx-page-navigation-bottom-container';
+const DECORATOR_CLASS_GROUP_TITLE = 'alx-group-title';
+const DECORATOR_CLASS_GROUP_DESCRIPTION = 'alx-group-description';
+const DECORATOR_CLASS_BACKEND_ERROR = 'alx-backend-error';
+const DECORATOR_CLASS_HIDDEN = 'alx-hidden';
+const DECORATOR_CLASS_IGNORE = 'alx-ignore';
+const DECORATOR_CLASS_LOOKUP_FIELD = 'alx-lookup-field';
+
+const DECORATOR_CLASS_INPUT_TYPE_CHECKBOX = 'alx-checkbox';
 
 $(document).ready(() => {
-    if (!window[FORM_CONFIG_LOCATION]) {
-        return;
-    }
+    const config = window[FORM_CONFIG_LOCATION] === 'string' ? JSON.parse(window[FORM_CONFIG_LOCATION]) : window[FORM_CONFIG_LOCATION] || {};
 
-    const config = typeof window[FORM_CONFIG_LOCATION] === 'string' ? JSON.parse(window[FORM_CONFIG_LOCATION]) : window[FORM_CONFIG_LOCATION];
+    const quickSelector = new QuickSelector({
+        DependencyInjector: DependencyInjector,
+        $: $
+    });
+    const elemConstructor = new ElemConstructor({
+        DependencyInjector: DependencyInjector,
+        $: $
+    });
 
-    const dependencyInjector = new DependencyInjector();
-    const quickSelector = new QuickSelector();
-
-    dependencyInjector.setTargetInstance(quickSelector).inject([
-        ['$', $]
-    ]);
-
-    const nestedGroupsGenerator = new NestedGroupsGenerator();
-
-    dependencyInjector.setTargetInstance(nestedGroupsGenerator).inject([
-        ['$', $],
-        ['QUICK_SELECTOR', quickSelector],
-        ['PREFIX_GROUP', PREFIX_GROUP]
-    ]);
-
-    nestedGroupsGenerator.start(config.groups);
-
-    const formEvents = new FormEvents();
-
-    dependencyInjector.setTargetInstance(formEvents).inject([
-        ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['QUICK_SELECTOR', quickSelector]
-    ]);
-
-    formEvents.init();
-
-    const ajaxRequestsObserver = new AjaxRequestsObserver();
-
-    dependencyInjector.setTargetInstance(ajaxRequestsObserver).inject([
-        ['$', $],
-        ['QUICK_SELECTOR', quickSelector],
-        ['FORM_EVENTS', formEvents]
-    ]);
-
-    ajaxRequestsObserver.init();
-
-    const pageDecorator = new PageDecorator(config.globalDecoratorClasses.page);
-
-    dependencyInjector.setTargetInstance(pageDecorator).inject([
-        ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['QUICK_SELECTOR', quickSelector],
-        ['ALX_CLASS_BACKEND_ERROR', ALX_CLASS_BACKEND_ERROR],
-        ['IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER],
-        ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER]
-    ]);
-
-    pageDecorator.start(config.pageDecorators);
-
-    const fieldDecorator = new FieldDecorator(config.globalDecoratorClasses.field).setFieldsToDecorate(nestedGroupsGenerator.getFieldIds());
-
-    dependencyInjector.setTargetInstance(fieldDecorator).inject([
-        ['$', $],
-        ['QUICK_SELECTOR', quickSelector],
-        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD],
-        ['DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER', DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER]
-    ]);
-
-    fieldDecorator.start(config.fieldDecorators);
-
-    const groupDecorator = new GroupDecorator(config.globalDecoratorClasses.group).setGroupsToDecorate(nestedGroupsGenerator.getGroupIds());
-
-    dependencyInjector.setTargetInstance(groupDecorator).inject([
-        ['$', $],
-        ['QUICK_SELECTOR', quickSelector],
-        ['PREFIX_GROUP', PREFIX_GROUP]
-    ]);
-
-    groupDecorator.start(config.groupDecorators);
-
-    const elemRelocator = new ElemRelocator();
-
-    dependencyInjector.setTargetInstance(elemRelocator).inject([
-        ['$', $],
-        ['QUICK_SELECTOR', quickSelector]
-    ]);
-
-    elemRelocator.start(config.elemsToRelocate);
-
-    const dependencies = new Dependencies();
-
-    dependencyInjector.setTargetInstance(dependencies).inject([
-        ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['QUICK_SELECTOR', quickSelector],
-        ['FORM_EVENTS', formEvents],
-        ['PREFIX_GROUP', PREFIX_GROUP],
-        ['DECORATOR_STATE_HIDDEN', DECORATOR_STATE_HIDDEN],
-        ['DECORATOR_STATE_IGNORE', DECORATOR_STATE_IGNORE]
-    ]);
-
-    dependencies.init(config.dependencies);
-
-    const paginator = new Paginator();
-
-    dependencyInjector.setTargetInstance(paginator).inject([
-        ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['QUICK_SELECTOR', quickSelector],
-        ['FORM_EVENTS', formEvents],
-        ['PREFIX_GROUP', PREFIX_GROUP],
-        ['DECORATOR_STATE_HIDDEN', DECORATOR_STATE_HIDDEN],
-        ['IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_TOP_CONTAINER],
-        ['IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER', IDENTIFIER_PAGE_NAVIGATION_BOTTOM_CONTAINER]
-    ]);
-
-    paginator.init(config.pages);
-
-    const validator = new Validator();
-
-    dependencyInjector.setTargetInstance(validator).inject([
-        ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['QUICK_SELECTOR', quickSelector],
-        ['FORM_EVENTS', formEvents],
-        ['DECORATOR_STATE_IGNORE', DECORATOR_STATE_IGNORE],
-        ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
-        ['DECORATOR_LOOKUP_FIELD', DECORATOR_LOOKUP_FIELD],
-        ['ALX_CLASS_BACKEND_ERROR', ALX_CLASS_BACKEND_ERROR],
-        ['DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER', DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER]
-    ]);
-
-    validator.init(config.validation);
-
-    const inputMask = new InputMask();
-
-    dependencyInjector.setTargetInstance(inputMask).inject([
-        ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['QUICK_SELECTOR', quickSelector]
-    ]);
-
-    inputMask.init(config.inputMask);
-
-    const bugfix = new Bugfix();
-
-    dependencyInjector.setTargetInstance(bugfix).inject([
-        ['$', $],
-        ['ID_FORM', ID_FORM],
-        ['QUICK_SELECTOR', quickSelector]
-    ]);
-
-    bugfix.init();
-
-    const queryStringEvaluator = new QueryStringEvaluator(config.queryStringEvaluator);
-
-    dependencyInjector.setTargetInstance(queryStringEvaluator).inject([
-        ['$', $],
-        ['QUICK_SELECTOR', quickSelector],
-        ['FORM_EVENTS', formEvents],
-        ['PREFIX_LOOKUP_ID', PREFIX_LOOKUP_ID],
-        ['POSTFIX_LOOKUP_ID_CHOSEN', POSTFIX_LOOKUP_ID_CHOSEN]
-    ]);
-
-    queryStringEvaluator.process(window.location.href);
-
-    const fieldTypeFactory = new FieldTypeFactory(config.queryStringEvaluator);
-
-    dependencyInjector.setTargetInstance(fieldTypeFactory).inject([
-        ['$', $],
-        ['QUICK_SELECTOR', quickSelector]
-    ]);
-
-    fieldTypeFactory.init();
+    const colourAppender = new ColourAppender(_.get(config, ['styling', 'colours']));
 
     const formState = new FormState();
+    const formEvents = new FormEvents({
+        DependencyInjector: DependencyInjector,
+        $: $,
+        QUICK_SELECTOR: quickSelector,
+        FORM_STATE: formState
+    });
 
-    dependencyInjector.setTargetInstance(formState).inject([
-        ['FIELD_TYPE_FACTORY', fieldTypeFactory]
-    ]);
+    new AlxAjaxRequestsProcessor({
+        DependencyInjector: DependencyInjector,
+        $: $,
+        FORM_EVENTS: formEvents
+    }).init(config.targetGroups);
 
-    formState.init(config);
+    new StructureBuilder({
+        DependencyInjector: DependencyInjector,
+        $: $,
+        QUICK_SELECTOR: quickSelector,
+        FORM_EVENTS: formEvents,
+        COLOUR_APPENDER: colourAppender,
+        ELEM_CONSTRUCTOR: elemConstructor,
+        ALX_CLASS_BACKEND_ERROR: ALX_CLASS_BACKEND_ERROR,
+        ALX_ID_API_KEY_FIELD: ALX_ID_API_KEY_FIELD,
+        PREFIX_GROUP: PREFIX_GROUP,
+        PREFIX_FIELD_ID: PREFIX_FIELD_ID,
+        DECORATOR_ID_HEADING: DECORATOR_ID_HEADING,
+        DECORATOR_ID_HEADING_INNER: DECORATOR_ID_HEADING_INNER,
+        DECORATOR_ID_HEADING_INNER_TITLE: DECORATOR_ID_HEADING_INNER_TITLE,
+        DECORATOR_ID_LOGO: DECORATOR_ID_LOGO,
+        DECORATOR_ID_MAIN: DECORATOR_ID_MAIN,
+        DECORATOR_ID_MAIN_INNER: DECORATOR_ID_MAIN_INNER,
+        DECORATOR_ID_MAIN_INNER_TITLE: DECORATOR_ID_MAIN_INNER_TITLE,
+        DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER: DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER,
+        DECORATOR_ID_PAGE_NAVIGATION_BOTTOM_CONTAINER: DECORATOR_ID_PAGE_NAVIGATION_BOTTOM_CONTAINER,
+        DECORATOR_ID_SAVE_AND_LOAD_BUTTON_CONTAINER: DECORATOR_ID_SAVE_AND_LOAD_BUTTON_CONTAINER,
+        DECORATOR_ID_SAVE_AND_LOAD_BUTTON_HELPER_TEXT: DECORATOR_ID_SAVE_AND_LOAD_BUTTON_HELPER_TEXT,
+        DECORATOR_ID_FOOTER: DECORATOR_ID_FOOTER,
+        DECORATOR_ID_FOOTER_INNER: DECORATOR_ID_FOOTER_INNER,
+        DECORATOR_ID_FOOTER_INNER_TITLE: DECORATOR_ID_FOOTER_INNER_TITLE,
+        DECORATOR_FORM_FIELD_WRAPPER: DECORATOR_FORM_FIELD_WRAPPER,
+        DECORATOR_FORM_LABEL_WRAPPER: DECORATOR_FORM_LABEL_WRAPPER,
+        DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER: DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER,
+        DECORATOR_FORM_FIELD_HELPER_TEXT: DECORATOR_FORM_FIELD_HELPER_TEXT,
+        DECORATOR_FORM_FIELD_DESCRIPTION: DECORATOR_FORM_FIELD_DESCRIPTION,
+        DECORATOR_FORM_NON_RESIZABLE_TEXTAREA: DECORATOR_FORM_NON_RESIZABLE_TEXTAREA,
+        DECORATOR_CLASS_GROUP_TITLE: DECORATOR_CLASS_GROUP_TITLE,
+        DECORATOR_CLASS_GROUP_DESCRIPTION: DECORATOR_CLASS_GROUP_DESCRIPTION,
+        DECORATOR_CLASS_BACKEND_ERROR: DECORATOR_CLASS_BACKEND_ERROR,
+        DECORATOR_CLASS_INPUT_TYPE_CHECKBOX: DECORATOR_CLASS_INPUT_TYPE_CHECKBOX
+    }).build(config.template, config.structure, config.content);
 
-    quickSelector.emptyCache();
+    new StateCoordinator({
+        DependencyInjector: DependencyInjector,
+        $: $,
+        QUICK_SELECTOR: quickSelector,
+        FORM_EVENTS: formEvents,
+        FORM_STATE: formState,
+        COLOUR_APPENDER: colourAppender,
+        ELEM_CONSTRUCTOR: elemConstructor,
+        ALX_CLASS_BACKEND_ERROR: ALX_CLASS_BACKEND_ERROR,
+        ALX_PREFIX_LOOKUP_ID: ALX_PREFIX_LOOKUP_ID,
+        PREFIX_GROUP: PREFIX_GROUP,
+        DECORATOR_CLASS_HIDDEN: DECORATOR_CLASS_HIDDEN,
+        DECORATOR_CLASS_IGNORE: DECORATOR_CLASS_IGNORE,
+        DECORATOR_CLASS_LOOKUP_FIELD: DECORATOR_CLASS_LOOKUP_FIELD,
+        DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER: DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER,
+        DECORATOR_ID_PAGE_NAVIGATION_BOTTOM_CONTAINER: DECORATOR_ID_PAGE_NAVIGATION_BOTTOM_CONTAINER
+    }).init(config.state, config.structure, config.plugins);
+
+    (() => {
+        const viewPortTag = document.createElement('meta');
+
+        viewPortTag.id = 'viewport';
+        viewPortTag.name = 'viewport';
+        viewPortTag.content = 'width=device-width, initial-scale=1';
+        document.getElementsByTagName('head')[0].appendChild(viewPortTag);
+    })();
 });

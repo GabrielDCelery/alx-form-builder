@@ -1,18 +1,29 @@
 'use strict';
 
-const _ = {
-    forEach: require('lodash.foreach')
-};
-
 class FormState {
-    _initFieldTypes (_fieldTypesConfig) {
-        _.forEach(_fieldTypesConfig, (_fieldTypeConfig, _fieldId) => {
-            this.FIELD_TYPE_FACTORY.initField(_fieldId, _fieldTypeConfig.type, _fieldTypeConfig.fieldConfig);
-        });
+    constructor () {
+        this.bInEditMode = false;
+        this.ajaxRequestInProgress = false;
     }
 
-    init (_config) {
-        this._initFieldTypes(_config.fieldTypes);
+    toggleAjaxRequestState (_bNewState) {
+        this.ajaxRequestInProgress = _bNewState;
+    }
+
+    setToEditMode () {
+        this.bInEditMode = true;
+    }
+
+    isAjaxRequestInProgress () {
+        return this.ajaxRequestInProgress;
+    }
+
+    isNewSubmission () {
+        return !this.bInEditMode;
+    }
+
+    isInEditMode () {
+        return this.bInEditMode;
     }
 }
 

@@ -3,6 +3,15 @@
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
+const plugins = process.env.DEV === 'true' ? [] : [
+    new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        test: /\.js($|\?)/i,
+        extractComments: true
+    })
+];
+
 module.exports = {
     entry: path.join(__dirname, '/src/', 'app.js'),
     output: {
@@ -52,14 +61,7 @@ module.exports = {
             }]
         }]
     },
-    plugins: [
-        new UglifyJsPlugin({
-            cache: true,
-            parallel: true,
-            test: /\.js($|\?)/i,
-            extractComments: true
-        })
-    ],
+    plugins: plugins,
     externals: {
         jquery: 'jQuery'
     }
