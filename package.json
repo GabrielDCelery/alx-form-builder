@@ -12,15 +12,9 @@
   },
   "license": "ISC",
   "dependencies": {
-    "inputmask": "^3.3.11",
     "jquery-datepicker": "^1.12.3",
     "jquery-validation": "^1.17.0",
-    "lodash.defaultsdeep": "^4.6.0",
-    "lodash.foreach": "^4.5.0",
-    "lodash.get": "^4.4.2",
-    "lodash.map": "^4.6.0",
-    "lodash.set": "^4.3.2",
-    "lodash.union": "^4.6.0"
+    "lodash-core": "^0.8.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.51",
