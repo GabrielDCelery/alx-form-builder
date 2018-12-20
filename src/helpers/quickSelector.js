@@ -4,9 +4,6 @@ const _ = require('lodash-core');
 
 class QuickSelector {
     constructor (_dependencies) {
-        _dependencies.DependencyInjector.inject(this, _dependencies, [
-            '$'
-        ]);
         this._cached = {};
         this._getElem = this._getElem.bind(this);
         this._getFieldWrapperDiv = this._getFieldWrapperDiv.bind(this);
@@ -32,7 +29,7 @@ class QuickSelector {
     }
 
     _getLabelOfField (_fieldSelector) {
-        return this.$('label', this.getFieldWrapperDiv(_fieldSelector).prev());
+        return $('label', this.getFieldWrapperDiv(_fieldSelector).prev());
     }
 
     _getLabelAndFieldWrapperDiv (_fieldSelector) {
@@ -44,7 +41,7 @@ class QuickSelector {
     }
 
     _getFieldWrapperDiv (_fieldSelector) {
-        let _$fieldWrapperDiv = this.$(_fieldSelector).parent();
+        let _$fieldWrapperDiv = $(_fieldSelector).parent();
 
         if (_$fieldWrapperDiv.parent().hasClass('formfileinput')) {
             _$fieldWrapperDiv = _$fieldWrapperDiv.parent().parent();
@@ -54,7 +51,7 @@ class QuickSelector {
     }
 
     _getElem (_selector) {
-        return this.$(_selector);
+        return $(_selector);
     }
 
     getLabelOfField (_field) {
@@ -79,6 +76,14 @@ class QuickSelector {
 
     getElemsByClass (_class) {
         return this._getElemFromCache('elemsByClass', this.generateClassSelector(_class), this._getElem);
+    }
+
+    getElemsByClasses (_classess) {
+        const _selector = _classess.map(_class => {
+            return this.generateClassSelector(_class);
+        }).join('');
+
+        return this._getElemFromCache('elemsByClasses', _selector, this._getElem);
     }
 
     getElem (_selector) {
@@ -106,4 +111,4 @@ class QuickSelector {
     }
 }
 
-module.exports = QuickSelector;
+module.exports = new QuickSelector();

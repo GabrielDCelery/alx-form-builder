@@ -8,7 +8,6 @@ class FieldContentInjector extends _ContentInjectorInterface {
         _dependencies.DependencyInjector.inject(this, _dependencies, [
             '$',
             'QUICK_SELECTOR',
-            'COLOUR_APPENDER',
             'DECORATOR_FORM_FIELD_HELPER_TEXT',
             'DECORATOR_FORM_FIELD_DESCRIPTION'
         ]);
@@ -45,12 +44,6 @@ class FieldContentInjector extends _ContentInjectorInterface {
 
         _$helperText.addClass(this.DECORATOR_FORM_FIELD_HELPER_TEXT);
 
-        this.COLOUR_APPENDER
-            .setElems(_$helperText)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_COLOUR, this.COLOUR_APPENDER.COLOUR_FIELDS_HELPER_TEXT)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR, this.COLOUR_APPENDER.COLOUR_FIELDS_HELPER_BACKGROUND)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BORDER_COLOUR, this.COLOUR_APPENDER.COLOUR_FIELDS_HELPER_BORDER);
-
         this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_fieldId).append(_$helperText);
 
         return _$helperText;
@@ -64,12 +57,6 @@ class FieldContentInjector extends _ContentInjectorInterface {
         const _$description = this._generateContent(_type, _value, 'p');
 
         _$description.addClass(this.DECORATOR_FORM_FIELD_DESCRIPTION);
-
-        this.COLOUR_APPENDER
-            .setElems(_$description)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_COLOUR, this.COLOUR_APPENDER.COLOUR_FIELDS_HELPER_TEXT)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR, this.COLOUR_APPENDER.COLOUR_FIELDS_HELPER_BACKGROUND)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BORDER_COLOUR, this.COLOUR_APPENDER.COLOUR_FIELDS_HELPER_BORDER);
 
         this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_fieldId).append(_$description);
 

@@ -9,6 +9,7 @@ const Validator = require('./handlers/Validator');
 const Paginator = require('./handlers/Paginator');
 const UniqueIdGenerator = require('./handlers/UniqueIdGenerator');
 const QueryStringEvaluator = require('./handlers/QueryStringEvaluator');
+const HiddenDataSubmitter = require('./handlers/HiddenDataSubmitter');
 
 const LOCAL_DECORATOR_TRIGGER_STATE_CHANGE = 'alx-trigger-state-change';
 const LOCAL_DECORATOR_STATE_CHANGE_DISABLED = 'alx-state-change-disabled';
@@ -29,6 +30,7 @@ class StateCoordinator {
         this.paginator = new Paginator(_dependencies);
         this.uniqueIdGenerator = new UniqueIdGenerator(_dependencies);
         this.queryStringEvaluator = new QueryStringEvaluator(_dependencies);
+        this.hiddenDataSubmitter = new HiddenDataSubmitter(_dependencies);
     }
 
     _toggleFieldAndDependeesDisabledState (_fieldId, _bDisable) {
@@ -176,6 +178,7 @@ class StateCoordinator {
         this.visibilityHandler.setFieldVisibility(_$field, _$fieldWrapper, _state.visible);
         this.readOnlyStateSetter.toggleFieldDisabledState(_$field, _state.readonly);
         this.validator.setFieldValidation(_$field, _state.validation);
+        this.hiddenDataSubmitter.setFieldToAlwaysSubmit(_$field, _state.alwaysSubmit);
 
         _$field.trigger('change');
     }
@@ -191,6 +194,7 @@ class StateCoordinator {
 
         this.visibilityHandler.setGroupVisibility(_$group, _$fieldsInGroup, _state.visible);
         this.readOnlyStateSetter.toggleGroupDisabledState(_$group, _$fieldsInGroup, _state.readonly);
+        this.hiddenDataSubmitter.setGroupToAlwaysSubmit(_$group, _$fieldsInGroup, _state.alwaysSubmit);
 
         _$fieldsInGroup.trigger('change');
     }

@@ -3,9 +3,9 @@
 const _ = require('lodash-core');
 
 const DependencyInjector = require('./helpers/DependencyInjector');
-const QuickSelector = require('./helpers/QuickSelector');
+const quickSelector = require('./helpers/quickSelector');
 const ElemConstructor = require('./helpers/ElemConstructor');
-const ColourAppender = require('./helpers/ColourAppender');
+const colourAppender = require('./helpers/colourAppender');
 
 const FormEvents = require('./FormEvents');
 const FormState = require('./FormState');
@@ -57,16 +57,12 @@ const DECORATOR_CLASS_INPUT_TYPE_CHECKBOX = 'alx-checkbox';
 $(document).ready(() => {
     const config = window[FORM_CONFIG_LOCATION] === 'string' ? JSON.parse(window[FORM_CONFIG_LOCATION]) : window[FORM_CONFIG_LOCATION] || {};
 
-    const quickSelector = new QuickSelector({
-        DependencyInjector: DependencyInjector,
-        $: $
-    });
     const elemConstructor = new ElemConstructor({
         DependencyInjector: DependencyInjector,
         $: $
     });
 
-    const colourAppender = new ColourAppender(_.get(config, ['styling', 'colours']));
+    colourAppender.appendConfig(_.get(config, ['styling', 'colours']));
 
     const formState = new FormState();
     const formEvents = new FormEvents({
@@ -125,7 +121,6 @@ $(document).ready(() => {
         QUICK_SELECTOR: quickSelector,
         FORM_EVENTS: formEvents,
         FORM_STATE: formState,
-        COLOUR_APPENDER: colourAppender,
         ELEM_CONSTRUCTOR: elemConstructor,
         ALX_CLASS_BACKEND_ERROR: ALX_CLASS_BACKEND_ERROR,
         ALX_PREFIX_LOOKUP_ID: ALX_PREFIX_LOOKUP_ID,

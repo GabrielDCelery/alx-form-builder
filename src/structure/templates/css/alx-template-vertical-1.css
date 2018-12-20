@@ -1,0 +1,102 @@
+/*******************************************************************
+TEMPLATE - VERTICAL 1
+*******************************************************************/
+
+/* GENERAL */
+
+.alx-template-vertical1-html,
+.alx-template-vertical1-body {
+    height: 100%;
+}
+
+/* HEADING */
+
+.alx-template-vertical1-page-heading {
+    width: 85%;
+    margin: 0 auto;
+    float: right;
+    position: relative;
+    height: 10vh;
+}
+
+.alx-template-vertical1-page-heading #alx-heading-inner-title {
+    text-align: center;
+    padding-top: 2vh;
+}
+
+.alx-template-vertical1-page-logo {
+    width: 20vw;
+    height: 8vh;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.alx-template-vertical1-page-logo img {
+    position: absolute;
+    right: 3vw;
+    /*height: 10vh;*/
+    max-width: 100%;
+    max-height: 100%;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+}
+
+/* TOP NAVIGATION */
+
+.alx-template-vertical1-page-top-navbar {
+    width: 15%;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 16px;
+    box-shadow: 3px 0 3px 0 #aaa;
+    float: left;
+    height:100%;
+}
+
+.alx-template-vertical1-page-top-navbar ul {
+    margin: 0 auto;
+    width: 100%;
+    list-style-type: none;
+    margin-top: 30px;
+}
+
+.alx-template-vertical1-page-top-navbar ul li {
+    text-align: center;
+    width: 100%;
+    border-bottom: 1px solid;
+    position: relative;
+}
+
+.alx-template-vertical1-page-top-navbar ul li:first-child {
+    border-top: 1px solid;
+}
+
+.alx-template-vertical1-page-top-navbar ul li a {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    padding: 1vh 2vw;
+    font-weight: bold;
+    width: 100%;
+}
+
+.alx-template-vertical1-page-top-navbar ul li.alx-page-nav-menu-step-hidden {
+    display: none;
+}
+
+/* MAIN */
+
+.alx-template-vertical1-page-main {
+    width: 85%;
+    margin: 0 auto;
+    margin-top: 2vh;
+    float: right;
+}
+
+
+.alx-template-vertical1-page-main #alx-main-inner {
+    width: 70%;
+    margin: 0 auto;
+}

@@ -85,7 +85,7 @@ form {
 #alx-save-load-button-container button {
     font-size: 0.6rem;
     background-color: #fff;
-    border: 1px solid #fff;
+    border: 1px solid;
     border-radius: 0.2rem;
     padding: 0.5em 2em;
     margin-right: 0.5em;
@@ -100,7 +100,8 @@ form {
     border-color: #e9322d !important;
 }
 
-.alx-form-input-wrapper label.error {
+.alx-form-input-wrapper label.error,
+.alx-backend-error .errorlist {
     display: block;
     padding: 0.5em 0.6em 0.5em;
     font-size: 75%;

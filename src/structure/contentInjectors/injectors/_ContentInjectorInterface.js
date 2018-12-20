@@ -1,15 +1,16 @@
 'use strict';
 
 const _ = require('lodash-core');
+const labeler = require('../../../helpers/labeler');
 
 class _ContentInjectorInterface {
     _generateContent (_type, _value, _plainTextWrapper) {
         if (_type === 'text') {
-            return this.$(`<${_plainTextWrapper}>${_value}</${_plainTextWrapper}>`);
+            return this.$(`<${_plainTextWrapper}>${_value}</${_plainTextWrapper}>`).addClass(labeler.get('CLASS_INJECTED_CONTENT_TEXT'));
         }
 
         if (_type === 'html') {
-            return this.$(_value);
+            return this.$(_value).addClass(labeler.get('CLASS_INJECTED_CONTENT_HTML'));
         }
 
         if (_type === 'img') {

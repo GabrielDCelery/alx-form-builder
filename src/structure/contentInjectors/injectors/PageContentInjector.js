@@ -1,14 +1,14 @@
 'use strict';
 
+const _ = require('lodash-core');
 const _ContentInjectorInterface = require('./_ContentInjectorInterface');
+const labeler = require('../../../helpers/labeler');
 
 class ContentInjector extends _ContentInjectorInterface {
     constructor (_dependencies) {
         super();
         _dependencies.DependencyInjector.inject(this, _dependencies, [
-            '$',
             'QUICK_SELECTOR',
-            'COLOUR_APPENDER',
             'ELEM_CONSTRUCTOR',
             'DECORATOR_ID_HEADING',
             'DECORATOR_ID_HEADING_INNER',
@@ -25,6 +25,8 @@ class ContentInjector extends _ContentInjectorInterface {
             'DECORATOR_ID_FOOTER_INNER',
             'DECORATOR_ID_FOOTER_INNER_TITLE'
         ]);
+
+        _.set(window, ['alx', 'pageContentInjector', 'injectLogo'], this.injectLogo.bind(this));
     }
 
     injectHeading (_logo = '', _title = '') {
@@ -34,23 +36,30 @@ class ContentInjector extends _ContentInjectorInterface {
 
         const _$heading = this.ELEM_CONSTRUCTOR.createWrapperDiv(this.DECORATOR_ID_HEADING);
         const _$headingInner = this.ELEM_CONSTRUCTOR.createWrapperDiv(this.DECORATOR_ID_HEADING_INNER);
-        const _$logo = this.ELEM_CONSTRUCTOR.createElem(ContentInjector._isValidContent(_logo) ? 'img' : null, _logo);
         const _$logoWrapper = this.ELEM_CONSTRUCTOR.createWrapperDiv(this.DECORATOR_ID_LOGO);
         const _$headingTitle = this.ELEM_CONSTRUCTOR.createElem('text', _title, 'h1');
         const _$headingTitleWrapper = this.ELEM_CONSTRUCTOR.createWrapperDiv(this.DECORATOR_ID_HEADING_INNER_TITLE);
 
-        this.COLOUR_APPENDER
-            .setElems(_$headingTitle)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_COLOUR, this.COLOUR_APPENDER.COLOUR_PAGE_TITLE);
-
-        _$logoWrapper.append(_$logo);
         _$headingTitleWrapper.append(_$headingTitle);
         _$headingInner.append(_$logoWrapper).append(_$headingTitleWrapper);
         _$heading.append(_$headingInner);
 
         this.QUICK_SELECTOR.getBody().prepend(_$heading);
+        this.injectLogo(_logo);
 
         return _$heading;
+    }
+
+    injectLogo (_logo = '') {
+        const _$logoWrapper = this.QUICK_SELECTOR.getElemById(this.DECORATOR_ID_LOGO);
+
+        _$logoWrapper.empty();
+
+        const _$logo = this.ELEM_CONSTRUCTOR.createElem(ContentInjector._isValidContent(_logo) ? 'img' : null, _logo);
+
+        _$logoWrapper.append(_$logo);
+
+        return _$logo;
     }
 
     injectMain (_title = '') {
@@ -99,20 +108,13 @@ class ContentInjector extends _ContentInjectorInterface {
     }
 
     moveButtons () {
-        const _$saveAndLoadButtons = this.$('button[type="button"]');
-        const _$logoutButton = this.$('#target_form_logout');
-
-        this.COLOUR_APPENDER
-            .setElems(_$saveAndLoadButtons)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_COLOUR, this.COLOUR_APPENDER.COLOUR_CONTROLLERS_BUTTON_TEXT)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BORDER_COLOUR, this.COLOUR_APPENDER.COLOUR_CONTROLLERS_BUTTON_BORDER)
-            .setElems(_$logoutButton)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_COLOUR, this.COLOUR_APPENDER.COLOUR_CONTROLLERS_BUTTON_TEXT)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BORDER_COLOUR, this.COLOUR_APPENDER.COLOUR_CONTROLLERS_BUTTON_BORDER);
+        const _$saveAndLoadButtons = $('button[type="button"]').addClass(labeler.get('CLASS_BUTTON_SAVE_LOAD'));
+        const _$logoutButton = $('#target_form_logout').addClass(labeler.get('CLASS_BUTTON_LOGOUT'));
 
         this.QUICK_SELECTOR.getElemById(this.DECORATOR_ID_SAVE_AND_LOAD_BUTTON_CONTAINER).prepend(_$logoutButton);
         this.QUICK_SELECTOR.getElemById(this.DECORATOR_ID_SAVE_AND_LOAD_BUTTON_CONTAINER).prepend(_$saveAndLoadButtons);
-        this.$('#target_form_submit').remove();
+
+        $('#target_form_submit').remove();
     }
 }
 

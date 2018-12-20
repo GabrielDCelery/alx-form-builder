@@ -27,6 +27,10 @@ const DEFAULT_SINGLE_GROUP_CONFIG = {
     description: {
         type: null,
         value: null
+    },
+    descriptionAfter: {
+        type: null,
+        value: null
     }
 };
 
@@ -48,7 +52,8 @@ class StructureBuilder {
         _dependencies.DependencyInjector.inject(this, _dependencies, [
             'FORM_EVENTS',
             'QUICK_SELECTOR',
-            'DECORATOR_CLASS_INPUT_TYPE_CHECKBOX'
+            'DECORATOR_CLASS_INPUT_TYPE_CHECKBOX',
+            'DECORATOR_CLASS_BACKEND_ERROR'
         ]);
 
         this.nestedGroupsGenerator = new NestedGroupsGenerator(_dependencies);
@@ -151,7 +156,9 @@ class StructureBuilder {
 
             const _heading = StructureBuilder._normalizeContentInjectionConfig(_config.heading);
             const _description = StructureBuilder._normalizeContentInjectionConfig(_config.description);
+            const _descriptionAfter = StructureBuilder._normalizeContentInjectionConfig(_config.descriptionAfter);
 
+            _groupContentInjector.injectDescriptionAfter(_groupId, _descriptionAfter.type, _descriptionAfter.value);
             _groupContentInjector.injectDescription(_groupId, _description.type, _description.value);
             _groupContentInjector.injectTitle(_groupId, _heading.type, _heading.value);
         });
@@ -199,6 +206,7 @@ class StructureBuilder {
         this._doSingleFieldModifications();
 
         this.templateAppender
+            .decorateBodyAndHtml()
             .decorateFormWithClasses()
             .decorateHeadingWithClasses()
             .decorateHelperTextsWithClasses()
@@ -209,6 +217,8 @@ class StructureBuilder {
             .decorateNavBarsWithClasses();
 
         this._initGlobalEventListeners();
+
+        this.QUICK_SELECTOR.getForm().removeClass(this.DECORATOR_CLASS_BACKEND_ERROR); // Fix for backend error
     }
 
     static _normalizeContentInjectionConfig (_config) {

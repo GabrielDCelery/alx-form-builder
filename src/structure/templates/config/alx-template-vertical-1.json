@@ -2,10 +2,10 @@
     "classes": {
         "general": {
             "html": [
-                "alx-template-default-html"
+                "alx-template-vertical1-html"
             ],
             "body": [
-                "alx-template-default-body"
+                "alx-template-vertical1-body"
             ]
         },
         "field": {
@@ -46,19 +46,17 @@
         "page": {
             "heading": {
                 "heading": [
-                    "alx-template-default-page-heading"
+                    "alx-template-vertical1-page-heading"
                 ],
                 "logo": [
-                    "alx-template-default-page-logo"
+                    "alx-template-vertical1-page-logo"
                 ],
                 "inner": [],
-                "title": [
-                    "alx-template-default-page-heading-title"
-                ]
+                "title": []
             },
             "main": {
                 "container": [
-                    "alx-template-default-page-main"
+                    "alx-template-vertical1-page-main"
                 ],
                 "inner": [],
                 "title": [],
@@ -78,7 +76,7 @@
             "navBar": {
                 "top": {
                     "container": [
-                        "alx-template-default-page-top-navbar"
+                        "alx-template-vertical1-page-top-navbar"
                     ]
                 },
                 "bottom": {

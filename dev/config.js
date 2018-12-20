@@ -1,14 +1,24 @@
 window.alx_dynamic_form_config = {
+    global: {
+        coloursEnabled: true
+    },
     targetGroups: {
         parent: 8,
         children: []
     },
-    template: 'default',
+    template: 'vertical1',
     styling: {
         colours: {
             simple: {
-                primary: '#fff8ff',
-                secondary: '#10069f'
+                primary: '#10069f',
+                secondary: '#fff8ff'
+            },
+            detailed: {
+                navigation: {
+                    buttons: {
+                        border: '#aaa'
+                    }
+                }
             }
         }
     },
@@ -268,7 +278,7 @@ window.alx_dynamic_form_config = {
     },
     content: {
         page: {
-            logo: "https://www.rolls-royce.com/~/media/Images/R/Rolls-Royce/logo/rebrand-svg-logo.svg?h=96&la=en&w=59",
+            logo: "https://vignette.wikia.nocookie.net/logopedia/images/9/9a/TMobile.png/revision/latest?cb=20121115030133",
             title: "Engine Warranty Intake Form"
         },
         multiple: {

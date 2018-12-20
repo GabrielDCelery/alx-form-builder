@@ -31,6 +31,9 @@ class FormEvents {
         this.$form = this.QUICK_SELECTOR.getForm();
 
         this._initEventListeners();
+
+        _.set(window, ['alx', 'formEvents', 'registerToFormEvent'], this.registerToFormEvent.bind(this));
+        _.set(window, ['alx', 'formEvents', 'getFormEventNames'], this.getFormEventNames.bind(this));
     }
 
     _initEventListeners () {
@@ -121,6 +124,28 @@ class FormEvents {
                 return _methodToExecute.apply(undefined, arguments);
             }, 0);
         });
+    }
+
+    getFormEventNames () {
+        return {
+            EVENT_STATE_CHANGED: this.EVENT_STATE_CHANGED,
+            EVENT_PAGINATION_CHANGED: this.EVENT_PAGINATION_CHANGED,
+            EVENT_CHANGE_PAGINATION: this.EVENT_CHANGE_PAGINATION,
+            EVENT_VALIDATE_FIELD: this.EVENT_VALIDATE_FIELD,
+            EVENT_VALIDATE_TARGET_GROUP_FIELDS: this.EVENT_VALIDATE_TARGET_GROUP_FIELDS,
+            EVENT_VALIDATE_FORM: this.EVENT_VALIDATE_FORM,
+            EVENT_FORM_VALIDATED: this.EVENT_FORM_VALIDATED,
+            EVENT_SUBMIT_FORM: this.EVENT_SUBMIT_FORM,
+            EVENT_MOVE_TO_ELEM_PAGE: this.EVENT_MOVE_TO_ELEM_PAGE,
+            EVENT_BACKEND_ERRORED: this.EVENT_BACKEND_ERRORED,
+            EVENT_AJAX_FETCHING_TARGET_DETAILS: this.EVENT_AJAX_FETCHING_TARGET_DETAILS,
+            EVENT_AJAX_TARGET_DETAILS_FETCHED: this.EVENT_AJAX_TARGET_DETAILS_FETCHED,
+            EVENT_AJAX_FETCHING_TARGET_LIST: this.EVENT_AJAX_FETCHING_TARGET_LIST,
+            EVENT_AJAX_TARGET_LIST_FETCHED: this.EVENT_AJAX_TARGET_LIST_FETCHED,
+            EVENT_SYNC_LOOKUP_FIELD: this.EVENT_SYNC_LOOKUP_FIELD,
+            EVENT_SWITCHED_TO_EDITMODE: this.EVENT_SWITCHED_TO_EDITMODE,
+            EVENT_CHANGE_FIELD_TYPE: this.EVENT_CHANGE_FIELD_TYPE
+        };
     }
 
     trigger (_formEventName, _variables) {

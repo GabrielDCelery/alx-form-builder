@@ -1,4 +1,10 @@
 .alx-required,
 :required {
-    background-color: #ffffe7 !important;
+    border-left: 3px solid !important;
+    /*background-color: #ffffe7 !important;*/
+}
+
+input[type=file].alx-required,
+input[type=file]:required {
+    border-left: 0px !important;
 }

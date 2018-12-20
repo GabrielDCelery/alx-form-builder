@@ -2,10 +2,11 @@
 
 require('./Paginator.scss');
 
+const labeler = require('../../helpers/labeler');
+
 const LOCAL_DECORATOR_CLASS_TRIGGER_MOVE_TO_PAGE = 'alx-trigger-move-to-page';
 const LOCAL_DECORATOR_CLASS_PAGE = 'alx-page';
 const LOCAL_DECORATOR_CLASS_ACTIVE_PAGE = 'alx-page-active';
-const LOCAL_DECORATOR_CLASS_PAGE_NAV_BUTTON = 'alx-page-nav-button';
 const LOCAL_DECORATOR_CLASS_PAGE_NAV_NEXT_BUTTON = 'alx-page-nav-button-next';
 const LOCAL_DECORATOR_CLASS_PAGE_NAV_PREVIOUS_BUTTON = 'alx-page-nav-button-previous';
 const LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU = 'alx-page-nav-menu';
@@ -26,7 +27,6 @@ class Paginator {
     constructor (_dependencies) {
         _dependencies.DependencyInjector.inject(this, _dependencies, [
             '$',
-            'COLOUR_APPENDER',
             'ELEM_CONSTRUCTOR',
             'PREFIX_GROUP',
             'QUICK_SELECTOR',
@@ -88,25 +88,16 @@ class Paginator {
         const _$button = this.ELEM_CONSTRUCTOR.createElem('text', _label, 'button')
             .addClass(LOCAL_DECORATOR_CLASS_TRIGGER_MOVE_TO_PAGE)
             .addClass(_customClasses.join(' '))
+            .addClass(labeler.get('CLASS_PAGE_NAV_BUTTON'))
             .data(LOCAL_DATA_PAGE_ID, _pageId);
-        this.COLOUR_APPENDER
-            .setElems(_$button)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR, this.COLOUR_APPENDER.COLOUR_NAVIGATION_BUTTON_BACKGROUND)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_COLOUR, this.COLOUR_APPENDER.COLOUR_NAVIGATION_BUTTON_TEXT)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BORDER_COLOUR, this.COLOUR_APPENDER.COLOUR_NAVIGATION_BUTTON_BORDER);
 
         return _$button;
     }
 
     _generateSubmitButton () {
         const _$submitButton = this.ELEM_CONSTRUCTOR.createElem('text', 'Submit', 'button')
-            .addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_BUTTON)
-            .addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_NEXT_BUTTON);
-        this.COLOUR_APPENDER
-            .setElems(_$submitButton)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR, this.COLOUR_APPENDER.COLOUR_NAVIGATION_BUTTON_BACKGROUND)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_COLOUR, this.COLOUR_APPENDER.COLOUR_NAVIGATION_BUTTON_TEXT)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BORDER_COLOUR, this.COLOUR_APPENDER.COLOUR_NAVIGATION_BUTTON_BORDER);
+            .addClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_NEXT_BUTTON)
+            .addClass(labeler.get('CLASS_PAGE_NAV_BUTTON'));
 
         _$submitButton.on('click', _event => {
             _event.preventDefault();
@@ -127,7 +118,7 @@ class Paginator {
         }
 
         return this._generateNavButton('Previous', _validPageId, [
-            LOCAL_DECORATOR_CLASS_PAGE_NAV_BUTTON,
+            labeler.get('CLASS_PAGE_NAV_BUTTON'),
             LOCAL_DECORATOR_CLASS_PAGE_NAV_PREVIOUS_BUTTON
         ]);
     }
@@ -142,7 +133,7 @@ class Paginator {
         }
 
         return this._generateNavButton('Next', _validPageId, [
-            LOCAL_DECORATOR_CLASS_PAGE_NAV_BUTTON,
+            labeler.get('CLASS_PAGE_NAV_BUTTON'),
             LOCAL_DECORATOR_CLASS_PAGE_NAV_NEXT_BUTTON
         ]);
     }
@@ -159,19 +150,12 @@ class Paginator {
                 .attr('href', '#')
                 .data(LOCAL_DATA_PAGE_ID, _$page.attr('id'));
 
-            this.COLOUR_APPENDER
-                .setElems(_$a)
-                .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_COLOUR, this.COLOUR_APPENDER.COLOR_PRIMARY);
-
             _$li.append(_$a);
             _$ul.append(_$li);
         });
 
         const _$topNavBar = this.QUICK_SELECTOR.getElemById(this.DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER);
 
-        this.COLOUR_APPENDER
-            .setElems(_$topNavBar)
-            .appendColourToElems(this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR, this.COLOUR_APPENDER.COLOUR_NAVIGATION_TAB_BACKGROUND);
         _$topNavBar.append(_$ul);
     }
 
@@ -190,25 +174,14 @@ class Paginator {
                 _lastPageIndex = _index - 1;
             }
 
-            _$navBarButton.toggleClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_HIDDEN, _$page.hasClass(this.DECORATOR_CLASS_HIDDEN));
-
             const _bIsActivePage = _index === _activePageIndex;
+
+            _$navBarButton.toggleClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_HIDDEN, _$page.hasClass(this.DECORATOR_CLASS_HIDDEN));
+            _$navBarButton.toggleClass(labeler.get('CLASS_STATE_ACTIVE'), _bIsActivePage);
+
             const _$navBarText = _$navBarButton.find('a');
 
             _$navBarText[_animation](this._animationConfig);
-
-            this.COLOUR_APPENDER
-                .setElems(_$navBarButton)
-                .appendColourToElems(
-                    this.COLOUR_APPENDER.PROPERTY_BACKGROUND_COLOUR,
-                    _bIsActivePage ? this.COLOUR_APPENDER.COLOUR_NAVIGATION_TAB_BACKGROUND_ACTIVE : this.COLOUR_APPENDER.COLOUR_NAVIGATION_TAB_BACKGROUND
-                );
-            this.COLOUR_APPENDER
-                .setElems(_$navBarText)
-                .appendColourToElems(
-                    this.COLOUR_APPENDER.PROPERTY_COLOUR,
-                    _bIsActivePage ? this.COLOUR_APPENDER.COLOUR_NAVIGATION_TAB_TEXT_ACTIVE : this.COLOUR_APPENDER.COLOUR_NAVIGATION_TAB_TEXT
-                );
             _$navBarButton.toggleClass(LOCAL_DECORATOR_CLASS_PAGE_NAV_MENU_STEP_ACTIVE, _bIsActivePage);
         });
 

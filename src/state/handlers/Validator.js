@@ -112,6 +112,8 @@ class Validator {
     }
 
     _initFieldValidation (_$field, _config) {
+        _$field.data(LOCAL_DECORATOR_DATA_OLD_VALUE, _$field.val());
+
         if (_.isNil(_config)) {
             return;
         }
@@ -139,12 +141,16 @@ class Validator {
             return;
         }
 
-        this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_$field.attr('id'))
-            .find(`.${this.ALX_CLASS_BACKEND_ERROR}`)
-            .parent()
-            .remove();
+        const _bIsValid = _$field.valid();
 
-        return _$field.valid();
+        if (_bIsValid) {
+            this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_$field.attr('id'))
+                .find(`.${this.ALX_CLASS_BACKEND_ERROR}`)
+                .parent()
+                .remove();
+        }
+
+        return _bIsValid;
     }
 
     _validateForm (_bForSubmission) {

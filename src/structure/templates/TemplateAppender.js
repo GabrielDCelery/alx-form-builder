@@ -5,9 +5,11 @@ require('./css/pure.css');
 require('./css/datepicker.css');
 require('./css/alx-general.css');
 require('./css/alx-template-default.css');
+require('./css/alx-template-vertical-1.css');
 
 const TEMPLATES = {
-    default: require('./config/alx-template-default.json')
+    default: require('./config/alx-template-default.json'),
+    vertical1: require('./config/alx-template-vertical-1.json')
 };
 
 class TemplateAppender {
@@ -65,11 +67,17 @@ class TemplateAppender {
         return this;
     }
 
+    decorateBodyAndHtml () {
+        this._decorateElemsWithClasses($('html'), this.template.classes.general.html);
+        this._decorateElemsWithClasses($('body'), this.template.classes.general.body);
+
+        return this;
+    }
+
     decorateFieldWithClasses (_fieldId) {
         this._decorateElemsWithClasses(this.QUICK_SELECTOR.getFieldWrapperDiv(_fieldId), this.DECORATOR_FORM_FIELD_WRAPPER);
         this._decorateElemsWithClasses(this.QUICK_SELECTOR.getLabelWrapperDivOfField(_fieldId), this.DECORATOR_FORM_LABEL_WRAPPER);
         this._decorateElemsWithClasses(this.QUICK_SELECTOR.getLabelAndFieldWrapperDiv(_fieldId), this.DECORATOR_FORM_LABEL_AND_FIELD_WRAPPER);
-
         this._decorateElemsWithClasses(this.QUICK_SELECTOR.getElemById(_fieldId), this.template.classes.field.field);
         this._decorateElemsWithClasses(this.QUICK_SELECTOR.getFieldWrapperDiv(_fieldId), this.template.classes.field.fieldWrapperDiv);
         this._decorateElemsWithClasses(this.QUICK_SELECTOR.getLabelOfField(_fieldId), this.template.classes.field.label);

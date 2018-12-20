@@ -4,36 +4,30 @@ TEMPLATE - BASIC
 
 /* HEADING */
 
-.alx-template-basic-page-heading {
+.alx-template-default-page-heading {
     display: block;
     height: 10vh;
     width: 100%;
-}
-
-.alx-template-basic-page-heading:after {
-    content: "";
-    display: table;
-    clear: both;
-}
-
-.alx-template-basic-page-logo {
-    width: 20vw;
-    float: left;
-    height: 10vh;
     position: relative;
-    text-align: center;
-    vertical-align: middle;
+    margin-top: 0.5vh;
+    margin-bottom: 0.5vh;
 }
 
-.alx-template-basic-page-logo img {
+.alx-template-default-page-logo {
+    width: 20vw;
+    height: 10vh;
     position: absolute;
-    height: 6vh;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
-.alx-template-basic-group-heading  {
+.alx-template-default-page-logo img {
+    position: absolute;
+    left: 3vw;
+    height: 10vh;
+    padding-top: 2.5vh;
+    padding-bottom: 2.5vh;
+}
+
+.alx-template-default-group-heading {
     text-align: center;
     margin-bottom: 0.8rem;
     padding: 0.5rem;
@@ -42,26 +36,27 @@ TEMPLATE - BASIC
     font-size: 0.8rem;
 }
 
-.alx-template-basic-page-heading-title {
+.alx-template-default-page-heading-title {
     position: relative;
-    width: 80vw;
+    width: 100%;
     height: 10vh;
     text-align: center;
     vertical-align: middle;
-    float: right;
 }
 
-.alx-template-basic-page-heading-title h1 {
+.alx-template-default-page-heading-title h1 {
+    width: 50%;
+    margin: 0 auto;
     position: relative;
-    left: -10vw;
     font-weight: lighter;
-    top: 30%;
+    top: 50%;
     transform: translateY(-50%);
+    font-size: 1.7em;
 }
 
 /* TOP NAVIGATION */
 
-.alx-template-basic-page-top-navbar {
+.alx-template-default-page-top-navbar {
     width: 100%;
     margin: 0;
     padding: 0;
@@ -70,7 +65,7 @@ TEMPLATE - BASIC
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 }
 
-.alx-template-basic-page-top-navbar ul {
+.alx-template-default-page-top-navbar ul {
     margin: 0 auto;
     display: table;
     width: 70%;
@@ -78,14 +73,14 @@ TEMPLATE - BASIC
     height: inherit;
 }
 
-.alx-template-basic-page-top-navbar ul li {
+.alx-template-default-page-top-navbar ul li {
     display: table-cell;
     text-align: center;
     height: inherit;
     vertical-align: middle;
 }
 
-.alx-template-basic-page-top-navbar ul li a {
+.alx-template-default-page-top-navbar ul li a {
     display: inline-block;
     text-align: center;
     text-decoration: none;
@@ -94,13 +89,13 @@ TEMPLATE - BASIC
     width: 100%;
 }
 
-.alx-template-basic-page-top-navbar ul li.alx-page-nav-menu-step-hidden {
+.alx-template-default-page-top-navbar ul li.alx-page-nav-menu-step-hidden {
     display: none;
 }
 
 /* MAIN */
 
-.alx-template-basic-page-main {    
+.alx-template-default-page-main {
     width: 50%;
     margin: 0 auto;
     margin-top: 2vh;
@@ -108,19 +103,19 @@ TEMPLATE - BASIC
 
 /* FIELDS */
 
-.alx-template-basic-label-wrapper {
+.alx-template-default-label-wrapper {
     box-sizing: border-box;
     padding-right: 1rem;
     padding-left: 1rem;
 }
 
-.alx-template-basic-label-and-field-wrapper {
+.alx-template-default-label-and-field-wrapper {
     margin-bottom: 1rem;
 }
 
 /* BOTTOM NAVIGATION */
 
-.alx-template-basic-page-bottom-navbar button {
+.alx-template-default-page-bottom-navbar button {
     display: inline-block;
     zoom: 1;
     line-height: normal;
@@ -142,7 +137,7 @@ TEMPLATE - BASIC
     border-radius: 0.2rem;
 }
 
-.alx-template-basic-page-bottom-navbar:after {
+.alx-template-default-page-bottom-navbar:after {
     content: "";
     display: table;
     clear: both;
@@ -150,9 +145,9 @@ TEMPLATE - BASIC
 
 /* FORM */
 
-.alx-template-basic-group-description,
-.alx-template-basic-field-description,
-.alx-template-basic-field-helper-text {
+.alx-template-default-group-description,
+.alx-template-default-field-description,
+.alx-template-default-field-helper-text {
     padding: 0.5rem;
     margin-bottom: 0.8rem;
     border-radius: 2px;
@@ -161,23 +156,35 @@ TEMPLATE - BASIC
     border-radius: 0.2rem;
 }
 
-.alx-template-basic-field-helper-text {
+.alx-template-default-field-helper-text {
     margin-top: 0.5rem;
 }
 
-
 /* MOBILE FRIENDLY QUICK HACK */
 
-
-@media only screen and (max-width: 1200px) {
-    .alx-template-basic-page-main {
-        width: 96%;
+@media only screen and (min-width: 1201px) and (max-width: 1366px) {
+    .alx-template-default-page-main {
+        width: 70%;
     }
 
+    .alx-template-default-page-heading-title h1 {
+        font-size: 1.5em;
+    }
+    
+}
+
+@media only screen and (max-width: 1200px) {
+    .alx-template-default-page-main {
+        width: 96%;
+    }
     .alx-form-element {
         width: 96%;
     }
-    
+
+    .alx-template-default-page-heading-title h1 {
+        font-size: 1em;
+    }
+
     .pure-u,
     .pure-u-1,
     .pure-u-1-1,
@@ -228,27 +235,22 @@ TEMPLATE - BASIC
         width: 100%;
         margin-bottom: 1em;
     }
-    
     .chosen-container.chosen-container-single {
         width: 100%;
     }
-    
     .alx-page-nav-button {
         width: 100%;
         font-size: 1.2rem;
     }
-    
     #alx-heading {
         width: 90%;
         margin: 0 auto;
         height: auto;
     }
-    
     #alx-logo {
         width: 30%;
         display: none;
     }
-    
     #alx-logo img {
         position: relative;
         height: 8vh;
@@ -256,47 +258,30 @@ TEMPLATE - BASIC
         transform: none;
         display: none;
     }
-    
-    #alx-heading-inner-title {
-        width: 100%;
-        height: auto;
-    }
-    
-    #alx-heading-inner-title h1 {
-        width: 100%;
-        left: 0;
-    }
-    
-    
+
     input[type=checkbox],
     input[type=radio] {
         font-size: 2em;
     }
-    
     #alx-save-load-button-container {
         width: 90%;
     }
-    
     #alx-save-load-button-container #target_form_logout,
     #alx-save-load-button-container button {
         font-size: 0.9rem;
     }
-    
     #alx-main-inner-title {
         font-size: 16px;
     }
-    
     label {
         font-size: 16px;
     }
-    
     .pure-form select:focus,
     .pure-form textarea:focus,
     .pure-form input:focus {
         font-size: 16px;
         background: #eee;
     }
-    
     .pure-form input[type=password],
     .pure-form input[type=email],
     .pure-form input[type=url],
@@ -315,66 +300,53 @@ TEMPLATE - BASIC
     .pure-form textarea {
         font-size: 16px;
     }
-
     .nwc-dialog {
         width: 90%;
     }
-
     .nwc-dialog button {
         width: 100%;
         margin-top: 10px;
     }
-
     .alx-form-element {
         position: relative;
     }
-
     .alx-css-checkbox-parent {
         display: block;
     }
-
     .alx-css-checkbox {
         width: 10%;
         float: left;
         height: 40px;
         display: table;
     }
-
     .alx-css-checkbox-label {
         width: 90%;
         float: right;
     }
-
     .alx-css-checkbox-parent::after {
         content: "";
         clear: both;
         display: table;
     }
-
     input[type=checkbox] {
         transform: scale(1.5);
         margin-top: 7px;
     }
-
-    .alx-template-basic-page-top-navbar ul {
+    .alx-template-default-page-top-navbar ul {
         width: 100%;
     }
-
-    .alx-template-basic-page-top-navbar ul li {
+    .alx-template-default-page-top-navbar ul li {
         border-top: 1px solid #e0e0e0;
         min-height: 24px;
         display: block;
         width: 100%;
     }
-
     #alx-save-load-button-container {
         display: none;
     }
-
-    .alx-template-basic-page-bottom-navbar button {
+    .alx-template-default-page-bottom-navbar button {
         width: 45%;
     }
-
     .alx-checkbox .pure-u,
     .alx-checkbox .pure-u-1,
     .alx-checkbox .pure-u-1-1,
@@ -425,11 +397,9 @@ TEMPLATE - BASIC
         width: 50%;
         margin-bottom: 1em;
     }
-
     .alx-checkbox .alx-form-label-wrapper {
         word-break: break-all;
     }
-
     .alx-checkbox .alx-form-input-wrapper {
         text-align: center;
     }
