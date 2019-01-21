@@ -17,7 +17,7 @@ class FormEvents {
         this.EVENT_VALIDATE_TARGET_GROUP_FIELDS = 'alx-event-validate-target-group-fields';
         this.EVENT_VALIDATE_FORM = 'alx-event-validate-form';
         this.EVENT_FORM_VALIDATED = 'alx-event-form-validated';
-        this.EVENT_SUBMIT_FORM = 'alx-event-change-pagination';
+        this.EVENT_TRY_TO_SUBMIT_FORM = 'alx-event-try-to-submit-form';
         this.EVENT_MOVE_TO_ELEM_PAGE = 'alx-event-move-to-elem-page';
         this.EVENT_BACKEND_ERRORED = 'alx-event-backend-errored';
         this.EVENT_AJAX_FETCHING_TARGET_DETAILS = 'alx-event-fetch-target-details';
@@ -27,6 +27,8 @@ class FormEvents {
         this.EVENT_SYNC_LOOKUP_FIELD = 'alx-event-sync-lookup-field';
         this.EVENT_SWITCHED_TO_EDITMODE = 'alx-event-switched-to-editmode';
         this.EVENT_CHANGE_FIELD_TYPE = 'alx-event-change-field-type';
+        this.EVENT_SUBMIT_FORM = 'alx-event-do-form-submission';
+        this.EVENT_BEFORE_FORM_SUBMISSION = 'alx-event-before-form-submission';
 
         this.$form = this.QUICK_SELECTOR.getForm();
 
@@ -45,6 +47,7 @@ class FormEvents {
         this._initAjaxTargetListFetchedListener();
         this._initAjaxTargetDetailsFetchedListener();
         this._initBackendErroredListener();
+        this._initFormSubmitListener();
     }
 
     _initStateChangedListener () {
@@ -62,9 +65,8 @@ class FormEvents {
     }
 
     _initSubmitFormListener () {
-        this.$form.on(this.EVENT_SUBMIT_FORM, _event => {
+        this.$form.on(this.EVENT_TRY_TO_SUBMIT_FORM, _event => {
             _event.preventDefault();
-
             this.$form.trigger(this.EVENT_VALIDATE_FORM, [true]);
         });
     }
@@ -74,12 +76,25 @@ class FormEvents {
             _event.preventDefault();
 
             if (!_bIsValid) {
+                console.log(_$erroredElems);
                 return this.$form.trigger(this.EVENT_MOVE_TO_ELEM_PAGE, [_$erroredElems.eq(0)]);
             }
 
             if (_bForSubmission) {
-                return this.$form.submit();
+                this.$form.trigger(this.EVENT_BEFORE_FORM_SUBMISSION);
+
+                return setTimeout(() => {
+                    return this.$form.trigger(this.EVENT_SUBMIT_FORM);
+                }, 50);
             }
+        });
+    }
+
+    _initFormSubmitListener () {
+        this.$form.on(this.EVENT_SUBMIT_FORM, _event => {
+            _event.preventDefault();
+
+            return this.$form.submit();
         });
     }
 
@@ -135,7 +150,7 @@ class FormEvents {
             EVENT_VALIDATE_TARGET_GROUP_FIELDS: this.EVENT_VALIDATE_TARGET_GROUP_FIELDS,
             EVENT_VALIDATE_FORM: this.EVENT_VALIDATE_FORM,
             EVENT_FORM_VALIDATED: this.EVENT_FORM_VALIDATED,
-            EVENT_SUBMIT_FORM: this.EVENT_SUBMIT_FORM,
+            EVENT_TRY_TO_SUBMIT_FORM: this.EVENT_TRY_TO_SUBMIT_FORM,
             EVENT_MOVE_TO_ELEM_PAGE: this.EVENT_MOVE_TO_ELEM_PAGE,
             EVENT_BACKEND_ERRORED: this.EVENT_BACKEND_ERRORED,
             EVENT_AJAX_FETCHING_TARGET_DETAILS: this.EVENT_AJAX_FETCHING_TARGET_DETAILS,
@@ -144,7 +159,9 @@ class FormEvents {
             EVENT_AJAX_TARGET_LIST_FETCHED: this.EVENT_AJAX_TARGET_LIST_FETCHED,
             EVENT_SYNC_LOOKUP_FIELD: this.EVENT_SYNC_LOOKUP_FIELD,
             EVENT_SWITCHED_TO_EDITMODE: this.EVENT_SWITCHED_TO_EDITMODE,
-            EVENT_CHANGE_FIELD_TYPE: this.EVENT_CHANGE_FIELD_TYPE
+            EVENT_CHANGE_FIELD_TYPE: this.EVENT_CHANGE_FIELD_TYPE,
+            EVENT_SUBMIT_FORM: this.EVENT_SUBMIT_FORM,
+            EVENT_BEFORE_FORM_SUBMISSION: this.EVENT_BEFORE_FORM_SUBMISSION
         };
     }
 

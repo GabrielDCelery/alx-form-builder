@@ -102,7 +102,7 @@ class Paginator {
         _$submitButton.on('click', _event => {
             _event.preventDefault();
 
-            this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_SUBMIT_FORM);
+            this.FORM_EVENTS.trigger(this.FORM_EVENTS.EVENT_TRY_TO_SUBMIT_FORM);
         });
 
         return _$submitButton;

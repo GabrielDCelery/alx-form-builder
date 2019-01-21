@@ -12,9 +12,16 @@ class FieldValueSetter {
             return;
         }
 
-        if (_$field.is('textarea') || _$field.is('input')) {
+        const _fieldValue = _$field.val();
+
+        if (_fieldValue === '' || _.isNil(_fieldValue)) {
             return _$field.val(_value);
         }
+        /*
+        if (_$field.is('textarea') || _$field.is('input') || _$field.is('select')) {
+            return _$field.val(_value);
+        }
+        */
     }
 }
 
