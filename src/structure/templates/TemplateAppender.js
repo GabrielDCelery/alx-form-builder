@@ -7,6 +7,8 @@ require('./css/alx-general.css');
 require('./css/alx-template-default.css');
 require('./css/alx-template-vertical-1.css');
 
+const labeler = require('../../helpers/labeler');
+
 const TEMPLATES = {
     default: require('./config/alx-template-default.json'),
     vertical1: require('./config/alx-template-vertical-1.json')
@@ -160,6 +162,12 @@ class TemplateAppender {
     decorateNavBarsWithClasses () {
         this._decorateElemsWithClasses(this.QUICK_SELECTOR.getElemById(this.DECORATOR_ID_PAGE_NAVIGATION_TOP_CONTAINER), this.template.classes.page.navBar.top.container);
         this._decorateElemsWithClasses(this.QUICK_SELECTOR.getElemById(this.DECORATOR_ID_PAGE_NAVIGATION_BOTTOM_CONTAINER), this.template.classes.page.navBar.bottom.container);
+
+        return this;
+    }
+
+    decoratePluginsWithClasses () {
+        this._decorateElemsWithClasses(this.QUICK_SELECTOR.getElemById(labeler.get('ID_STICKY_NOTE')), this.template.classes.plugins.stickyNote);
 
         return this;
     }

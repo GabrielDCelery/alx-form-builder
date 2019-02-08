@@ -113,7 +113,7 @@ $(document).ready(() => {
         DECORATOR_CLASS_GROUP_DESCRIPTION: DECORATOR_CLASS_GROUP_DESCRIPTION,
         DECORATOR_CLASS_BACKEND_ERROR: DECORATOR_CLASS_BACKEND_ERROR,
         DECORATOR_CLASS_INPUT_TYPE_CHECKBOX: DECORATOR_CLASS_INPUT_TYPE_CHECKBOX
-    }).build(config.template, config.structure, config.content);
+    }).build(config.template, config.structure, config.content, config.plugins);
 
     new StateCoordinator({
         DependencyInjector: DependencyInjector,

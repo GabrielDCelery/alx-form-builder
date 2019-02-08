@@ -96,7 +96,9 @@ TEMPLATE - BASIC
 /* MAIN */
 
 .alx-template-default-page-main {
-    width: 50%;
+    width: 100%;
+    padding-left: 25%;
+    padding-right: 25%;
     margin: 0 auto;
     margin-top: 2vh;
 }
@@ -160,22 +162,35 @@ TEMPLATE - BASIC
     margin-top: 0.5rem;
 }
 
+.alx-template-default-sticky-note {
+    position: absolute;
+    top: 0;
+    left: 77%;
+}
+
 /* MOBILE FRIENDLY QUICK HACK */
 
 @media only screen and (min-width: 1201px) and (max-width: 1366px) {
     .alx-template-default-page-main {
-        width: 70%;
+        width: 100%;
+        padding-left: 15%;
+        padding-right: 15%;
     }
 
     .alx-template-default-page-heading-title h1 {
         font-size: 1.5em;
     }
     
+    .alx-template-default-sticky-note {
+        display: none;
+    }
 }
 
 @media only screen and (max-width: 1200px) {
     .alx-template-default-page-main {
-        width: 96%;
+        width: 100%;
+        padding-left: 2%;
+        padding-right: 2%;
     }
     .alx-form-element {
         width: 96%;
@@ -402,5 +417,9 @@ TEMPLATE - BASIC
     }
     .alx-checkbox .alx-form-input-wrapper {
         text-align: center;
+    }
+
+    .alx-template-default-sticky-note {
+        display: none;
     }
 }

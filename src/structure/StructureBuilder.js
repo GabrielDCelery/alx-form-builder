@@ -6,6 +6,8 @@ const NestedGroupsGenerator = require('./layout/NestedGroupsGenerator');
 const TemplateAppender = require('./templates/TemplateAppender');
 const FieldTypeFactory = require('./fieldTypes/FieldTypeFactory');
 const ContentInjectorFactory = require('./contentInjectors/ContentInjectorFactory');
+const StickyNote = require('./plugins/StickyNote');
+const labeler = require('../helpers/labeler');
 
 const DEFAULT_MULTIPLE_GROUPS_CONFIG = {
     headings: [],
@@ -59,6 +61,7 @@ class StructureBuilder {
         this.nestedGroupsGenerator = new NestedGroupsGenerator(_dependencies);
         this.templateAppender = new TemplateAppender(_dependencies);
         this.contentInjectorFactory = new ContentInjectorFactory(_dependencies);
+        this.stickyNote = new StickyNote();
 
         _dependencies.CONTENT_INJECTOR_FACTORY = this.contentInjectorFactory;
         _dependencies.TEMPLATE_APPENDER = this.templateAppender;
@@ -102,6 +105,14 @@ class StructureBuilder {
         _pageContentInjector.injectSaveAndLoadButtonContainer();
         _pageContentInjector.injectFooter(_pageConfig.footer);
         _pageContentInjector.moveButtons();
+    }
+
+    _initContentPlugins (_pluginConfig) {
+        if (_pluginConfig.stickyNote) {
+            this.contentInjectorFactory.getInjector('plugin')
+                .injectStickyNote(_pluginConfig.stickyNote.type, _pluginConfig.stickyNote.value);
+            this.stickyNote.init(`#${labeler.get('ID_STICKY_NOTE')}`);
+        }
     }
 
     _doMultipleGroupModifications () {
@@ -181,7 +192,7 @@ class StructureBuilder {
         });
     }
 
-    build (_template, _structureConfig = {}, _contentConfig = {}) {
+    build (_template, _structureConfig = {}, _contentConfig = {}, _pluginConfig = {}) {
         this.templateAppender.setTemplate(_template);
 
         this.nestedGroupsGenerator
@@ -205,6 +216,8 @@ class StructureBuilder {
         this._doSingleGroupModifications();
         this._doSingleFieldModifications();
 
+        this._initContentPlugins(_pluginConfig);
+
         this.templateAppender
             .decorateBodyAndHtml()
             .decorateFormWithClasses()
@@ -214,7 +227,8 @@ class StructureBuilder {
             .decorateMainWithClasses()
             .decorateGroupsWithClasses()
             .decorateBackendErrorMessagesWithClasses()
-            .decorateNavBarsWithClasses();
+            .decorateNavBarsWithClasses()
+            .decoratePluginsWithClasses();
 
         this._initGlobalEventListeners();
 

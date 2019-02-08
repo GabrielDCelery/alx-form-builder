@@ -16,6 +16,8 @@ class Labeler {
         this.CLASS_PAGE_NAV_MENU_ITEM = 'alx-page-nav-menu-item';
         this.CLASS_PAGE_NAV_MENU_ITEM_ACTIVE = 'alx-page-nav-menu-item-active';
         this.CLASS_STATE_ACTIVE = 'alx-state-active';
+        this.ID_STICKY_NOTE = 'alx-sticky-note';
+        this.ID_MAIN = 'alx-main';
 
         this.get = this.get.bind(this);
     }

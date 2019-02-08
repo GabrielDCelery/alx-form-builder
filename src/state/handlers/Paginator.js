@@ -19,7 +19,7 @@ const LOCAL_DATA_PAGE_ID = 'alx-page-id';
 const LOCAL_DATA_PAGE_LABEL = 'alx-page-label';
 
 const LOCAL_ANIMATION_DURATION_UNINITALIZED = 0;
-const LOCAL_ANIMATION_DURATION_INITIALIZED = 300;
+const LOCAL_ANIMATION_DURATION_INITIALIZED = 500;
 const LOCAL_ANIMATION_HIDE = 'fadeOut';
 const LOCAL_ANIMATION_SHOW = 'fadeIn';
 
@@ -206,6 +206,7 @@ class Paginator {
     _moveToPage (_pageId) {
         if (_pageId) {
             this._setActivePage(_pageId);
+            this.QUICK_SELECTOR.getWindow().scrollTop('slow');
         }
 
         this._setActiveTab();

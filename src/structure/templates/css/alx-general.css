@@ -130,3 +130,7 @@ form {
 .alx-backend-error ul {
     list-style: none;
 }
+
+#alx-main {
+    position: relative;
+}

@@ -49,6 +49,9 @@
                 "list": [],
                 "listItem": []
             }
+        },
+        "plugins": {
+            "stickyNote": []
         }
     }
 }

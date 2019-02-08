@@ -6,7 +6,7 @@ window.alx_dynamic_form_config = {
         parent: 8,
         children: []
     },
-    template: 'vertical1',
+    template: 'default',
     styling: {
         colours: {
             simple: {
@@ -47,6 +47,10 @@ window.alx_dynamic_form_config = {
         },
         urlLookup: {
             id: 'id_field_reference_number'
+        },
+        stickyNote: {
+            type: 'html',
+            value: '<div id="contact-us-sticky-note" class="custom-text"><p>Contact your onboarder:</p><p><a href="https://dev-onboardingatallegis.autologyx.com/portal/my-account/contact-details/" target="_blank">CLICK HERE</a></p></div>'
         }
     },
     structure: {
@@ -278,7 +282,7 @@ window.alx_dynamic_form_config = {
     },
     content: {
         page: {
-            logo: "https://vignette.wikia.nocookie.net/logopedia/images/9/9a/TMobile.png/revision/latest?cb=20121115030133",
+            logo: "",
             title: "Engine Warranty Intake Form"
         },
         multiple: {

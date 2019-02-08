@@ -96,6 +96,11 @@
                 "list": [],
                 "listItem": []
             }
+        },
+        "plugins": {
+            "stickyNote": [
+                "alx-template-default-sticky-note"
+            ]
         }
     }
 }

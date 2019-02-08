@@ -6,22 +6,22 @@ const labeler = require('../../../helpers/labeler');
 class _ContentInjectorInterface {
     _generateContent (_type, _value, _plainTextWrapper) {
         if (_type === 'text') {
-            return this.$(`<${_plainTextWrapper}>${_value}</${_plainTextWrapper}>`).addClass(labeler.get('CLASS_INJECTED_CONTENT_TEXT'));
+            return $(`<${_plainTextWrapper}>${_value}</${_plainTextWrapper}>`).addClass(labeler.get('CLASS_INJECTED_CONTENT_TEXT'));
         }
 
         if (_type === 'html') {
-            return this.$(_value).addClass(labeler.get('CLASS_INJECTED_CONTENT_HTML'));
+            return $(_value).addClass(labeler.get('CLASS_INJECTED_CONTENT_HTML'));
         }
 
         if (_type === 'img') {
             const _imgSrc = _value.indexOf('http') === -1 ? `data:image/png;base64, ${_value}` : _value;
 
-            return this.$(`<img src="${_imgSrc}"></div>`);
+            return $(`<img src="${_imgSrc}"></div>`);
         }
     }
 
     _generateWrapperDiv (_id) {
-        const _$div = this.$('<div/>');
+        const _$div = $('<div/>');
 
         if (_id) {
             _$div.attr('id', _id);

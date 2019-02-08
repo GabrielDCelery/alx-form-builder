@@ -98,6 +98,10 @@ class QuickSelector {
         return this._getElemFromCache('body', 'body', this._getElem);
     }
 
+    getWindow () {
+        return this._getElem(window);
+    }
+
     generateIdSelector (_selector) {
         return _selector[0] === '#' ? _selector : `#${_selector}`;
     }
